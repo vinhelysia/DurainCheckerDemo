@@ -1,0 +1,407 @@
+{
+  "address": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "farmVi",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum DurianTrust.RiskLevel",
+          "name": "riskLevel",
+          "type": "uint8"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "BatchRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "stageVi",
+          "type": "string"
+        }
+      ],
+      "name": "TimelineEventAdded",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "PPM_SCALE",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "stageVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "stageEn",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "locationVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "locationEn",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "date",
+          "type": "string"
+        },
+        {
+          "internalType": "uint8",
+          "name": "status",
+          "type": "uint8"
+        }
+      ],
+      "name": "addTimelineEvent",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        }
+      ],
+      "name": "getBatch",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "farmVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "farmEn",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "provinceVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "provinceEn",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "harvestDate",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "cadmiumPpm",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "thresholdPpm",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "aiResultVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "aiResultEn",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "confidence",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DurianTrust.RiskLevel",
+          "name": "riskLevel",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "riskCauseVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riskCauseEn",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getBatchIdByTokenId",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getBatchIds",
+      "outputs": [
+        {
+          "internalType": "string[]",
+          "name": "",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRegistrant",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        }
+      ],
+      "name": "getTimeline",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "stageVi",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "stageEn",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "locationVi",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "locationEn",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "date",
+              "type": "string"
+            },
+            {
+              "internalType": "uint8",
+              "name": "status",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct DurianTrust.TimelineEvent[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        }
+      ],
+      "name": "getTokenIdByBatchId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "farmVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "farmEn",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "provinceVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "provinceEn",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "harvestDate",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "cadmiumPpm",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "thresholdPpm",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "aiResultVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "aiResultEn",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "confidence",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DurianTrust.RiskLevel",
+          "name": "riskLevel",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "riskCauseVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riskCauseEn",
+          "type": "string"
+        }
+      ],
+      "name": "registerBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]
+}
