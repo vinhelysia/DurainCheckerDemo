@@ -1,0 +1,162 @@
+:root {
+  --color-bg: #f7f2e8;
+  --color-surface: #fffdf7;
+  --color-surface-alt: #f0e9da;
+  --color-line: #e2d9c6;
+  --color-ink: #1e2a22;
+  --color-ink-soft: #57645b;
+  --color-green-deep: #1f4734;
+  --color-green-mid: #3c6e54;
+  --color-gold: #d9a441;
+  --color-gold-soft: #f3dfb3;
+  --color-ledger: #5e8e86;
+  --color-ledger-soft: #e2edea;
+  --color-risk-low: #3c6e54;
+  --color-risk-medium: #9f6427;
+  --color-risk-high: #b23b2e;
+  --color-risk-low-bg: #e7f0ea;
+  --color-risk-medium-bg: #fbeddb;
+  --color-risk-high-bg: #fbe6e2;
+  --font-display: 'Be Vietnam Pro', Inter, sans-serif;
+  --font-body: Inter, 'Be Vietnam Pro', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas,
+    monospace;
+  --fs-h1: 3.25rem;
+  --fs-h2: 2.25rem;
+  --fs-h3: 1.25rem;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --radius-card: 8px;
+  --radius-pill: 999px;
+  --shadow-card:
+    0 1px 2px rgba(31, 71, 52, 0.06),
+    0 8px 24px rgba(31, 71, 52, 0.06);
+  --shadow-elevated:
+    0 16px 44px rgba(31, 71, 52, 0.14),
+    0 4px 12px rgba(31, 71, 52, 0.08);
+
+  color: var(--color-ink);
+  background: var(--color-bg);
+  color-scheme: light;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-synthesis: none;
+  font-weight: 400;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 860px) {
+  :root {
+    --fs-h1: 2.5rem;
+    --fs-h2: 1.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --fs-h1: 2rem;
+    --fs-h2: 1.55rem;
+    --fs-h3: 1.12rem;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+body,
+button,
+input {
+  font: inherit;
+  letter-spacing: 0;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  line-height: 1.12;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  font-weight: 700;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  font-weight: 700;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--color-ink);
+  background: var(--color-gold-soft);
+}
+
+#root {
+  min-height: 100dvh;
+}

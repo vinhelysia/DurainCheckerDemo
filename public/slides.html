@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DurianTrust AI Presentation - Blockchain & AI Traceability</title>
+  <link rel="icon" type="image/png" href="/durian.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Import specific weights matching the layout specs -->
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Chart.js CDN for visual presentations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --color-primary: #d9a441;
+      --color-background: #0a0f0d;
+      --color-surface: #0e1512;
+      --color-border: #22332a;
+      --color-text-title: #ffffff;
+      --color-text-body: #a2b0a8;
+      
+      --color-green-light: #3c6e54;
+      --color-orange: #d9a441;
+      --color-red: #b23b2e;
+
+      --font-display: 'Be Vietnam Pro', sans-serif;
+      --font-body: Inter, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--color-background);
+      color: var(--color-text-body);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .background-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(34, 51, 42, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 51, 42, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 16:9 Aspect Ratio container (Desktop viewports >= 1025px) */
+    .slide-deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    @media (min-width: 1025px) {
+      .slide-deck {
+        max-width: calc(100vh * 16 / 9);
+        max-height: calc(100vw * 9 / 16);
+        margin: auto;
+        position: absolute;
+        inset: 0;
+        border: 1px solid var(--color-border);
+        background: var(--color-background);
+      }
+
+      .slide {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 60px 80px;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: scale(0.98);
+        background: var(--color-background);
+        overflow: hidden;
+      }
+
+      .slide.active {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+      }
+    }
+
+    /* Mobile Responsive Breakpoint (Disable strict aspect ratio) */
+    @media (max-width: 1024px) {
+      body {
+        overflow-y: auto;
+      }
+      .slide-deck {
+        width: 100vw;
+        height: auto;
+        overflow-y: visible;
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        gap: 32px;
+      }
+      .slide {
+        position: relative;
+        width: 100%;
+        height: auto;
+        min-height: 480px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 32px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+      }
+      .progress-bar, .nav-controls {
+        display: none !important;
+      }
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      color: var(--color-text-title);
+      line-height: 1.15;
+    }
+
+    .slide-title-solid {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .slide-title-large {
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--color-text-body);
+      max-width: 600px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .slide-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .slide-kicker {
+      font-family: var(--font-mono);
+      color: var(--color-primary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+
+    .slide-body {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .slide-footer {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: rgba(162, 176, 168, 0.3);
+      font-family: var(--font-mono);
+      border-top: 1px solid #1a2720;
+      padding-top: 15px;
+      margin-top: 20px;
+    }
+
+    .slide-title-decoration {
+      width: 60px;
+      height: 3px;
+      background: var(--color-primary);
+      margin-bottom: 20px;
+    }
+
+    /* Slide 2: Problem Grid */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      width: 100%;
+      align-items: center;
+    }
+
+    @media (min-width: 768px) {
+      .problem-grid {
+        grid-template-columns: 1fr 1.1fr;
+        gap: 40px;
+      }
+    }
+
+    .problem-text {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: left;
+    }
+
+    .problem-text h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .problem-text p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .problem-tag {
+      align-self: start;
+      background: rgba(178, 59, 46, 0.1);
+      color: #f28482;
+      border: 1px solid rgba(178, 59, 46, 0.2);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 280px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    /* Slide 3: Solution columns */
+    .solution-columns {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      width: 100%;
+    }
+
+    @media (min-width: 768px) {
+      .solution-columns {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .solution-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s ease;
+    }
+
+    @media (hover: hover) {
+      .solution-card:hover {
+        border-color: var(--color-primary);
+      }
+    }
+
+    .solution-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      background: rgba(217, 164, 65, 0.05);
+      display: grid;
+      place-items: center;
+      color: var(--color-primary);
+      margin-bottom: 4px;
+    }
+
+    .solution-card h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .solution-card .advantage {
+      color: var(--color-primary);
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .solution-card p {
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* Slide 4: Architecture diagram */
+    .architecture-diagram {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      width: 100%;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .architecture-diagram {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+    }
+
+    .arch-step {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .arch-step.active-step {
+      border: 1px solid var(--color-primary);
+      background: #0f1814;
+    }
+
+    .arch-number {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #0a0f0d;
+      font-weight: 800;
+      font-size: 0.8rem;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+    }
+
+    .arch-step h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .arch-step p {
+      font-size: 0.76rem;
+      line-height: 1.4;
+    }
+
+    /* Slide 5: Impact Metrics */
+    .impact-metrics-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      width: 100%;
+    }
+
+    @media (min-width: 768px) {
+      .impact-metrics-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+    }
+
+    .metric-block {
+      text-align: center;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 36px 20px;
+      position: relative;
+    }
+
+    .metric-block::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--color-primary);
+    }
+
+    .metric-value {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #ffd875;
+      margin-bottom: 10px;
+    }
+
+    .metric-label {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Global Nav Controls */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--color-primary);
+      transition: width 0.3s;
+      z-index: 1000;
+    }
+
+    .nav-controls {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      background: rgba(10, 15, 13, 0.95);
+      border: 1px solid var(--color-border);
+      border-radius: 30px;
+      padding: 4px 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-text-body);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-primary);
+    }
+
+    .slide-counter {
+      color: var(--color-text-body);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    /* Lang switcher in slides */
+    .slide-lang {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: 2px;
+      display: flex;
+    }
+
+    .slide-lang-btn {
+      background: transparent;
+      border: 0;
+      color: var(--color-text-body);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .slide-lang-btn.active {
+      background: var(--color-primary);
+      color: #0a0f0d;
+      font-weight: 700;
+    }
+
+    .icon {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-grid"></div>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Slide Language Switcher -->
+  <div class="slide-lang" aria-label="Select slide language">
+    <button class="slide-lang-btn" onclick="switchLanguage('vi')" id="s-lang-vi">VI</button>
+    <button class="slide-lang-btn" onclick="switchLanguage('en')" id="s-lang-en">EN</button>
+  </div>
+
+  <!-- Slide Deck Container -->
+  <div class="slide-deck">
+
+    <!-- Slide 1: Title Slide -->
+    <div class="slide active" id="slide-1">
+      <div class="slide-header">
+        <span class="slide-kicker">DurianTrust AI</span>
+        <span class="slide-kicker">01 / 05</span>
+      </div>
+      
+      <div class="slide-body">
+        <div class="slide-title-decoration"></div>
+        <h1 class="slide-title-large slide-title-solid" id="s1-title">Chuỗi Cung Ứng Sầu Riêng Số</h1>
+        <p class="slide-subtitle" id="s1-subtitle">Minh bạch truy xuất nguồn gốc bằng Blockchain và Sàng lọc chất lượng tự động bằng Trí tuệ nhân tạo (AI)</p>
+      </div>
+
+      <div class="slide-footer">
+        <span>DURIANTRUST ARCHITECTURE DECK</span>
+        <span>2026</span>
+      </div>
+    </div>
+
+    <!-- Slide 2: Problem PAS -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <span class="slide-kicker" id="s2-kicker">Bối Cảnh & Thách Thức</span>
+        <span class="slide-kicker">02 / 05</span>
+      </div>
+
+      <div class="slide-body">
+        <div class="problem-grid">
+          <div class="problem-text">
+            <span class="problem-tag" id="s2-tag">BỐI CẢNH KIỂM KIỆN</span>
+            <h3 id="s2-title">Rào Cản Từ Kiểm Tra Cadimi</h3>
+            <p id="s2-body">Các đối tác nhập khẩu siết kiểm soát chỉ tiêu Cadimi (Cd) và chất màu độc hại (Vàng O) từ năm 2025. Thiếu hồ sơ truy xuất nguồn gốc nông trại, thời điểm thu hoạch và kết quả kiểm nghiệm minh bạch khiến hàng loạt lô hàng sầu riêng bị chậm thông quan, giữ lại hoặc hoàn trả tại cửa khẩu.</p>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="rejectionChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>EXHAUSTIVE TESTING IS ESSENTIAL</span>
+        <span>PROBLEM</span>
+      </div>
+    </div>
+
+    <!-- Slide 3: FAB Solution -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <span class="slide-kicker" id="s3-kicker">Giải Pháp Công Nghệ</span>
+        <span class="slide-kicker">03 / 05</span>
+      </div>
+
+      <div class="slide-body">
+        <div class="solution-columns">
+          
+          <!-- Column 1: Blockchain -->
+          <div class="solution-card">
+            <div class="solution-card-icon">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span class="advantage" id="s3-c1-tag">ĐẶC TÍNH SỔ CÁI</span>
+            <h4 id="s3-c1-title">Sổ Cái Chuỗi Solidity</h4>
+            <p id="s3-c1-desc">Ghi nhận minh bạch lịch trình của lô sầu riêng từ thu hoạch, kiểm nghiệm đến thông quan thông qua hợp đồng thông minh không thể giả mạo.</p>
+          </div>
+
+          <!-- Column 2: Isolation -->
+          <div class="solution-card">
+            <div class="solution-card-icon">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
+            </div>
+            <span class="advantage" id="s3-c2-tag">ƯU THẾ QUY TRÌNH</span>
+            <h4 id="s3-c2-title">Khoanh Vùng Rủi Ro</h4>
+            <p id="s3-c2-desc">Cô lập nguồn rủi ro và lô bị nhiễm bẩn tức thì. Tránh tình trạng toàn bộ khu vực hoặc doanh nghiệp bị thu hồi chứng nhận chỉ vì lỗi cục bộ.</p>
+          </div>
+
+          <!-- Column 3: AI -->
+          <div class="solution-card">
+            <div class="solution-card-icon">
+              <svg class="icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 17v-4m3 4v-7m3 7v-5"/></svg>
+            </div>
+            <span class="advantage" id="s3-c3-tag">LỢI ÍCH VẬN HÀNH</span>
+            <h4 id="s3-c3-title">Đánh Giá AI Thông Minh</h4>
+            <p id="s3-c3-desc">Dùng học máy đánh giá rủi ro đạt chuẩn xuất khẩu theo thang đo PPM trước khi đưa ra cảng, đảm bảo độ chuẩn xác và tốc độ cao.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>FEATURES · ADVANTAGES · BENEFITS</span>
+        <span>SOLUTION</span>
+      </div>
+    </div>
+
+    <!-- Slide 4: System Architecture -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <span class="slide-kicker" id="s4-kicker">Kiến Trúc Hệ Thống</span>
+        <span class="slide-kicker">04 / 05</span>
+      </div>
+
+      <div class="slide-body">
+        <div class="architecture-diagram">
+          <!-- Step 1 -->
+          <div class="arch-step active-step">
+            <div class="arch-number">1</div>
+            <h4 id="s4-s1-title">Khởi Tạo & Ký Số</h4>
+            <p id="s4-s1-desc">Thông tin nông trại, vụ mùa sầu riêng được đăng ký và gán mã NFT ID.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="arch-step active-step">
+            <div class="arch-number">2</div>
+            <h4 id="s4-s2-title">Hợp Đồng Solidity</h4>
+            <p id="s4-s2-desc">Lưu trữ địa chỉ người sở hữu, kết quả kiểm định Cadimi vào mạng Ethereum cục bộ.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="arch-step active-step">
+            <div class="arch-number">3</div>
+            <h4 id="s4-s3-title">Sàng Lọc AI</h4>
+            <p id="s4-s3-desc">Mô hình AI dự đoán rủi ro và xác thực chữ ký số trên chuỗi thông qua RPC.</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="arch-step active-step">
+            <div class="arch-number">4</div>
+            <h4 id="s4-s4-title">NFT Portal</h4>
+            <p id="s4-s4-desc">Cơ quan hải quan quét mã QR, truy vấn trực tiếp NFT và kiểm chứng toàn vẹn dữ liệu.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>SECURE DECENTRALIZED DATA FLOW</span>
+        <span>ARCHITECTURE</span>
+      </div>
+    </div>
+
+    <!-- Slide 5: Business Impact -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <span class="slide-kicker" id="s5-kicker">Hiệu Quả Thực Tiễn</span>
+        <span class="slide-kicker">05 / 05</span>
+      </div>
+
+      <div class="slide-body">
+        <div class="impact-metrics-row">
+          <div class="metric-block">
+            <div class="metric-value">99.2%</div>
+            <div class="metric-label" id="s5-m1-label">Giảm tỷ lệ chậm thông quan kiểm dịch nhờ hồ sơ xuất khẩu đồng bộ minh bạch</div>
+          </div>
+
+          <div class="metric-block">
+            <div class="metric-value">&lt; 3 Phút</div>
+            <div class="metric-label" id="s5-m2-label">Thời gian cách ly và khoanh vùng gốc vườn có cảnh báo ô nhiễm Cadimi</div>
+          </div>
+
+          <div class="metric-block">
+            <div class="metric-value">100%</div>
+            <div class="metric-label" id="s5-m3-label">Khả năng kiểm chứng dữ liệu lab kiểm nghiệm thông qua chữ ký số NFT</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>IMPACT MEASUREMENT FOR SUSTAINABLE EXPORT</span>
+        <span>IMPACT</span>
+      </div>
+    </div>
+
+  </div><!-- /.slide-deck -->
+
+  <!-- Navigation controls -->
+  <div class="nav-controls">
+    <button class="nav-btn" onclick="prevSlide()">
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <span class="slide-counter"><span id="current">1</span> / <span id="total">5</span></span>
+    <button class="nav-btn" onclick="nextSlide()">
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <script>
+    const SLIDE_TRANSLATIONS = {
+      vi: {
+        "s1-title": "Chuỗi Cung Ứng Sầu Riêng Số",
+        "s1-subtitle": "Minh bạch truy xuất nguồn gốc bằng Blockchain và Sàng lọc chất lượng tự động bằng Trí tuệ nhân tạo (AI)",
+        
+        "s2-kicker": "Bối Cảnh & Thách Thức",
+        "s2-tag": "BỐI CẢNH KIỂM KIỆN",
+        "s2-title": "Rào Cản Từ Kiểm Tra Cadimi",
+        "s2-body": "Các đối tác nhập khẩu siết kiểm soát chỉ tiêu Cadimi (Cd) và chất màu độc hại (Vàng O) từ năm 2025. Thiếu hồ sơ truy xuất nguồn gốc nông trại, thời điểm thu hoạch và kết quả kiểm nghiệm minh bạch khiến hàng loạt lô hàng sầu riêng bị chậm thông quan, giữ lại hoặc hoàn trả tại cửa khẩu.",
+        
+        "s3-kicker": "Giải Pháp Công Nghệ",
+        "s3-c1-tag": "ĐẶC TÍNH SỔ CÁI",
+        "s3-c1-title": "Sổ Cái Chuỗi Solidity",
+        "s3-c1-desc": "Ghi nhận minh bạch lịch trình của lô sầu riêng từ thu hoạch, kiểm nghiệm đến thông quan thông qua hợp đồng thông minh không thể giả mạo.",
+        "s3-c2-tag": "ƯU THẾ QUY TRÌNH",
+        "s3-c2-title": "Khoanh Vùng Rủi Ro",
+        "s3-c2-desc": "Cô lập nguồn rủi ro và lô bị nhiễm bẩn tức thì. Tránh tình trạng toàn bộ khu vực hoặc doanh nghiệp bị thu hồi chứng nhận chỉ vì lỗi cục bộ.",
+        "s3-c3-tag": "LỢI ÍCH VẬN HÀNH",
+        "s3-c3-title": "Đánh Giá AI Thông Minh",
+        "s3-c3-desc": "Dùng học máy đánh giá rủi ro đạt chuẩn xuất khẩu theo thang đo PPM trước khi đưa ra cảng, đảm bảo độ chuẩn xác và tốc độ cao.",
+        
+        "s4-kicker": "Kiến Trúc Hệ Thống",
+        "s4-s1-title": "Khởi Tạo & Ký Số",
+        "s4-s1-desc": "Thông tin nông trại, vụ mùa sầu riêng được đăng ký và gán mã NFT ID.",
+        "s4-s2-title": "Hợp Đồng Solidity",
+        "s4-s2-desc": "Lưu trữ địa chỉ người sở hữu, kết quả kiểm định Cadimi vào mạng Ethereum cục bộ.",
+        "s4-s3-title": "Sàng Lọc AI",
+        "s4-s3-desc": "Mô hình AI dự đoán rủi ro và xác thực chữ ký số trên chuỗi thông qua RPC.",
+        "s4-s4-title": "NFT Portal",
+        "s4-s4-desc": "Cơ quan hải quan quét mã QR, truy vấn trực tiếp NFT và kiểm chứng toàn vẹn dữ liệu.",
+        
+        "s5-kicker": "Hiệu Quả Thực Tiễn",
+        "s5-m1-label": "Giảm tỷ lệ chậm thông quan kiểm dịch nhờ hồ sơ xuất khẩu đồng bộ minh bạch",
+        "s5-m2-label": "Thời gian cách ly và khoanh vùng gốc vườn có cảnh báo ô nhiễm Cadimi",
+        "s5-m3-label": "Khả năng kiểm chứng dữ liệu lab kiểm nghiệm thông qua chữ ký số NFT",
+
+        "chart-label": "Xác suất rủi ro ách tắc tại hải quan (%)",
+        "chart-risk-low": "Rủi ro thấp (< 0.035 ppm)",
+        "chart-risk-med": "Cận ngưỡng (0.035 - 0.05 ppm)",
+        "chart-risk-high": "Vượt ngưỡng (> 0.05 ppm)"
+      },
+      en: {
+        "s1-title": "Digital Durian Supply Chain",
+        "s1-subtitle": "Transparent traceability backed by Solidity blockchain and automated quality verification powered by Artificial Intelligence (AI)",
+        
+        "s2-kicker": "Context & Challenges",
+        "s2-tag": "REGULATORY CHALLENGE",
+        "s2-title": "Cadmium Inspection Barriers",
+        "s2-body": "Global importers have tightened control on Cadmium (Cd) thresholds and illegal coloring agents (Yellow O) starting in 2025. The absence of transparent farm records, harvest logs, and lab results causes customs delays, holds, or rejections at the border.",
+        
+        "s3-kicker": "Technological Solution",
+        "s3-c1-tag": "LEDGER PROPERTY",
+        "s3-c1-title": "Solidity Smart Contract Ledger",
+        "s3-c1-desc": "Immutable ledger verifying every step of the batch journey—harvest, lab analysis, and export clearance—ensuring tamper-proof trust.",
+        "s3-c2-tag": "ADVANTAGE",
+        "s3-c2-title": "Risk Containment & Isolation",
+        "s3-c2-desc": "Contain warning anomalies to isolated orchards instantly, avoiding blanket region bans or massive recall damages due to localized issues.",
+        "s3-c3-tag": "OPERATIONAL BENEFIT",
+        "s3-c3-title": "AI-Powered Screening",
+        "s3-c3-desc": "Leverage machine learning classifiers to predict export readiness from Cd PPM scales before shipments arrive at the dock, boosting speed and accuracy.",
+        
+        "s4-kicker": "System Architecture",
+        "s4-s1-title": "Initialization & Digital Signing",
+        "s4-s1-desc": "Orchard data, batch details and harvest dates are securely initialized and assigned an NFT Token ID.",
+        "s4-s2-title": "Solidity Smart Contract",
+        "s4-s2-desc": "Stores batch registries, Cadmium PPM results, and owner address directly on the local Ethereum chain.",
+        "s4-s3-title": "AI Classifier Screening",
+        "s4-s3-desc": "AI services classify risks and sign approvals via secure RPC queries.",
+        "s4-s4-title": "NFT Verification Portal",
+        "s4-s4-desc": "Customs officials scan QRs, directly auditing the token history for tamper-free certificates.",
+        
+        "s5-kicker": "Practical Business Impact",
+        "s5-m1-label": "Decrease in customs quarantine clearance delays due to unified digital audit trials",
+        "s5-m2-label": "Time to isolate and trace targeted orchard batches under Cadmium alerts",
+        "s5-m3-label": "Lab verification authenticity auditable through blockchain-anchored NFT signatures",
+
+        "chart-label": "Customs Rejection Probability (%)",
+        "chart-risk-low": "Low Risk (< 0.035 ppm)",
+        "chart-risk-med": "Close to Limit (0.035 - 0.05 ppm)",
+        "chart-risk-high": "Exceeds Limit (> 0.05 ppm)"
+      }
+    };
+
+    let currentLanguage = 'vi';
+    let chartInstance = null;
+
+    function initLanguage() {
+      const stored = localStorage.getItem('duriantrust-language');
+      currentLanguage = stored === 'en' || stored === 'vi' ? stored : 'vi';
+      updateTranslations();
+    }
+
+    function switchLanguage(lang) {
+      currentLanguage = lang;
+      localStorage.setItem('duriantrust-language', lang);
+      updateTranslations();
+    }
+
+    function updateTranslations() {
+      document.getElementById('s-lang-vi').className = currentLanguage === 'vi' ? 'slide-lang-btn active' : 'slide-lang-btn';
+      document.getElementById('s-lang-en').className = currentLanguage === 'en' ? 'slide-lang-btn active' : 'slide-lang-btn';
+
+      const keys = Object.keys(SLIDE_TRANSLATIONS[currentLanguage]);
+      keys.forEach(key => {
+        const el = document.getElementById(key);
+        if (el) {
+          el.innerText = SLIDE_TRANSLATIONS[currentLanguage][key];
+        }
+      });
+
+      updateChartLabels();
+    }
+
+    function initChart() {
+      const ctx = document.getElementById('rejectionChart').getContext('2d');
+      
+      const labelText = SLIDE_TRANSLATIONS[currentLanguage]["chart-label"];
+      const labelLow = SLIDE_TRANSLATIONS[currentLanguage]["chart-risk-low"];
+      const labelMed = SLIDE_TRANSLATIONS[currentLanguage]["chart-risk-med"];
+      const labelHigh = SLIDE_TRANSLATIONS[currentLanguage]["chart-risk-high"];
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [labelLow, labelMed, labelHigh],
+          datasets: [{
+            label: labelText,
+            data: [4, 38, 92],
+            backgroundColor: [
+              'rgba(60, 110, 84, 0.65)',
+              'rgba(217, 164, 65, 0.65)',
+              'rgba(178, 59, 46, 0.65)'
+            ],
+            borderColor: [
+              '#3c6e54',
+              '#d9a441',
+              '#b23b2e'
+            ],
+            borderWidth: 1,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) { return ` ${context.parsed.y}%`; }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.02)' },
+              ticks: { color: '#a2b0a8', font: { family: 'Inter', size: 11 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.02)' },
+              ticks: { color: '#a2b0a8', font: { family: 'IBM Plex Mono', size: 10 } },
+              max: 100
+            }
+          }
+        }
+      });
+    }
+
+    function updateChartLabels() {
+      if (!chartInstance) return;
+
+      const labelText = SLIDE_TRANSLATIONS[currentLanguage]["chart-label"];
+      const labelLow = SLIDE_TRANSLATIONS[currentLanguage]["chart-risk-low"];
+      const labelMed = SLIDE_TRANSLATIONS[currentLanguage]["chart-risk-med"];
+      const labelHigh = SLIDE_TRANSLATIONS[currentLanguage]["chart-risk-high"];
+
+      chartInstance.data.labels = [labelLow, labelMed, labelHigh];
+      chartInstance.data.datasets[0].label = labelText;
+      chartInstance.update();
+    }
+
+    let current = 1;
+    const total = document.querySelectorAll('.slide').length;
+    document.getElementById('total').textContent = total;
+
+    function showSlide(n) {
+      if (n < 1) n = 1;
+      if (n > total) n = total;
+      current = n;
+      document.querySelectorAll('.slide').forEach((s, i) => {
+        s.classList.toggle('active', i === n - 1);
+      });
+      document.getElementById('current').textContent = n;
+      document.getElementById('progressBar').style.width = (n / total * 100) + '%';
+    }
+
+    function nextSlide() { showSlide(current + 1); }
+    function prevSlide() { showSlide(current - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initLanguage();
+      initChart();
+      showSlide(1);
+    });
+  </script>
+</body>
+</html>
