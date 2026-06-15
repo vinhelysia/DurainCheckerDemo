@@ -18,7 +18,7 @@ function Header() {
       <div className="header-shell">
         <a className="brand" href="#top" aria-label="DurianTrust home">
           <span className="brand-mark" aria-hidden="true">
-            <img src="/durian-logo.svg" alt="" width="46" height="46" />
+            <img src="durian-logo.svg" alt="" width="46" height="46" />
           </span>
           <span>
             <strong>DurianTrust</strong>
