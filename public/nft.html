@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DurianTrust NFT Audit - Xác Thực Chuỗi Cung Ứng Sầu Riêng</title>
-  <link rel="icon" type="image/png" href="/durian.png" />
+  <link rel="icon" type="image/png" href="durian.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Import specific weights: 400 (body), 500 (medium), 600 (semi-bold mono), 700 (heading) -->
@@ -15,20 +15,20 @@
 
   <style>
     :root {
-      --bg-color: #0a0f0d;
-      --surface-color: #0e1512;
-      --border-color: #22332a;
-      --border-color-glow: rgba(217, 164, 65, 0.2);
+      --bg-color: #f7f2e8;
+      --surface-color: #ffffff;
+      --border-color: #e2d9c6;
+      --border-color-glow: rgba(31, 71, 52, 0.08);
       --gold-primary: #d9a441;
-      --text-primary: #ffffff;
-      --text-secondary: #9aa8a0;
+      --text-primary: #1e2a22;
+      --text-secondary: #57645b;
       
-      --color-risk-low: #3c6e54;
-      --color-risk-medium: #d9a441;
+      --color-risk-low: #1f4734;
+      --color-risk-medium: #9f6427;
       --color-risk-high: #b23b2e;
-      --color-risk-low-bg: rgba(60, 110, 84, 0.15);
-      --color-risk-medium-bg: rgba(217, 164, 65, 0.15);
-      --color-risk-high-bg: rgba(178, 59, 46, 0.15);
+      --color-risk-low-bg: #e7f0ea;
+      --color-risk-medium-bg: #fbeddb;
+      --color-risk-high-bg: #fbe6e2;
 
       --font-display: 'Be Vietnam Pro', sans-serif;
       --font-body: Inter, sans-serif;
@@ -57,8 +57,8 @@
       position: absolute;
       inset: 0;
       background-image: 
-        linear-gradient(rgba(34, 51, 42, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(34, 51, 42, 0.05) 1px, transparent 1px);
+        linear-gradient(rgba(31, 71, 52, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 71, 52, 0.04) 1px, transparent 1px);
       background-size: 50px 50px;
       pointer-events: none;
       z-index: 0;
@@ -68,7 +68,7 @@
       position: sticky;
       top: 0;
       z-index: 10;
-      background: rgba(10, 15, 13, 0.9);
+      background: rgba(255, 253, 247, 0.9);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-color);
     }
@@ -94,7 +94,7 @@
     .brand-logo {
       width: 40px;
       height: 40px;
-      background: #14231c;
+      background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 50%;
       display: grid;
@@ -144,7 +144,7 @@
     }
 
     .lang-switcher {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(31, 71, 52, 0.06);
       border: 1px solid var(--border-color);
       border-radius: 30px;
       padding: 4px;
@@ -166,8 +166,8 @@
     }
 
     .lang-btn.active {
-      background: var(--gold-primary);
-      color: #0a0f0d;
+      background: var(--color-risk-low);
+      color: #ffffff;
       box-shadow: none;
     }
 
@@ -195,7 +195,7 @@
       font-size: 2.2rem;
       font-weight: 700;
       margin-bottom: 12px;
-      color: #ffffff;
+      color: var(--text-primary);
     }
 
     .hero-panel p {
@@ -238,11 +238,11 @@
 
     .search-input {
       width: 100%;
-      background: rgba(0, 0, 0, 0.2);
+      background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       padding: 12px 16px 12px 48px;
-      color: #fff;
+      color: var(--text-primary);
       font-family: var(--font-mono);
       font-size: 1rem;
       font-weight: 600;
@@ -251,14 +251,14 @@
 
     .search-input:focus {
       outline: none;
-      border-color: var(--gold-primary);
+      border-color: var(--color-risk-low);
     }
 
     .search-btn {
-      background: var(--gold-primary);
+      background: var(--color-risk-low);
       border: 0;
       border-radius: 6px;
-      color: #0a0f0d;
+      color: #ffffff;
       font-family: var(--font-display);
       font-weight: 700;
       font-size: 0.95rem;
@@ -272,6 +272,7 @@
 
     .search-btn:hover {
       transform: translateY(-1px);
+      background: #173b2a;
     }
 
     .search-btn:active {
@@ -288,7 +289,7 @@
     }
 
     .search-hints span {
-      background: rgba(255, 255, 255, 0.02);
+      background: #ffffff;
       padding: 2px 8px;
       border-radius: 4px;
       font-family: var(--font-mono);
@@ -373,13 +374,13 @@
       height: 460px;
       box-sizing: border-box;
       background-color: var(--surface-color);
-      border: 1px solid var(--border-color-glow);
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 32px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 24px rgba(31, 71, 52, 0.08);
     }
 
     /* Desktop Hover Translation & Scale Spec */
@@ -419,9 +420,9 @@
       font-family: var(--font-mono);
       font-size: 0.7rem;
       font-weight: 700;
-      color: #1e2a22;
-      background: #f3dfb3;
-      border: 1px solid var(--gold-primary);
+      color: var(--color-risk-low);
+      background: var(--color-risk-low-bg);
+      border: 1px solid rgba(31, 71, 52, 0.2);
       padding: 2px 8px;
       border-radius: var(--radius-pill);
       text-transform: uppercase;
@@ -438,8 +439,8 @@
       width: 96px;
       height: 96px;
       border-radius: 50%;
-      background: #0b100d;
-      border: 1.5px solid var(--gold-primary);
+      background: #ffffff;
+      border: 2px solid var(--color-risk-low);
       display: grid;
       place-items: center;
       position: relative;
@@ -449,14 +450,14 @@
       content: "";
       position: absolute;
       inset: 4px;
-      border: 1px solid rgba(217, 164, 65, 0.15);
+      border: 1px dashed rgba(31, 71, 52, 0.3);
       border-radius: 50%;
     }
 
     .gold-stamp svg {
       width: 44px;
       height: 44px;
-      fill: var(--gold-primary);
+      fill: var(--color-risk-low);
     }
 
     .card-info {
@@ -469,7 +470,7 @@
       font-family: var(--font-display);
       font-size: 1.4rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--text-primary);
     }
 
     .card-batch-code {
@@ -481,7 +482,7 @@
 
     .card-divider {
       height: 1px;
-      background: #1a2720;
+      background: var(--border-color);
       width: 100%;
     }
 
@@ -505,7 +506,7 @@
     .card-meta-row span:last-child {
       font-family: var(--font-mono);
       font-weight: 600;
-      color: #ffffff;
+      color: var(--text-primary);
     }
 
     .card-footer {
@@ -515,7 +516,7 @@
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      border-top: 1px solid #1a2720;
+      border-top: 1px solid var(--border-color);
       padding-top: 10px;
     }
 
@@ -525,14 +526,14 @@
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 32px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 24px rgba(31, 71, 52, 0.08);
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
 
     .detail-section-header {
-      border-bottom: 1px solid #1a2720;
+      border-bottom: 1px solid var(--border-color);
       padding-bottom: 12px;
       display: flex;
       justify-content: space-between;
@@ -542,7 +543,7 @@
     .detail-section-header h3 {
       font-family: var(--font-display);
       font-size: 1.3rem;
-      color: #fff;
+      color: var(--text-primary);
     }
 
     .verification-badge {
@@ -588,14 +589,14 @@
 
     .meta-box span {
       font-weight: 600;
-      color: #fff;
+      color: var(--text-primary);
       font-size: 0.95rem;
     }
 
     .meta-box .mono-val {
       font-family: var(--font-mono);
       font-size: 0.85rem;
-      background: rgba(0,0,0,0.25);
+      background: var(--bg-color);
       padding: 4px 8px;
       border-radius: 4px;
       border: 1px solid var(--border-color);
@@ -623,7 +624,7 @@
     }
 
     .ai-score-block {
-      background: rgba(0, 0, 0, 0.2);
+      background: var(--bg-color);
       border-radius: 8px;
       border: 1px solid var(--border-color);
       padding: 20px;
@@ -678,7 +679,7 @@
 
     .meter-track {
       height: 6px;
-      background: rgba(255,255,255,0.03);
+      background: rgba(31, 71, 52, 0.08);
       border-radius: 3px;
       overflow: hidden;
     }
@@ -703,7 +704,7 @@
       grid-template-columns: 1fr auto;
       align-items: center;
       padding: 10px 0;
-      border-bottom: 1px solid #1a2720;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .test-row:last-child {
@@ -713,7 +714,7 @@
     .test-info h4 {
       font-size: 0.9rem;
       font-weight: 600;
-      color: #fff;
+      color: var(--text-primary);
     }
 
     .test-info p {
@@ -729,15 +730,15 @@
     }
 
     .test-value.pass {
-      color: #72bf96;
+      color: var(--color-risk-low);
     }
 
     .test-value.warn {
-      color: #eec170;
+      color: var(--color-risk-medium);
     }
 
     .test-value.fail {
-      color: #f28482;
+      color: var(--color-risk-high);
     }
 
     /* Error Message Panel */
@@ -746,7 +747,7 @@
       max-width: 600px;
       margin: 0 auto;
       width: 100%;
-      background: rgba(178, 59, 46, 0.05);
+      background: var(--color-risk-high-bg);
       border: 1px solid rgba(178, 59, 46, 0.2);
       border-radius: 8px;
       padding: 24px;
@@ -773,7 +774,7 @@
       font-size: 1.2rem;
       font-weight: 700;
       margin-bottom: 8px;
-      color: #fff;
+      color: var(--text-primary);
     }
 
     .error-panel p {
@@ -802,8 +803,8 @@
     .spinner {
       width: 36px;
       height: 36px;
-      border: 2px solid rgba(217, 164, 65, 0.1);
-      border-top-color: var(--gold-primary);
+      border: 2px solid rgba(31, 71, 52, 0.1);
+      border-top-color: var(--color-risk-low);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -822,14 +823,14 @@
       border-top: 1px solid var(--border-color);
       padding: 30px 24px;
       text-align: center;
-      background: #070b09;
+      background: var(--color-risk-low);
       margin-top: auto;
       z-index: 1;
     }
 
     footer p {
       font-size: 0.8rem;
-      color: var(--text-secondary);
+      color: rgba(255, 255, 255, 0.8);
     }
 
     .icon {
@@ -848,20 +849,20 @@
 
   <header>
     <div class="nav-container">
-      <a href="/" class="brand">
+      <a href="./" class="brand">
         <div class="brand-logo">
           <svg viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15.5h-2v-2h2v2zm0-4h-2v-5h2v5z"/>
           </svg>
         </div>
         <div class="brand-title">
-          <h1>DurianTrust AI</h1>
+          <h1>DurianTrust</h1>
           <p data-i18n="header.subtitle">SECURE LEDGER INTEGRATION</p>
         </div>
       </a>
       
       <div class="nav-actions">
-        <a href="/" class="btn-back">
+        <a href="./" class="btn-back">
           <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
           <span data-i18n="nav.back">Về trang chủ</span>
         </a>
@@ -876,8 +877,8 @@
 
   <main>
     <div class="hero-panel">
-      <h2 data-i18n="hero.title">NFT Sầu Riêng Phân Phối</h2>
-      <p data-i18n="hero.subtitle2">Kiểm tra tính minh bạch và chứng nhận chất lượng AI của lô hàng bằng mã NFT Token hoặc Mã Lô Hàng.</p>
+      <h2 data-i18n="hero.title">Chứng Thư Số Sầu Riêng</h2>
+      <p data-i18n="hero.subtitle2">Kiểm tra tính minh bạch và chứng nhận chất lượng AI của lô hàng bằng Mã Số Chứng Thư hoặc Mã Lô Hàng.</p>
     </div>
 
     <div class="search-container">
@@ -924,7 +925,7 @@
         <div class="nft-card" id="nft-card">
           <div class="card-header">
             <span class="card-brand-label">DURIANTRUST CERTIFICATE</span>
-            <span class="card-nft-badge" id="card-token-badge">NFT: #8801</span>
+            <span class="card-nft-badge" id="card-token-badge">Chứng thư: #8801</span>
           </div>
 
           <div class="card-visual">
@@ -966,7 +967,7 @@
       <!-- Detailed Verification Data Panel -->
       <div class="details-panel">
         <div class="detail-section-header">
-          <h3 data-i18n="detail.title">Hồ Sơ Xác Minh NFT</h3>
+          <h3 data-i18n="detail.title">Hồ Sơ Chứng Thực Sổ Cái</h3>
           <div class="verification-badge">
             <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span id="verification-status" data-i18n="detail.verified">ĐÃ XÁC MINH TRÊN CHUỖI</span>
@@ -975,7 +976,7 @@
 
         <div class="grid-2col">
           <div class="meta-box">
-            <label data-i18n="detail.owner">Chủ sở hữu NFT (Đăng ký viên)</label>
+            <label data-i18n="detail.owner">Đơn vị Đăng ký Kiểm nghiệm (Registrant)</label>
             <div class="mono-val">
               <span id="detail-owner-address">0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266</span>
               <button class="copy-btn" onclick="copyText('detail-owner-address')" aria-label="Copy Address">
@@ -1051,22 +1052,22 @@
       vi: {
         "header.subtitle": "TÍCH HỢP SỔ CÁI BẢO MẬT",
         "nav.back": "Quay lại trang chủ",
-        "hero.title": "Tra Cứu NFT Sầu Riêng",
-        "hero.subtitle2": "Kiểm tra tính minh bạch và chứng nhận chất lượng AI của lô sầu riêng xuất khẩu bằng mã số NFT hoặc Mã Lô Hàng.",
+        "hero.title": "Tra Cứu Chứng Thư Số",
+        "hero.subtitle2": "Kiểm tra tính minh bạch và chứng nhận chất lượng AI của lô sầu riêng xuất khẩu bằng số Chứng thư hoặc Mã Lô Hàng.",
         "search.btn": "Xác Thực",
         "search.hint": "Gợi ý:",
         "status.connecting": "ĐANG KẾT NỐI...",
-        "status.online": "MẠNG BLOCKCHAIN: TRỰC TUYẾN",
-        "status.offline": "MẠNG BLOCKCHAIN: MÔ PHỎNG",
+        "status.online": "MẠNG SỔ CÁI: TRỰC TUYẾN",
+        "status.offline": "MẠNG SỔ CÁI: MÔ PHỎNG",
         "status.fetching": "Đang truy vấn sổ cái mật mã...",
         "error.title": "Không Tìm Thấy",
-        "error.desc": "Không tìm thấy Token ID hoặc Mã Lô Hàng tương ứng trên sổ cái blockchain. Vui lòng kiểm tra lại dữ liệu đầu vào.",
+        "error.desc": "Không tìm thấy Mã số Chứng thư hoặc Mã Lô Hàng tương ứng trên sổ cái blockchain. Vui lòng kiểm tra lại dữ liệu đầu vào.",
         "card.harvest": "Harvest Date",
         "card.province": "Province",
         "card.owner": "Registrant",
-        "detail.title": "Hồ Sơ Xác Minh NFT",
+        "detail.title": "Hồ Sơ Chứng Thực Sổ Cái",
         "detail.verified": "ĐÃ XÁC MINH TRÊN SỔ CÁI",
-        "detail.owner": "Địa Chỉ Đăng Ký (Registrant)",
+        "detail.owner": "Đơn vị Đăng ký Kiểm nghiệm (Registrant)",
         "detail.harvest": "Ngày Thu Hoạch",
         "detail.aiResult": "Đánh giá chất lượng AI:",
         "detail.confidence": "Độ tin cậy mô hình AI",
@@ -1076,7 +1077,7 @@
         "detail.yellowO": "Hàm Lượng Vàng O",
         "detail.yellowODesc": "Giới hạn kiểm nghiệm: Không phát hiện",
         "detail.notDetected": "Không phát hiện",
-        "footer.text": "© 2026 DurianTrust AI. Hệ thống truy xuất nguồn gốc sầu riêng xuất khẩu bằng blockchain.",
+        "footer.text": "© 2026 DurianTrust. Hệ thống kiểm định & truy xuất nguồn gốc sầu riêng xuất khẩu.",
         "risk.low": "Rủi Ro Thấp",
         "risk.medium": "Cần Kiểm Tra",
         "risk.high": "Vượt Ngưỡng - Giữ Lô"
@@ -1084,8 +1085,8 @@
       en: {
         "header.subtitle": "SECURE LEDGER INTEGRATION",
         "nav.back": "Back to Home",
-        "hero.title": "Audit Durian NFTs",
-        "hero.subtitle2": "Verify the supply chain integrity and AI-inspected quality certifications of your export durians via NFT Token ID or Batch ID.",
+        "hero.title": "Verify Digital Certificates",
+        "hero.subtitle2": "Verify the supply chain integrity and AI-inspected quality certifications of your export durians via Certificate ID or Batch ID.",
         "search.btn": "Verify",
         "search.hint": "Hints:",
         "status.connecting": "CONNECTING...",
@@ -1093,13 +1094,13 @@
         "status.offline": "BLOCKCHAIN NETWORK: SIMULATED",
         "status.fetching": "Querying cryptographic ledger...",
         "error.title": "Not Found",
-        "error.desc": "The queried Token ID or Batch ID was not found on the blockchain ledger. Please verify your inputs.",
+        "error.desc": "The queried Certificate ID or Batch ID was not found on the blockchain ledger. Please verify your inputs.",
         "card.harvest": "Harvest Date",
         "card.province": "Province",
         "card.owner": "Registrant",
-        "detail.title": "NFT Verification Audit",
-        "detail.verified": "ON-CHAIN VERIFIED",
-        "detail.owner": "Registrant (Owner Address)",
+        "detail.title": "Ledger Verification Audit",
+        "detail.verified": "ON-CHAIN LEDGER VERIFIED",
+        "detail.owner": "Registrant (Inspection Account)",
         "detail.harvest": "Harvest Date",
         "detail.aiResult": "AI Quality Rating:",
         "detail.confidence": "AI Model Confidence",
@@ -1109,7 +1110,7 @@
         "detail.yellowO": "Yellow O Substance",
         "detail.yellowODesc": "Regulatory limit: Not detected",
         "detail.notDetected": "Not detected",
-        "footer.text": "© 2026 DurianTrust AI. Blockchain traceability system for durian export.",
+        "footer.text": "© 2026 DurianTrust. Secured supply chain verification system for durian export.",
         "risk.low": "Low Risk",
         "risk.medium": "Review Needed",
         "risk.high": "High Risk - Hold"
@@ -1227,15 +1228,15 @@
       }
 
       document.title = currentLanguage === 'vi' 
-        ? 'DurianTrust NFT Audit - Xác Thực Chuỗi Cung Ứng Sầu Riêng'
-        : 'DurianTrust NFT Audit - Durian Supply Chain Verification';
+        ? 'Kiểm định & Xác thực Sầu riêng - DurianTrust'
+        : 'Durian Verification & Traceability - DurianTrust';
     }
 
     async function initWeb3() {
       const badge = document.getElementById('status-badge');
 
       try {
-        const response = await fetch('/contracts/DurianTrust.json');
+        const response = await fetch('contracts/DurianTrust.json');
         if (!response.ok) throw new Error("Config not found");
         contractConfig = await response.json();
         
@@ -1414,7 +1415,7 @@
 
       // Card rendering
       document.getElementById('card-farm-name').innerText = farmName;
-      document.getElementById('card-token-badge').innerText = `NFT: #${data.tokenId}`;
+      document.getElementById('card-token-badge').innerText = isVi ? `Chứng thư: #${data.tokenId}` : `Cert: #${data.tokenId}`;
       document.getElementById('card-batch-id').innerText = data.id;
       document.getElementById('card-province-name').innerText = provinceName;
       document.getElementById('card-harvest-date-val').innerText = data.harvestDate;

@@ -25,7 +25,7 @@ function AIResultCard({ batch, loading, source }) {
           </span>
           {batch.tokenId ? (
             <span className="source-badge source-badge--token">
-              NFT: #{batch.tokenId}
+              {language === 'vi' ? 'Chứng thư' : 'Cert'}: #{batch.tokenId}
             </span>
           ) : null}
           <span className={`risk-pill risk-${batch.riskLevel}`}>

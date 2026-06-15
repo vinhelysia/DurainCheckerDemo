@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="durian-logo-title durian-logo-desc">
+  <title id="durian-logo-title">DurianTrust logo</title>
+  <desc id="durian-logo-desc">A square trust mark with a stylized durian, blockchain nodes, and a verification check.</desc>
+  <defs>
+    <linearGradient id="shellGradient" x1="248" x2="776" y1="208" y2="824" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5e8e86" />
+      <stop offset="0.52" stop-color="#3c6e54" />
+      <stop offset="1" stop-color="#1f4734" />
+    </linearGradient>
+    <linearGradient id="fleshGradient" x1="342" x2="694" y1="362" y2="684" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f3dfb3" />
+      <stop offset="1" stop-color="#d9a441" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="220" fill="#fffdf7" />
+  <circle cx="512" cy="512" r="438" fill="#fffdf7" stroke="#1f4734" stroke-width="34" />
+  <circle cx="512" cy="512" r="382" fill="#e2edea" opacity="0.64" />
+
+  <path
+    fill="url(#shellGradient)"
+    stroke="#1f4734"
+    stroke-linejoin="round"
+    stroke-width="28"
+    d="M512 138 550 242 638 166 636 282 746 258 698 360 816 388 708 446 848 526 708 584 816 658 698 678 746 790 636 760 638 886 550 798 512 902 474 798 386 886 388 760 278 790 326 678 208 658 316 584 176 526 316 446 208 388 326 360 278 258 388 282 386 166 474 242Z"
+  />
+
+  <path
+    fill="#fffdf7"
+    stroke="#1f4734"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="30"
+    d="M354 404C404 310 520 286 622 344c106 60 134 202 54 318-70 102-208 142-302 64-90-74-92-222-20-322Z"
+  />
+  <path
+    fill="url(#fleshGradient)"
+    d="M396 462c54-62 140-80 210-34 62 42 70 120 18 184-58 70-164 86-222 22-42-48-44-124-6-172Z"
+  />
+  <path
+    fill="#d9a441"
+    opacity="0.96"
+    d="M612 452c42 28 66 70 60 116-4 40-30 82-68 112 26-72 18-140-28-198 12-12 24-22 36-30Z"
+  />
+  <path
+    fill="none"
+    stroke="#1f4734"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="30"
+    d="M394 462c54-62 140-80 210-34M604 680c38-30 64-72 68-112"
+    opacity="0.84"
+  />
+
+  <g fill="none" stroke="#5e8e86" stroke-linecap="round" stroke-linejoin="round" stroke-width="24">
+    <path d="M664 282 736 232 808 284" />
+    <path d="M736 232v94" />
+  </g>
+  <g fill="#fffdf7" stroke="#5e8e86" stroke-width="22">
+    <circle cx="664" cy="282" r="28" />
+    <circle cx="736" cy="232" r="28" />
+    <circle cx="808" cy="284" r="28" />
+    <circle cx="736" cy="326" r="28" />
+  </g>
+
+  <path
+    fill="none"
+    stroke="#1f4734"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="58"
+    d="m384 560 92 92 188-212"
+  />
+  <path
+    fill="none"
+    stroke="#fffdf7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="30"
+    d="m384 560 92 92 188-212"
+  />
+
+  <circle cx="512" cy="512" r="438" fill="none" stroke="#d9a441" stroke-width="12" opacity="0.72" />
+</svg>

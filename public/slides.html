@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DurianTrust AI Presentation - Blockchain & AI Traceability</title>
-  <link rel="icon" type="image/png" href="/durian.png" />
+  <link rel="icon" type="image/png" href="durian.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Import specific weights matching the layout specs -->
@@ -15,12 +15,13 @@
 
   <style>
     :root {
-      --color-primary: #d9a441;
-      --color-background: #0a0f0d;
-      --color-surface: #0e1512;
-      --color-border: #22332a;
-      --color-text-title: #ffffff;
-      --color-text-body: #a2b0a8;
+      --color-primary: #1f4734;
+      --color-accent: #d9a441;
+      --color-background: #f7f2e8;
+      --color-surface: #ffffff;
+      --color-border: #e2d9c6;
+      --color-text-title: #1e2a22;
+      --color-text-body: #57645b;
       
       --color-green-light: #3c6e54;
       --color-orange: #d9a441;
@@ -146,7 +147,7 @@
     }
 
     .slide-title-solid {
-      color: #ffffff;
+      color: var(--color-text-title);
       font-weight: 700;
     }
 
@@ -198,9 +199,9 @@
       justify-content: space-between;
       align-items: center;
       font-size: 0.75rem;
-      color: rgba(162, 176, 168, 0.3);
+      color: var(--color-text-body);
       font-family: var(--font-mono);
-      border-top: 1px solid #1a2720;
+      border-top: 1px solid var(--color-border);
       padding-top: 15px;
       margin-top: 20px;
     }
@@ -260,7 +261,7 @@
     .chart-container {
       width: 100%;
       height: 280px;
-      background: rgba(0, 0, 0, 0.2);
+      background: #ffffff;
       border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 16px;
@@ -312,7 +313,7 @@
     .solution-card h4 {
       font-size: 1.1rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--color-text-title);
     }
 
     .solution-card .advantage {
@@ -360,8 +361,8 @@
     }
 
     .arch-step.active-step {
-      border: 1px solid var(--color-primary);
-      background: #0f1814;
+      border: 2px solid var(--color-primary);
+      background: var(--color-surface);
     }
 
     .arch-number {
@@ -369,7 +370,7 @@
       height: 24px;
       border-radius: 50%;
       background: var(--color-primary);
-      color: #0a0f0d;
+      color: #ffffff;
       font-weight: 800;
       font-size: 0.8rem;
       display: grid;
@@ -380,7 +381,7 @@
     .arch-step h4 {
       font-size: 0.9rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--color-text-title);
     }
 
     .arch-step p {
@@ -426,7 +427,7 @@
       font-family: var(--font-display);
       font-size: 2.6rem;
       font-weight: 800;
-      color: #ffd875;
+      color: var(--color-accent);
       margin-bottom: 10px;
     }
 
@@ -455,7 +456,7 @@
       align-items: center;
       gap: 20px;
       z-index: 1000;
-      background: rgba(10, 15, 13, 0.95);
+      background: rgba(255, 253, 247, 0.95);
       border: 1px solid var(--color-border);
       border-radius: 30px;
       padding: 4px 14px;
@@ -477,7 +478,7 @@
     }
 
     .nav-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.05);
       color: var(--color-primary);
     }
 
@@ -495,7 +496,7 @@
       top: 24px;
       right: 24px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(31, 71, 52, 0.06);
       border: 1px solid var(--color-border);
       border-radius: 20px;
       padding: 2px;
@@ -516,7 +517,7 @@
 
     .slide-lang-btn.active {
       background: var(--color-primary);
-      color: #0a0f0d;
+      color: #ffffff;
       font-weight: 700;
     }
 
@@ -755,18 +756,18 @@
         
         "s4-kicker": "Kiến Trúc Hệ Thống",
         "s4-s1-title": "Khởi Tạo & Ký Số",
-        "s4-s1-desc": "Thông tin nông trại, vụ mùa sầu riêng được đăng ký và gán mã NFT ID.",
+        "s4-s1-desc": "Thông tin nông trại, vụ mùa sầu riêng được đăng ký và cấp Chứng thư số.",
         "s4-s2-title": "Hợp Đồng Solidity",
         "s4-s2-desc": "Lưu trữ địa chỉ người sở hữu, kết quả kiểm định Cadimi vào mạng Ethereum cục bộ.",
         "s4-s3-title": "Sàng Lọc AI",
         "s4-s3-desc": "Mô hình AI dự đoán rủi ro và xác thực chữ ký số trên chuỗi thông qua RPC.",
-        "s4-s4-title": "NFT Portal",
-        "s4-s4-desc": "Cơ quan hải quan quét mã QR, truy vấn trực tiếp NFT và kiểm chứng toàn vẹn dữ liệu.",
+        "s4-s4-title": "Cổng Chứng Thư Số",
+        "s4-s4-desc": "Bên mua và hải quan quét mã QR, truy vấn chứng thư số để kiểm chứng dữ liệu.",
         
         "s5-kicker": "Hiệu Quả Thực Tiễn",
         "s5-m1-label": "Giảm tỷ lệ chậm thông quan kiểm dịch nhờ hồ sơ xuất khẩu đồng bộ minh bạch",
         "s5-m2-label": "Thời gian cách ly và khoanh vùng gốc vườn có cảnh báo ô nhiễm Cadimi",
-        "s5-m3-label": "Khả năng kiểm chứng dữ liệu lab kiểm nghiệm thông qua chữ ký số NFT",
+        "s5-m3-label": "Khả năng kiểm chứng dữ liệu lab kiểm nghiệm thông qua chữ ký số bảo mật",
 
         "chart-label": "Xác suất rủi ro ách tắc tại hải quan (%)",
         "chart-risk-low": "Rủi ro thấp (< 0.035 ppm)",
@@ -795,18 +796,18 @@
         
         "s4-kicker": "System Architecture",
         "s4-s1-title": "Initialization & Digital Signing",
-        "s4-s1-desc": "Orchard data, batch details and harvest dates are securely initialized and assigned an NFT Token ID.",
+        "s4-s1-desc": "Orchard data, batch details and harvest dates are securely registered and assigned a Certificate ID.",
         "s4-s2-title": "Solidity Smart Contract",
         "s4-s2-desc": "Stores batch registries, Cadmium PPM results, and owner address directly on the local Ethereum chain.",
         "s4-s3-title": "AI Classifier Screening",
         "s4-s3-desc": "AI services classify risks and sign approvals via secure RPC queries.",
-        "s4-s4-title": "NFT Verification Portal",
-        "s4-s4-desc": "Customs officials scan QRs, directly auditing the token history for tamper-free certificates.",
+        "s4-s4-title": "Verification Portal",
+        "s4-s4-desc": "Customs officials and buyers scan QRs, directly auditing the ledger history for tamper-free certificates.",
         
         "s5-kicker": "Practical Business Impact",
         "s5-m1-label": "Decrease in customs quarantine clearance delays due to unified digital audit trials",
         "s5-m2-label": "Time to isolate and trace targeted orchard batches under Cadmium alerts",
-        "s5-m3-label": "Lab verification authenticity auditable through blockchain-anchored NFT signatures",
+        "s5-m3-label": "Lab verification authenticity auditable through blockchain-secured signatures",
 
         "chart-label": "Customs Rejection Probability (%)",
         "chart-risk-low": "Low Risk (< 0.035 ppm)",
@@ -887,12 +888,12 @@
           },
           scales: {
             x: {
-              grid: { color: 'rgba(255, 255, 255, 0.02)' },
-              ticks: { color: '#a2b0a8', font: { family: 'Inter', size: 11 } }
+              grid: { color: 'rgba(31, 71, 52, 0.05)' },
+              ticks: { color: '#57645b', font: { family: 'Inter', size: 11 } }
             },
             y: {
-              grid: { color: 'rgba(255, 255, 255, 0.02)' },
-              ticks: { color: '#a2b0a8', font: { family: 'IBM Plex Mono', size: 10 } },
+              grid: { color: 'rgba(31, 71, 52, 0.05)' },
+              ticks: { color: '#57645b', font: { family: 'IBM Plex Mono', size: 10 } },
               max: 100
             }
           }
