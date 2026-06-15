@@ -7,7 +7,6 @@ const introItems = [
   { href: '#/intro/problem', key: 'problem' },
   { href: '#/intro/solution', key: 'solution' },
   { href: '#/intro/impact', key: 'impact' },
-  { href: 'slides.html', key: 'slides' },
 ]
 
 const unitItems = [
