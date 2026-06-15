@@ -1324,16 +1324,21 @@
 
   .mobile-nav-section a,
   .mobile-nav-primary a {
-    display: grid;
+    display: flex;
     align-items: center;
     min-height: 48px;
     border-radius: var(--radius-card);
     padding: 10px 14px;
   }
 
-  .mobile-nav-section a {
-    grid-template-columns: 34px minmax(0, 1fr);
-    gap: 10px;
+  .mobile-nav-header {
+    padding: 6px 14px 2px;
+    color: var(--color-green-mid);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
 
   .mobile-nav-section a:hover,
@@ -1352,7 +1357,8 @@
 
   .mobile-nav-section a span,
   .mobile-nav-primary a span {
-    font-weight: 800;
+    font-weight: 700;
+    white-space: nowrap;
   }
 
   .mobile-nav-primary {
