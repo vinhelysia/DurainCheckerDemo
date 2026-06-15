@@ -1,13 +1,20 @@
 import { MapPin, ScanLine, ShieldCheck } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 
 const icons = [ShieldCheck, MapPin, ScanLine]
 
 function SolutionPillars() {
   const { copy } = useLanguage()
+  const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 })
 
   return (
-    <section className="section" id="solution" aria-labelledby="solution-title">
+    <section
+      className={`section reveal-on-scroll ${isVisible ? 'revealed' : ''}`}
+      id="solution"
+      aria-labelledby="solution-title"
+      ref={ref}
+    >
       <div className="section-shell">
         <div className="section-heading">
           <p className="section-kicker">{copy.solution.kicker}</p>

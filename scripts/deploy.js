@@ -1,4 +1,3 @@
-/* global process */
 import hre from "hardhat";
 import fs from "fs";
 import path from "path";

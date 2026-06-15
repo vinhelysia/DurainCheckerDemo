@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import Lenis from 'lenis'
 import DemoSection from './components/DemoSection'
 import Footer from './components/Footer'
 import Header from './components/Header'
@@ -6,76 +7,126 @@ import Hero from './components/Hero'
 import ImpactSection from './components/ImpactSection'
 import ProblemSection from './components/ProblemSection'
 import SolutionPillars from './components/SolutionPillars'
+import UnitDetails from './components/UnitDetails'
 import { useLanguage } from './components/LanguageContext'
+import Preloader from './components/Preloader'
+import 'lenis/dist/lenis.css'
 import './App.css'
 
 function App() {
   const { copy } = useLanguage()
+  const [preloaderComplete, setPreloaderComplete] = useState(() => {
+    return sessionStorage.getItem('duriantrust-preloader-seen') === 'true'
+  })
+
+  const [currentRoute, setCurrentRoute] = useState(() => {
+    return window.location.hash || '#/'
+  })
+
+  const lenisRef = useRef(null)
 
   useEffect(() => {
-    function smoothScrollTo(element, duration = 600) {
-      const headerOffset = 90 // Height of sticky header + breathing room
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-      const startPosition = window.pageYOffset
-      const distance = offsetPosition - startPosition
-      let startTime = null
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth exponential easing
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+    })
 
-      function animation(currentTime) {
-        if (startTime === null) startTime = currentTime
-        const timeElapsed = currentTime - startTime
-        const run = ease(timeElapsed, startPosition, distance, duration)
-        window.scrollTo(0, run)
-        if (timeElapsed < duration) {
-          requestAnimationFrame(animation)
-        }
-      }
+    lenisRef.current = lenis
 
-      // Cubic easing out
-      function ease(t, b, c, d) {
-        t /= d
-        t--
-        return c * (t * t * t + 1) + b
-      }
-
-      requestAnimationFrame(animation)
+    function raf(time) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
     }
 
-    function handleAnchorClick(e) {
-      const clickTarget = e.target.closest('a')
-      if (clickTarget) {
-        const href = clickTarget.getAttribute('href')
-        if (href && href.startsWith('#') && href !== '#') {
-          const targetId = href.substring(1)
-          const element = document.getElementById(targetId)
-          if (element) {
-            e.preventDefault()
-            smoothScrollTo(element)
-            // Update URL hash without jumping
-            window.history.pushState(null, '', href)
-          }
-        }
-      }
-    }
+    requestAnimationFrame(raf)
 
-    document.addEventListener('click', handleAnchorClick)
-    return () => document.removeEventListener('click', handleAnchorClick)
+    return () => {
+      lenis.destroy()
+    }
   }, [])
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      const newHash = window.location.hash || '#/'
+      setCurrentRoute(newHash)
+      
+      // Reset scroll position immediately
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(0, { immediate: true })
+      } else {
+        window.scrollTo({ top: 0, behavior: 'instant' })
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange)
+    
+    // Trigger scroll sync on mount
+    handleHashChange()
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange)
+    }
+  }, [])
+
+  const renderRouteView = () => {
+    switch (currentRoute) {
+      case '#/':
+      case '#/home':
+        return <Hero />
+      case '#/intro/problem':
+        return <ProblemSection />
+      case '#/intro/solution':
+        return <SolutionPillars />
+      case '#/intro/impact':
+        return <ImpactSection />
+      case '#/unit/farm':
+        return <UnitDetails unitType="farm" />
+      case '#/unit/transport':
+        return <UnitDetails unitType="transport" />
+      case '#/unit/testing':
+        return <UnitDetails unitType="testing" />
+      case '#/unit/export':
+        return <UnitDetails unitType="export" />
+      case '#/unit/demo':
+        return <DemoSection />
+      default:
+        // Redirect legacy anchor hashes to clean routed views
+        if (currentRoute === '#problem') {
+          window.location.hash = '#/intro/problem'
+          return null
+        }
+        if (currentRoute === '#solution') {
+          window.location.hash = '#/intro/solution'
+          return null
+        }
+        if (currentRoute === '#demo') {
+          window.location.hash = '#/unit/demo'
+          return null
+        }
+        if (currentRoute === '#impact') {
+          window.location.hash = '#/intro/impact'
+          return null
+        }
+        return <Hero />
+    }
+  }
+
   return (
-    <div className="app">
+    <div className={`app ${preloaderComplete ? 'preloader-done' : 'preloader-active'}`}>
+      <Preloader onComplete={() => setPreloaderComplete(true)} />
       <a className="skip-link" href="#main">
         {copy.skipLink}
       </a>
-      <Header />
-      <main id="main">
-        <Hero />
-        <ProblemSection />
-        <SolutionPillars />
-        <DemoSection />
-        <ImpactSection />
-      </main>
-      <Footer />
+      <div className="main-content-wrapper" aria-hidden={!preloaderComplete}>
+        <Header />
+        <main id="main">
+          {renderRouteView()}
+        </main>
+        <Footer />
+      </div>
     </div>
   )
 }

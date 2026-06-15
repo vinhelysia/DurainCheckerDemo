@@ -3,6 +3,7 @@ import { BadgeCheck, CalendarDays, MapPin, QrCode, Sprout } from 'lucide-react'
 import { defaultBatchId, localized, formatDate } from '../data/batches'
 import { useLanguage } from './LanguageContext'
 import { useBlockchainBatches } from '../hooks/useBlockchainBatches'
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 import AIResultCard from './AIResultCard'
 import BlockchainTimeline from './BlockchainTimeline'
 import HashProofChip from './HashProofChip'
@@ -12,6 +13,7 @@ function DemoSection() {
   const [selectedBatchId, setSelectedBatchId] = useState(defaultBatchId)
   const [isScanning, setIsScanning] = useState(false)
   const [scanStatus, setScanStatus] = useState('')
+  const [ref, isVisible] = useIntersectionObserver({ threshold: 0.08 })
 
   const { batches, activeBatch, loading, source } = useBlockchainBatches(selectedBatchId)
 
@@ -51,7 +53,12 @@ function DemoSection() {
   }
 
   return (
-    <section className="section demo-section" id="demo" aria-labelledby="demo-title">
+    <section
+      className={`section demo-section reveal-on-scroll ${isVisible ? 'revealed' : ''}`}
+      id="demo"
+      aria-labelledby="demo-title"
+      ref={ref}
+    >
       <div className="section-shell">
         <div className="section-heading demo-heading">
           <div>
@@ -80,7 +87,12 @@ function DemoSection() {
 
         <div className="lookup-bar">
           <label htmlFor="batch-id">{copy.demo.batchIdLabel}</label>
-          <input id="batch-id" value={currentBatch.id} readOnly />
+          <input
+            id="batch-id"
+            className={isScanning ? 'scanning-text-shimmer' : ''}
+            value={currentBatch.id}
+            readOnly
+          />
           <button
             className="button button-primary scan-button"
             type="button"
@@ -130,11 +142,14 @@ function DemoSection() {
           </div>
         </div>
 
-        <div className="demo-result-grid">
-          <BlockchainTimeline timeline={currentBatch.timeline} loading={loading} source={source} />
-          <div className="ai-result-stack">
-            <AIResultCard batch={currentBatch} loading={loading} source={source} />
-            <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} loading={loading} />
+        <div className={`demo-result-grid-wrapper ${isScanning ? 'is-scanning' : ''}`}>
+          {isScanning && <div className="audit-beam" aria-hidden="true" />}
+          <div className="demo-result-grid">
+            <BlockchainTimeline timeline={currentBatch.timeline} loading={loading} source={source} />
+            <div className="ai-result-stack">
+              <AIResultCard batch={currentBatch} loading={loading} source={source} />
+              <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} loading={loading} />
+            </div>
           </div>
         </div>
       </div>

@@ -1,10 +1,17 @@
 import { useLanguage } from './LanguageContext'
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 
 function ImpactSection() {
   const { copy } = useLanguage()
+  const [ref, isVisible] = useIntersectionObserver({ threshold: 0.15 })
 
   return (
-    <section className="section impact-section" id="impact" aria-labelledby="impact-title">
+    <section
+      className={`section impact-section reveal-on-scroll ${isVisible ? 'revealed' : ''}`}
+      id="impact"
+      aria-labelledby="impact-title"
+      ref={ref}
+    >
       <div className="section-shell">
         <div className="section-heading">
           <p className="section-kicker">{copy.impact.kicker}</p>

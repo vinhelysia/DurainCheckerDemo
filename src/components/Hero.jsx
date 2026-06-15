@@ -13,11 +13,11 @@ function Hero() {
           <h1 id="hero-title">{copy.hero.title}</h1>
           <p className="hero-lead">{copy.hero.lead}</p>
           <div className="hero-actions" aria-label={copy.hero.ariaLabelActions}>
-            <a className="button button-primary" href="#demo">
+            <a className="button button-primary" href="#/unit/demo">
               <span>{copy.hero.ctaDemo}</span>
               <ArrowRight size={18} aria-hidden="true" />
             </a>
-            <a className="button button-secondary" href="#problem">
+            <a className="button button-secondary" href="#/intro/problem">
               {copy.hero.ctaProblem}
             </a>
           </div>

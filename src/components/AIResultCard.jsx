@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { AlertTriangle, CheckCircle2, Cpu } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import { localized } from '../data/batches'
@@ -7,6 +8,18 @@ function AIResultCard({ batch, loading, source }) {
   const confidence = Math.round(batch.confidence * 100)
   const isLowRisk = batch.riskLevel === 'low'
   const StatusIcon = isLowRisk ? CheckCircle2 : AlertTriangle
+
+  const [meterWidth, setMeterWidth] = useState(0)
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setMeterWidth(confidence)
+    }, 50)
+    return () => {
+      clearTimeout(t)
+      setMeterWidth(0)
+    }
+  }, [confidence])
 
   return (
     <article 
@@ -56,7 +69,7 @@ function AIResultCard({ batch, loading, source }) {
           <strong>{confidence}%</strong>
         </div>
         <div className="meter-track">
-          <span style={{ width: `${confidence}%` }} />
+          <span style={{ width: `${meterWidth}%` }} />
         </div>
       </div>
 

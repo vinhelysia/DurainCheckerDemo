@@ -1,11 +1,18 @@
 import { AlertTriangle, Search } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 
 function ProblemSection() {
   const { copy } = useLanguage()
+  const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 })
 
   return (
-    <section className="section problem-section" id="problem" aria-labelledby="problem-title">
+    <section
+      className={`section problem-section reveal-on-scroll ${isVisible ? 'revealed' : ''}`}
+      id="problem"
+      aria-labelledby="problem-title"
+      ref={ref}
+    >
       <div className="section-shell problem-grid">
         <div>
           <p className="section-kicker">{copy.problem.kicker}</p>
