@@ -3,6 +3,8 @@ export const copyData = {
     skipLink: 'Bỏ qua điều hướng',
     header: {
       nav: {
+        landing: 'Landing Page',
+        landingMeta: '4 phần chính',
         problem: 'Vấn đề',
         solution: 'Giải pháp',
         demo: 'Demo',
@@ -11,6 +13,10 @@ export const copyData = {
         slides: 'Tài liệu Chiến lược',
       },
       ariaLabel: 'Điều hướng chính',
+      landingMenuAria: 'Các phần trong landing page',
+      mobileNavAria: 'Điều hướng trên di động',
+      mobileMenuOpen: 'Mở menu điều hướng',
+      mobileMenuClose: 'Đóng menu điều hướng',
       languageSwitchAria: 'Chọn ngôn ngữ',
     },
     hero: {
@@ -154,6 +160,8 @@ export const copyData = {
     skipLink: 'Skip to content',
     header: {
       nav: {
+        landing: 'Landing Page',
+        landingMeta: '4 sections',
         problem: 'Problem',
         solution: 'Solution',
         demo: 'Demo',
@@ -162,6 +170,10 @@ export const copyData = {
         slides: 'Strategic Slides',
       },
       ariaLabel: 'Main navigation',
+      landingMenuAria: 'Landing page sections',
+      mobileNavAria: 'Mobile navigation',
+      mobileMenuOpen: 'Open navigation menu',
+      mobileMenuClose: 'Close navigation menu',
       languageSwitchAria: 'Select language',
     },
     hero: {
