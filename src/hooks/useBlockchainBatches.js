@@ -76,14 +76,17 @@ export function useBlockchainBatches(selectedBatchId) {
         console.warn('Blockchain connection failed. Falling back to static data.', err)
         if (!active) return
 
-        // Offline fallback
-        const staticList = staticBatches.map(b => ({
+        // Offline fallback - load static + locally registered batches
+        const localBatches = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
+        const allBatches = [...staticBatches, ...localBatches]
+
+        const list = allBatches.map(b => ({
           id: b.id,
           riskLevel: b.riskLevel
         }))
-        setBatches(staticList)
+        setBatches(list)
 
-        const matched = staticBatches.find(b => b.id === selectedBatchId) || staticBatches[0]
+        const matched = allBatches.find(b => b.id === selectedBatchId) || allBatches[0]
 
         // Map static batches to their corresponding token IDs in fallback mode
         const staticTokenIds = {
@@ -92,9 +95,17 @@ export function useBlockchainBatches(selectedBatchId) {
           'DRN-2026-DL-0892': 8803
         }
 
+        let tokenId = staticTokenIds[matched.id]
+        if (!tokenId) {
+          // generate a deterministic token ID for user created batches
+          let sum = 0
+          for (let i = 0; i < matched.id.length; i++) sum += matched.id.charCodeAt(i)
+          tokenId = 8800 + (sum % 1000)
+        }
+
         const formattedMatched = {
           ...matched,
-          tokenId: staticTokenIds[matched.id] || 0
+          tokenId: tokenId
         }
 
         setActiveBatch(formattedMatched)

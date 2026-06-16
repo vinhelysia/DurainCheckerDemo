@@ -15,6 +15,7 @@ const unitItems = [
   { href: '#/unit/testing', key: 'testing' },
   { href: '#/unit/export', key: 'export' },
   { href: '#/unit/demo', key: 'demo' },
+  { href: '#/manage', key: 'manage' },
   { href: 'nft.html', key: 'nft' },
 ]
 
@@ -217,7 +218,7 @@ function Header() {
                   <div className="drawer-item-info">
                     <strong>{copy.header.nav[item.key]}</strong>
                     <span className="drawer-item-desc">
-                      {item.key === 'problem' && (language === 'vi' ? 'Phân tích thách thức, kiểm soát Cd & Auramine O' : 'Analysis of cadmium & dye challenges')}
+                      {item.key === 'problem' && (language === 'vi' ? 'Phân tích thách thức, kiểm soát Cadimi & Auramine O' : 'Analysis of cadmium & dye challenges')}
                       {item.key === 'solution' && (language === 'vi' ? 'Hợp đồng thông minh & mô hình kiểm định AI' : 'Smart contracts & AI validation model')}
                       {item.key === 'impact' && (language === 'vi' ? 'Niềm tin thị trường & thông quan nhanh' : 'Market trust & fast custom clearance')}
                       {item.key === 'slides' && (language === 'vi' ? 'Tài liệu thuyết trình chiến lược kinh doanh' : 'Strategic business deck presentation')}
@@ -243,9 +244,10 @@ function Header() {
                     <span className="drawer-item-desc">
                       {item.key === 'farm' && (language === 'vi' ? 'Nhật ký IoT đất trồng, tưới tiêu & bón phân' : 'IoT soil logs, irrigation & harvests')}
                       {item.key === 'transport' && (language === 'vi' ? 'Theo dõi xe lạnh, cảm biến nhiệt độ & GPS' : 'Cold chain telemetry, sensors & tracks')}
-                      {item.key === 'testing' && (language === 'vi' ? 'Dữ liệu phân tích hóa chất & sàng lọc Cd' : 'Chemical assays & cadmium screening')}
+                      {item.key === 'testing' && (language === 'vi' ? 'Dữ liệu phân tích hóa chất & sàng lọc Cadimi' : 'Chemical assays & cadmium screening')}
                       {item.key === 'export' && (language === 'vi' ? 'Tờ khai hải quan & chứng thư số NFT' : 'Customs declarations & NFT certificates')}
                       {item.key === 'demo' && (language === 'vi' ? 'Tra cứu blockchain theo mã lô hàng' : 'Blockchain lookup by batch identifier')}
+                      {item.key === 'manage' && (language === 'vi' ? 'Đăng ký lô hàng & ghi nhật ký kiểm định AI' : 'Register batches & log AI quality audits')}
                       {item.key === 'nft' && (language === 'vi' ? 'Kiểm chứng chữ ký mã hóa Web3' : 'Verify Web3 cryptographic signature')}
                     </span>
                   </div>

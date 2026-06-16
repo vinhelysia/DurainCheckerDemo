@@ -123,7 +123,8 @@ h3,
 h4 {
   color: var(--color-ink);
   font-family: var(--font-display);
-  line-height: 1.12;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
 }
 
 h1 {

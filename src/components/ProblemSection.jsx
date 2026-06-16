@@ -1,6 +1,13 @@
-import { AlertTriangle, Search } from 'lucide-react'
+import { ShieldAlert, ThermometerSnowflake, FileWarning, Clock } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
+
+const iconMap = {
+  shield: ShieldAlert,
+  temp: ThermometerSnowflake,
+  file: FileWarning,
+  clock: Clock
+}
 
 function ProblemSection() {
   const { copy } = useLanguage()
@@ -30,21 +37,19 @@ function ProblemSection() {
           </p>
         </div>
 
-        <div className="problem-points" aria-label={copy.problem.points.ariaLabel}>
-          <div className="problem-point">
-            <AlertTriangle size={24} aria-hidden="true" />
-            <span>
-              <strong>{copy.problem.points.riskTitle}</strong>
-              <small>{copy.problem.points.riskDesc}</small>
-            </span>
-          </div>
-          <div className="problem-point">
-            <Search size={24} aria-hidden="true" />
-            <span>
-              <strong>{copy.problem.points.recordsTitle}</strong>
-              <small>{copy.problem.points.recordsDesc}</small>
-            </span>
-          </div>
+        <div className="problem-points" aria-label={copy.problem.pointsAriaLabel}>
+          {copy.problem.points.map((point, index) => {
+            const IconComponent = iconMap[point.icon] || ShieldAlert
+            return (
+              <div className="problem-point" key={index}>
+                <IconComponent size={24} aria-hidden="true" />
+                <span>
+                  <strong>{point.title}</strong>
+                  <small>{point.desc}</small>
+                </span>
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>

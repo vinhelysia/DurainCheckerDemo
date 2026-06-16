@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BadgeCheck, CalendarDays, MapPin, QrCode, Sprout } from 'lucide-react'
 import { defaultBatchId, localized, formatDate } from '../data/batches'
 import { useLanguage } from './LanguageContext'
@@ -7,15 +7,70 @@ import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 import AIResultCard from './AIResultCard'
 import BlockchainTimeline from './BlockchainTimeline'
 import HashProofChip from './HashProofChip'
+import QRScannerModal from './QRScannerModal'
+
+function QRCodeLabel({ batchId, language, loading }) {
+  if (loading) return <div className="qr-label-card-display skeleton" style={{ height: '140px' }} />
+
+  const qrUrl = `${window.location.origin}${window.location.pathname}?batchId=${batchId}#/unit/demo`
+  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrUrl)}`
+
+  return (
+    <article className="qr-label-card-display" aria-label="Product QR label code">
+      <div className="qr-image-wrapper">
+        <img src={qrImgUrl} alt={`QR Code for ${batchId}`} width="140" height="140" />
+      </div>
+      <div className="qr-label-text">
+        <h4>{language === 'vi' ? 'Nhãn QR sầu riêng' : 'Durian QR Label'}</h4>
+        <p>
+          {language === 'vi' 
+            ? 'Quét bằng camera điện thoại để truy vết trên Blockchain' 
+            : 'Scan with phone camera to trace origin on the Blockchain'}
+        </p>
+        <code className="text-xs">{batchId}</code>
+      </div>
+    </article>
+  )
+}
 
 function DemoSection() {
   const { language, copy } = useLanguage()
-  const [selectedBatchId, setSelectedBatchId] = useState(defaultBatchId)
-  const [isScanning, setIsScanning] = useState(false)
-  const [scanStatus, setScanStatus] = useState('')
+
+  const getBatchIdFromUrl = () => {
+    const searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.has('batchId')) {
+      return searchParams.get('batchId')
+    }
+    const hashParts = window.location.hash.split('?')
+    if (hashParts.length > 1) {
+      const hashParams = new URLSearchParams(hashParts[1])
+      if (hashParams.has('batchId')) {
+        return hashParams.get('batchId')
+      }
+    }
+    return defaultBatchId
+  }
+
+  const [selectedBatchId, setSelectedBatchId] = useState(getBatchIdFromUrl)
+  const [isScannerOpen, setIsScannerOpen] = useState(false)
   const [ref, isVisible] = useIntersectionObserver({ threshold: 0.08 })
 
   const { batches, activeBatch, loading, source } = useBlockchainBatches(selectedBatchId)
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const paramId = getBatchIdFromUrl()
+      if (paramId !== selectedBatchId) {
+        setSelectedBatchId(paramId)
+      }
+    }
+    window.addEventListener('popstate', handleUrlChange)
+    window.addEventListener('hashchange', handleUrlChange)
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange)
+      window.removeEventListener('hashchange', handleUrlChange)
+    }
+  }, [selectedBatchId])
 
   // Use fallback if activeBatch is not loaded yet
   const currentBatch = activeBatch || {
@@ -35,21 +90,10 @@ function DemoSection() {
 
   function handleSelect(batchId) {
     setSelectedBatchId(batchId)
-    setScanStatus('')
   }
 
   function handleScan() {
-    setIsScanning(true)
-    setScanStatus(source === 'chain' ? copy.demo.scanBlockchain : copy.demo.scanStatusProgress)
-
-    window.setTimeout(() => {
-      setIsScanning(false)
-      setScanStatus(
-        source === 'chain'
-          ? `${copy.demo.scanConfirmed} - ${copy.demo.scanStatusComplete.replace('{id}', currentBatch.id)}`
-          : copy.demo.scanStatusComplete.replace('{id}', currentBatch.id)
-      )
-    }, 650)
+    setIsScannerOpen(true)
   }
 
   return (
@@ -89,22 +133,17 @@ function DemoSection() {
           <label htmlFor="batch-id">{copy.demo.batchIdLabel}</label>
           <input
             id="batch-id"
-            className={isScanning ? 'scanning-text-shimmer' : ''}
             value={currentBatch.id}
             readOnly
           />
           <button
             className="button button-primary scan-button"
             type="button"
-            disabled={isScanning}
             onClick={handleScan}
           >
             <QrCode size={18} aria-hidden="true" />
-            {isScanning ? copy.demo.scanning : copy.demo.scanQr}
+            {copy.demo.scanQr}
           </button>
-          <p className="sr-status" aria-live="polite">
-            {scanStatus}
-          </p>
         </div>
 
         <div
@@ -142,16 +181,24 @@ function DemoSection() {
           </div>
         </div>
 
-        <div className={`demo-result-grid-wrapper ${isScanning ? 'is-scanning' : ''}`}>
-          {isScanning && <div className="audit-beam" aria-hidden="true" />}
+        <div className="demo-result-grid-wrapper">
           <div className="demo-result-grid">
             <BlockchainTimeline timeline={currentBatch.timeline} loading={loading} source={source} />
             <div className="ai-result-stack">
               <AIResultCard batch={currentBatch} loading={loading} source={source} />
+              <QRCodeLabel batchId={currentBatch.id} language={language} loading={loading} />
               <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} loading={loading} />
             </div>
           </div>
         </div>
+
+        <QRScannerModal
+          isOpen={isScannerOpen}
+          onClose={() => setIsScannerOpen(false)}
+          batches={batches}
+          onScanSuccess={handleSelect}
+          language={language}
+        />
       </div>
     </section>
   )

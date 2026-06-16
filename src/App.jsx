@@ -8,6 +8,7 @@ import ImpactSection from './components/ImpactSection'
 import ProblemSection from './components/ProblemSection'
 import SolutionPillars from './components/SolutionPillars'
 import UnitDetails from './components/UnitDetails'
+import ManagementPortal from './components/ManagementPortal'
 import { useLanguage } from './components/LanguageContext'
 import Preloader from './components/Preloader'
 import 'lenis/dist/lenis.css'
@@ -51,6 +52,25 @@ function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const newHash = window.location.hash || '#/'
+      
+      // Redirect legacy anchor hashes to clean routed views
+      if (newHash === '#problem') {
+        window.location.hash = '#/intro/problem'
+        return
+      }
+      if (newHash === '#solution') {
+        window.location.hash = '#/intro/solution'
+        return
+      }
+      if (newHash === '#demo') {
+        window.location.hash = '#/unit/demo'
+        return
+      }
+      if (newHash === '#impact') {
+        window.location.hash = '#/intro/impact'
+        return
+      }
+
       setCurrentRoute(newHash)
       
       // Reset scroll position immediately
@@ -92,24 +112,9 @@ function App() {
         return <UnitDetails unitType="export" />
       case '#/unit/demo':
         return <DemoSection />
+      case '#/manage':
+        return <ManagementPortal />
       default:
-        // Redirect legacy anchor hashes to clean routed views
-        if (currentRoute === '#problem') {
-          window.location.hash = '#/intro/problem'
-          return null
-        }
-        if (currentRoute === '#solution') {
-          window.location.hash = '#/intro/solution'
-          return null
-        }
-        if (currentRoute === '#demo') {
-          window.location.hash = '#/unit/demo'
-          return null
-        }
-        if (currentRoute === '#impact') {
-          window.location.hash = '#/intro/impact'
-          return null
-        }
         return <Hero />
     }
   }
