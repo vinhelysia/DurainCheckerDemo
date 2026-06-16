@@ -29,6 +29,11 @@ export default function ManagementPortal() {
   const [provinceEn, setProvinceEn] = useState('Lam Dong')
   const [harvestDate, setHarvestDate] = useState('')
   const [cadmiumPpm, setCadmiumPpm] = useState('0.030')
+  const [violations, setViolations] = useState(0)
+  const [rainfall, setRainfall] = useState(150)
+  const [aiPredicting, setAiPredicting] = useState(false)
+  const [aiResult, setAiResult] = useState(null)
+  const [aiError, setAiError] = useState('')
 
   // Timeline Form State
   const [selectedBatchId, setSelectedBatchId] = useState('')
@@ -61,6 +66,11 @@ export default function ManagementPortal() {
     // Random cadmium level from 0.01 to 0.08
     const randomCd = (Math.random() * 0.07 + 0.01).toFixed(3)
     setCadmiumPpm(randomCd)
+    
+    // Randomize violations and rainfall for AI prediction demonstration
+    setViolations(Math.floor(Math.random() * 4))
+    setRainfall(Math.floor(Math.random() * 250 + 50))
+    
     setTxMessage({ text: '', type: '' })
   }
 
@@ -176,6 +186,83 @@ export default function ManagementPortal() {
     loadContract()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reloadTrigger])
+
+  // Dynamic AI Pre-Lab Risk Prediction
+  useEffect(() => {
+    if (!provinceVi) {
+      setAiResult(null)
+      return
+    }
+
+    const fetchAiPrediction = async () => {
+      setAiPredicting(true)
+      setAiError('')
+      
+      const parsedMonth = new Date(harvestDate).getMonth() + 1
+      const month = Number.isNaN(parsedMonth) ? 6 : parsedMonth
+      
+      try {
+        const response = await fetch('/api/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            province: provinceVi,
+            harvest_month: month,
+            farm_violation_history: Number(violations),
+            rainfall_mm: Number(rainfall)
+          })
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setAiResult({
+            ...data,
+            source: 'model'
+          })
+        } else {
+          throw new Error('API server returned error status')
+        }
+      } catch (err) {
+        console.warn('Backend AI Prediction failed or offline. Using client-side fallback simulation.', err)
+        
+        // Dynamic client-side fallback simulation matching Python model rules
+        let baseline = 0.1
+        if (provinceVi === 'Đắk Lắk' || provinceVi === 'Dak Lak') baseline = 1.2
+        else if (provinceVi === 'Tiền Giang' || provinceVi === 'Tien Giang') baseline = 0.5
+        else if (provinceVi === 'Đồng Nai' || provinceVi === 'Dong Nai') baseline = 0.4
+        else if (provinceVi === 'Bến Tre' || provinceVi === 'Ben Tre') baseline = 0.3
+
+        const score = baseline + Number(violations) * 0.5 + Number(rainfall) * 0.004
+        
+        let risk = 'low'
+        let probability = 0.9
+        if (score >= 2.0) {
+          risk = 'high'
+          probability = Math.min(0.99, 0.7 + (score - 2.0) * 0.1)
+        } else if (score >= 1.0) {
+          risk = 'medium'
+          probability = Math.min(0.89, 0.6 + (score - 1.0) * 0.25)
+        } else {
+          probability = Math.min(0.99, 0.8 + (1.0 - score) * 0.19)
+        }
+
+        setAiResult({
+          risk,
+          probability: parseFloat(probability.toFixed(2)),
+          needs_full_testing: risk !== 'low',
+          source: 'fallback'
+        })
+      } finally {
+        setAiPredicting(false)
+      }
+    }
+
+    // Debounce predictions by 300ms to avoid unnecessary API requests during typing/inputs
+    const timer = setTimeout(fetchAiPrediction, 300)
+    return () => clearTimeout(timer)
+  }, [provinceVi, harvestDate, violations, rainfall])
 
   // Connect wallet manual trigger
   const handleConnectWallet = async () => {
@@ -614,6 +701,107 @@ export default function ManagementPortal() {
                   />
                 </div>
               </div>
+
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label htmlFor="m-violations">
+                    {language === 'vi' ? 'Lịch sử vi phạm của vườn (0-5)' : 'Farm Violation History (0-5)'}
+                  </label>
+                  <select
+                    id="m-violations"
+                    value={violations}
+                    onChange={(e) => setViolations(Number(e.target.value))}
+                  >
+                    <option value={0}>0</option>
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                    <option value={4}>4</option>
+                    <option value={5}>5</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="m-rainfall">
+                    {language === 'vi' ? 'Lượng mưa ước tính (mm)' : 'Estimated Rainfall (mm)'}
+                  </label>
+                  <input
+                    id="m-rainfall"
+                    type="number"
+                    min="0"
+                    max="1000"
+                    value={rainfall}
+                    onChange={(e) => setRainfall(Number(e.target.value))}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* AI Predicted Risk (pre-lab) Panel */}
+              {provinceVi && (
+                <div className={`ai-preview-panel risk-${aiResult ? aiResult.risk : 'low'}`} style={{ marginBottom: '18px' }}>
+                  <div className="ai-preview-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Cpu size={16} />
+                      <span>
+                        {language === 'vi' ? 'DỰ BÁO NGUY CƠ Cd BỞI AI (TRƯỚC PHÒNG LAB)' : 'AI RISK PRE-LAB FORECAST'}
+                      </span>
+                    </div>
+                    {aiResult && (
+                      <span className={`status-badge-pill ${aiResult.source === 'model' ? 'chain-mode' : 'fallback-mode'}`} style={{ fontSize: '0.68rem', padding: '1px 8px', textTransform: 'none', height: 'fit-content', lineHeight: 'normal' }}>
+                        {aiResult.source === 'model' ? '🧠 AI Model' : '⚠️ Simulated'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="ai-preview-body">
+                    {aiPredicting ? (
+                      <div className="text-xs py-2 opacity-80" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <RefreshCw size={12} className="animate-spin" />
+                        <span>{language === 'vi' ? 'Đang phân tích dữ liệu...' : 'Analyzing farm data...'}</span>
+                      </div>
+                    ) : aiError ? (
+                      <div className="text-xs text-red-500 py-1">{aiError}</div>
+                    ) : aiResult ? (
+                      <>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-semibold">
+                            {language === 'vi' 
+                              ? `Nguy cơ: ${aiResult.risk === 'low' ? 'Thấp' : aiResult.risk === 'medium' ? 'Trung bình' : 'Cao'}`
+                              : `Risk Level: ${aiResult.risk.toUpperCase()}`}
+                          </span>
+                          <span className={`risk-badge risk-${aiResult.risk}`}>
+                            {aiResult.risk === 'low' 
+                              ? (language === 'vi' ? 'Đạt chuẩn' : 'Safe') 
+                              : aiResult.risk === 'medium' 
+                                ? (language === 'vi' ? 'Cần kiểm tra' : 'Review') 
+                                : (language === 'vi' ? 'Nguy cơ cao' : 'Critical')}
+                          </span>
+                        </div>
+                        <div className="text-xs opacity-80 mb-1">
+                          <strong>{language === 'vi' ? 'Khả năng xảy ra: ' : 'Probability: '}</strong> 
+                          {Math.round(aiResult.probability * 100)}%
+                        </div>
+                        <div className="text-xs font-semibold mt-1">
+                          {aiResult.needs_full_testing ? (
+                            <span className="text-red-500" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ef4444' }}>
+                              <AlertTriangle size={12} />
+                              {language === 'vi' 
+                                ? 'Yêu cầu kiểm nghiệm đầy đủ trong phòng thí nghiệm' 
+                                : 'Requires comprehensive lab assay'}
+                            </span>
+                          ) : (
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#10b981' }}>
+                              <CheckCircle2 size={12} />
+                              {language === 'vi' 
+                                ? 'Đạt điều kiện miễn giảm quy trình kiểm nghiệm phụ' 
+                                : 'Eligible for fast-track processing'}
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    ) : null}
+                  </div>
+                </div>
+              )}
 
               <div className="form-group">
                 <label htmlFor="m-cadmium">{language === 'vi' ? 'Kết quả kiểm nghiệm Cadimi (ppm)' : 'Cadmium Assay Level (ppm)'}</label>

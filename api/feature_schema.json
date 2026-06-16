@@ -1,0 +1,20 @@
+{
+  "feature_order": [
+    "province",
+    "harvest_month",
+    "farm_violation_history",
+    "rainfall_mm"
+  ],
+  "province_mapping": {
+    "Lâm Đồng": 0,
+    "Tiền Giang": 1,
+    "Đắk Lắk": 2,
+    "Bến Tre": 3,
+    "Đồng Nai": 4
+  },
+  "label_mapping": {
+    "0": "low",
+    "1": "medium",
+    "2": "high"
+  }
+}
