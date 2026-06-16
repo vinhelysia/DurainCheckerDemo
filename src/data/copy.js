@@ -193,6 +193,16 @@ export const copyData = {
       statusPending: 'Đang chờ xử lý',
       statusRejected: 'Không đạt tiêu chuẩn',
     },
+    managePortal: {
+      roles: {
+        owner: 'Chủ sở hữu (Admin)',
+        farmer: 'Nông dân',
+        lab: 'Kiểm nghiệm viên',
+        logistics: 'Vận chuyển',
+        norole: 'Không có vai trò',
+      },
+      simulatedLabel: 'Vai trò giả lập (Chỉ dùng kiểm thử offline):',
+    },
   },
   en: {
     skipLink: 'Skip to content',
@@ -387,6 +397,16 @@ export const copyData = {
       statusApproved: 'Export Approved',
       statusPending: 'Processing / Pending',
       statusRejected: 'Hold / Non-compliant',
+    },
+    managePortal: {
+      roles: {
+        owner: 'Owner (Admin)',
+        farmer: 'Farmer',
+        lab: 'Lab Tester',
+        logistics: 'Logistics',
+        norole: 'No Role',
+      },
+      simulatedLabel: 'Offline simulated testing only:',
     },
   },
 }

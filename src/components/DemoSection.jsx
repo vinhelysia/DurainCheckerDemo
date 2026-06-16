@@ -8,30 +8,7 @@ import AIResultCard from './AIResultCard'
 import BlockchainTimeline from './BlockchainTimeline'
 import HashProofChip from './HashProofChip'
 import QRScannerModal from './QRScannerModal'
-
-function QRCodeLabel({ batchId, language, loading }) {
-  if (loading) return <div className="qr-label-card-display skeleton" style={{ height: '140px' }} />
-
-  const qrUrl = `${window.location.origin}${window.location.pathname}?batchId=${batchId}#/unit/demo`
-  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrUrl)}`
-
-  return (
-    <article className="qr-label-card-display" aria-label="Product QR label code">
-      <div className="qr-image-wrapper">
-        <img src={qrImgUrl} alt={`QR Code for ${batchId}`} width="140" height="140" />
-      </div>
-      <div className="qr-label-text">
-        <h4>{language === 'vi' ? 'Nhãn QR sầu riêng' : 'Durian QR Label'}</h4>
-        <p>
-          {language === 'vi' 
-            ? 'Quét bằng camera điện thoại để truy vết trên Blockchain' 
-            : 'Scan with phone camera to trace origin on the Blockchain'}
-        </p>
-        <code className="text-xs">{batchId}</code>
-      </div>
-    </article>
-  )
-}
+import BatchQRLabel from './BatchQRLabel'
 
 function DemoSection() {
   const { language, copy } = useLanguage()
@@ -186,7 +163,7 @@ function DemoSection() {
             <BlockchainTimeline timeline={currentBatch.timeline} loading={loading} source={source} />
             <div className="ai-result-stack">
               <AIResultCard batch={currentBatch} loading={loading} source={source} />
-              <QRCodeLabel batchId={currentBatch.id} language={language} loading={loading} />
+              <BatchQRLabel batchId={currentBatch.id} language={language} loading={loading} />
               <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} loading={loading} />
             </div>
           </div>

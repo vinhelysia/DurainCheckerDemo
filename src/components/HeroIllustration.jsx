@@ -35,10 +35,14 @@ function HeroIllustration() {
           <stop offset="0" stopColor="#f3dfb3" />
           <stop offset="1" stopColor="#d9a441" />
         </linearGradient>
+        <linearGradient id="cardGradient" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#FFFDF7" />
+          <stop offset="100%" stopColor="#FAF4E9" />
+        </linearGradient>
       </defs>
 
       {/* Outer bounding card */}
-      <rect x="18" y="22" width="924" height="396" rx="30" fill="#FFFDF7" />
+      <rect x="18" y="22" width="924" height="396" rx="30" fill="url(#cardGradient)" />
       <rect
         x="18"
         y="22"
@@ -92,6 +96,13 @@ function HeroIllustration() {
         strokeWidth="3.5"
         strokeLinecap="round"
       />
+
+      {/* Data packets flowing along the ledger line */}
+      <g className="data-packets" fill="#D9A441">
+        <circle className="packet packet-1" cx="182" cy="180" r="4.5" />
+        <circle className="packet packet-2" cx="182" cy="180" r="4.5" />
+        <circle className="packet packet-3" cx="182" cy="180" r="4.5" />
+      </g>
 
       {/* Node 1: Smart Farm (Brand Durian Mark) */}
       <a href="#/unit/farm" className="hero-node-link">
@@ -210,13 +221,13 @@ function HeroIllustration() {
             
             {/* Isometric Cargo box */}
             <path d="M0 -22 L24 -11 L0 0 L-24 -11 Z" fill="#F3DFB3" stroke="#D9A441" strokeWidth="1.5" />
-            <path d="-24 -11 L0 0 V22 L-24 11 Z" fill="#D9A441" />
-            <path d="0 0 L24 -11 V11 L0 22 Z" fill="#C8893B" />
+            <path d="M-24 -11 L0 0 V22 L-24 11 Z" fill="#D9A441" />
+            <path d="M0 0 L24 -11 V11 L0 22 Z" fill="#C8893B" />
             
             {/* Sealed Stamp Circle */}
             <g transform="translate(0, 5)">
               <circle cx="0" cy="0" r="13" fill="#1F4734" stroke="#FFFDF7" strokeWidth="2" />
-              <path d="-5 0 L-2 3 L5 -4" fill="none" stroke="#D9A441" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M-5 0 L-2 3 L5 -4" fill="none" stroke="#D9A441" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </g>
           </g>
           <circle cx="825" cy="180" r="46" fill="none" stroke="rgba(31, 71, 52, 0.05)" strokeWidth="1" />
