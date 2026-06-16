@@ -1,0 +1,42 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Stuff\\DurianBlockchainWeb3\\durian-web3\\contracts\\DurianTrust.sol": {
+      "lastModificationDate": 1781501545159,
+      "contentHash": "799ddc5cd4ffcbbd734d4a392989c1da",
+      "sourceName": "contracts/DurianTrust.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "DurianTrust"
+      ]
+    }
+  }
+}
