@@ -2417,7 +2417,10 @@ button.nav-link {
   border: none;
   font-family: inherit;
   cursor: pointer;
-  outline: none;
+}
+button.nav-link:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
 }
 
 /* ==========================================================================
@@ -3072,4 +3075,25 @@ button.nav-link {
   background: var(--color-surface-alt);
   color: var(--color-ink);
   margin-top: 4px;
+}
+
+/* Route Loading Spinner */
+.route-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  min-height: 50vh;
+  color: var(--color-ink-soft);
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+}
+.route-loading .spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(60, 110, 84, 0.1);
+  border-top-color: var(--color-green-mid);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }

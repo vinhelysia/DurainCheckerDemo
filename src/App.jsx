@@ -1,18 +1,19 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 import Lenis from 'lenis'
-import DemoSection from './components/DemoSection'
 import Footer from './components/Footer'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import ImpactSection from './components/ImpactSection'
 import ProblemSection from './components/ProblemSection'
 import SolutionPillars from './components/SolutionPillars'
-import UnitDetails from './components/UnitDetails'
-import ManagementPortal from './components/ManagementPortal'
 import { useLanguage } from './components/LanguageContext'
 import Preloader from './components/Preloader'
 import 'lenis/dist/lenis.css'
 import './App.css'
+
+const DemoSection = lazy(() => import('./components/DemoSection'))
+const UnitDetails = lazy(() => import('./components/UnitDetails'))
+const ManagementPortal = lazy(() => import('./components/ManagementPortal'))
 
 function App() {
   const { copy } = useLanguage()
@@ -128,7 +129,14 @@ function App() {
       <div className="main-content-wrapper" aria-hidden={!preloaderComplete}>
         <Header />
         <main id="main">
-          {renderRouteView()}
+          <Suspense fallback={
+            <div className="route-loading" role="status" aria-live="polite">
+              <div className="spinner"></div>
+              <span>{copy.header.ariaLabel === 'Điều hướng chính' ? 'Đang tải...' : 'Loading...'}</span>
+            </div>
+          }>
+            {renderRouteView()}
+          </Suspense>
         </main>
         <Footer />
       </div>

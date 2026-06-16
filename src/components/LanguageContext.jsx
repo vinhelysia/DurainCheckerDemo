@@ -23,8 +23,8 @@ export function LanguageProvider({ children }) {
     // Update page title
     document.title =
       language === 'vi'
-        ? 'DurianTrust AI - Minh bạch chuỗi cung ứng sầu riêng'
-        : 'DurianTrust AI - Blockchain & AI Durian Traceability'
+        ? 'DurianTrust - Minh bạch chuỗi cung ứng sầu riêng'
+        : 'DurianTrust - Blockchain & Rule-Based Durian Traceability'
 
     // Update meta description
     const metaDesc = document.querySelector('meta[name="description"]')
@@ -32,8 +32,8 @@ export function LanguageProvider({ children }) {
       metaDesc.setAttribute(
         'content',
         language === 'vi'
-          ? 'DurianTrust AI demo: truy xuất nguồn gốc sầu riêng bằng blockchain và phân loại chất lượng bằng AI.'
-          : 'DurianTrust AI demo: blockchain traceability and AI quality classification for durian supply chain.'
+          ? 'DurianTrust demo: truy xuất nguồn gốc sầu riêng bằng blockchain và phân loại chất lượng bằng Quy tắc.'
+          : 'DurianTrust demo: blockchain traceability and Rule-Based quality classification for durian supply chain.'
       )
     }
   }, [language])

@@ -1,4 +1,6 @@
 import "@nomicfoundation/hardhat-toolbox";
+import dotenv from "dotenv";
+dotenv.config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 export default {
@@ -10,6 +12,16 @@ export default {
         runs: 200
       },
       viaIR: true
+    }
+  },
+  networks: {
+    sepolia: {
+      url: "https://ethereum-sepolia-rpc.publicnode.com",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
+    baseSepolia: {
+      url: "https://sepolia.base.org",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     }
   },
   paths: {

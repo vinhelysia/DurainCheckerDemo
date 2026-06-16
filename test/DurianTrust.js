@@ -5,10 +5,13 @@ import hre from "hardhat";
 describe("DurianTrust Contract Tests", function () {
   let durianTrust;
   let owner;
-  let addr1;
+  let farmer;
+  let lab;
+  let logistics;
+  let stranger;
 
   beforeEach(async function () {
-    [owner, addr1] = await hre.ethers.getSigners();
+    [owner, farmer, lab, logistics, stranger] = await hre.ethers.getSigners();
     const DurianTrust = await hre.ethers.getContractFactory("DurianTrust");
     durianTrust = await DurianTrust.deploy();
     await durianTrust.waitForDeployment();
@@ -72,11 +75,25 @@ describe("DurianTrust Contract Tests", function () {
     });
   });
 
-  describe("Access Control", function () {
-    it("Should only allow owner to register batches", async function () {
+  describe("Role Management and Access Control", function () {
+    beforeEach(async function () {
+      // Setup roles
+      await durianTrust.addFarmer(farmer.address);
+      await durianTrust.addLab(lab.address);
+      await durianTrust.addLogistics(logistics.address);
+    });
+
+    it("Should verify role assignments", async function () {
+      expect(await durianTrust.isFarmer(farmer.address)).to.be.true;
+      expect(await durianTrust.isLab(lab.address)).to.be.true;
+      expect(await durianTrust.isLogistics(logistics.address)).to.be.true;
+      expect(await durianTrust.isFarmer(stranger.address)).to.be.false;
+    });
+
+    it("Should allow farmer to register a batch", async function () {
       await expect(
-        durianTrust.connect(addr1).registerBatch(
-          "BATCH-FAIL",
+        durianTrust.connect(farmer).registerBatch(
+          "FARM-BATCH",
           "Farm", "Farm En",
           "Province", "Province En",
           "2026-06-01",
@@ -86,13 +103,29 @@ describe("DurianTrust Contract Tests", function () {
           0,
           "None", "None En"
         )
-      ).to.be.revertedWith("Only owner can call this");
+      ).to.emit(durianTrust, "BatchRegistered");
     });
 
-    it("Should only allow owner to add timeline events", async function () {
-      // Register batch as owner first
+    it("Should reject batch registration from unauthorized account", async function () {
+      await expect(
+        durianTrust.connect(stranger).registerBatch(
+          "FARM-BATCH-FAIL",
+          "Farm", "Farm En",
+          "Province", "Province En",
+          "2026-06-01",
+          300, 500,
+          "Pass", "Pass En",
+          9400,
+          0,
+          "None", "None En"
+        )
+      ).to.be.revertedWith("Only farmer or owner can call this");
+    });
+
+    it("Should allow logistics actor to add timeline events", async function () {
+      // Owner registers batch
       await durianTrust.registerBatch(
-        "BATCH-1",
+        "BATCH-LT",
         "Farm", "Farm En",
         "Province", "Province En",
         "2026-06-01",
@@ -103,16 +136,185 @@ describe("DurianTrust Contract Tests", function () {
         "None", "None En"
       );
 
-      // Attempt to add event as addr1
+      // Logistics actor submits timeline event
       await expect(
-        durianTrust.connect(addr1).addTimelineEvent(
-          "BATCH-1",
-          "Harvest", "Harvest En",
-          "Location", "Location En",
-          "2026-06-01",
+        durianTrust.connect(logistics).addTimelineEvent(
+          "BATCH-LT",
+          "Kiểm định", "Lab test",
+          "Phòng Lab", "Lab Room",
+          "2026-06-02",
           1
         )
-      ).to.be.revertedWith("Only owner can call this");
+      ).to.emit(durianTrust, "TimelineEventAdded");
+    });
+
+    it("Should reject timeline event from unauthorized account", async function () {
+      // Owner registers batch
+      await durianTrust.registerBatch(
+        "BATCH-LT2",
+        "Farm", "Farm En",
+        "Province", "Province En",
+        "2026-06-01",
+        300, 500,
+        "Pass", "Pass En",
+        9400,
+        0,
+        "None", "None En"
+      );
+
+      // Stranger tries to submit timeline event
+      await expect(
+        durianTrust.connect(stranger).addTimelineEvent(
+          "BATCH-LT2",
+          "Kiểm định", "Lab test",
+          "Phòng Lab", "Lab Room",
+          "2026-06-02",
+          1
+        )
+      ).to.be.revertedWith("Only logistics actor or owner can call this");
+    });
+
+    it("Should allow lab to update lab reports", async function () {
+      // Owner registers batch
+      await durianTrust.registerBatch(
+        "BATCH-LAB",
+        "Farm", "Farm En",
+        "Province", "Province En",
+        "2026-06-01",
+        300, 500,
+        "Pass", "Pass En",
+        9400,
+        0,
+        "None", "None En"
+      );
+
+      // Lab updates lab report
+      await expect(
+        durianTrust.connect(lab).updateLabReport(
+          "BATCH-LAB",
+          200, 500,
+          "Đạt chuẩn", "Export-ready",
+          9800,
+          0,
+          "An toàn", "Safe"
+        )
+      ).to.emit(durianTrust, "LabReportUpdated");
+
+      const b = await durianTrust.getBatch("BATCH-LAB");
+      expect(b.cadmiumPpm).to.equal(200);
+    });
+
+    it("Should reject lab report update from unauthorized account", async function () {
+      // Owner registers batch
+      await durianTrust.registerBatch(
+        "BATCH-LAB2",
+        "Farm", "Farm En",
+        "Province", "Province En",
+        "2026-06-01",
+        300, 500,
+        "Pass", "Pass En",
+        9400,
+        0,
+        "None", "None En"
+      );
+
+      // Stranger tries to update lab report
+      await expect(
+        durianTrust.connect(stranger).updateLabReport(
+          "BATCH-LAB2",
+          200, 500,
+          "Đạt chuẩn", "Export-ready",
+          9800,
+          0,
+          "An toàn", "Safe"
+        )
+      ).to.be.revertedWith("Only lab or owner can call this");
+    });
+
+    it("Should reject batch registration with duplicate batch IDs", async function () {
+      await durianTrust.registerBatch(
+        "DUP-BATCH",
+        "Farm", "Farm En",
+        "Province", "Province En",
+        "2026-06-01",
+        300, 500,
+        "Pass", "Pass En",
+        9400,
+        0,
+        "None", "None En"
+      );
+
+      await expect(
+        durianTrust.registerBatch(
+          "DUP-BATCH",
+          "Farm 2", "Farm 2 En",
+          "Province 2", "Province 2 En",
+          "2026-06-02",
+          400, 500,
+          "Pass 2", "Pass 2 En",
+          9500,
+          0,
+          "None 2", "None 2 En"
+        )
+      ).to.be.revertedWith("Batch already exists");
+    });
+
+    it("Should append lab reports to history, preserve prior records, and return the latest via getBatch", async function () {
+      await durianTrust.registerBatch(
+        "HIST-BATCH",
+        "Farm", "Farm En",
+        "Province", "Province En",
+        "2026-06-01",
+        300, 500,
+        "Pass", "Pass En",
+        9400,
+        0,
+        "None", "None En"
+      );
+
+      // Setup lab role
+      await durianTrust.addLab(lab.address);
+
+      // Perform update 1
+      await durianTrust.connect(lab).updateLabReport(
+        "HIST-BATCH",
+        200, 500,
+        "Đạt chuẩn 1", "Export-ready 1",
+        9800,
+        0,
+        "An toàn 1", "Safe 1"
+      );
+
+      // Perform update 2
+      await durianTrust.connect(lab).updateLabReport(
+        "HIST-BATCH",
+        400, 500,
+        "Đạt chuẩn 2", "Export-ready 2",
+        9900,
+        1, // Medium risk
+        "An toàn 2", "Safe 2"
+      );
+
+      // Fetch history
+      const history = await durianTrust.getLabReportHistory("HIST-BATCH");
+      expect(history.length).to.equal(3); // Initial + Update 1 + Update 2
+
+      // Verify prior records are preserved
+      expect(history[0].cadmiumPpm).to.equal(300);
+      expect(history[0].confidence).to.equal(9400);
+
+      expect(history[1].cadmiumPpm).to.equal(200);
+      expect(history[1].confidence).to.equal(9800);
+
+      expect(history[2].cadmiumPpm).to.equal(400);
+      expect(history[2].confidence).to.equal(9900);
+
+      // Assert getBatch returns the LATEST report's values (proves the backward-compat getter reads latest, not the old record)
+      const b = await durianTrust.getBatch("HIST-BATCH");
+      expect(b.cadmiumPpm).to.equal(400);
+      expect(b.confidence).to.equal(9900);
+      expect(b.riskLevel).to.equal(1);
+      expect(b.aiResultVi).to.equal("Đạt chuẩn 2");
     });
   });
 });

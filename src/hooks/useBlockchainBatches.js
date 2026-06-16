@@ -24,7 +24,7 @@ export function useBlockchainBatches(selectedBatchId) {
         setLoading(true)
 
         // 1. Fetch contract address and ABI dynamically at runtime
-        const configRes = await fetch('/contracts/DurianTrust.json')
+        const configRes = await fetch(`${import.meta.env.BASE_URL}contracts/DurianTrust.json`)
         if (!configRes.ok) {
           throw new Error('Could not fetch contract config')
         }
@@ -33,6 +33,8 @@ export function useBlockchainBatches(selectedBatchId) {
         if (!contractConfig.address || contractConfig.address === '0x0000000000000000000000000000000000000000') {
           throw new Error('Contract address is not yet set')
         }
+
+        const deployBlock = contractConfig.deployBlock || 0
 
         // Try connecting to the RPC provider from env, Vite proxy `/rpc`, or localhost:8545
         let provider
@@ -71,7 +73,7 @@ export function useBlockchainBatches(selectedBatchId) {
         setSource('chain')
 
         // 4. Fetch full details for the selected batch
-        await loadBatchDetails(contract, selectedBatchId || ids[0])
+        await loadBatchDetails(contract, selectedBatchId || ids[0], deployBlock)
       } catch (err) {
         console.warn('Blockchain connection failed. Falling back to static data.', err)
         if (!active) return
@@ -103,9 +105,22 @@ export function useBlockchainBatches(selectedBatchId) {
           tokenId = 8800 + (sum % 1000)
         }
 
+        const labReports = matched.labReports || [{
+          cadmiumPpm: matched.cadmiumPpm,
+          thresholdPpm: matched.thresholdPpm,
+          aiResult: matched.aiResult,
+          confidence: matched.confidence,
+          riskLevel: matched.riskLevel,
+          riskCause: matched.riskCause,
+          timestamp: Math.floor(Date.now() / 1000),
+          reporter: '0xDevSimulatorAccountAddress000000000000'
+        }]
+
         const formattedMatched = {
           ...matched,
-          tokenId: tokenId
+          tokenId: tokenId,
+          blockchainHash: 'simulated, not on-chain',
+          labReports: labReports
         }
 
         setActiveBatch(formattedMatched)
@@ -114,7 +129,7 @@ export function useBlockchainBatches(selectedBatchId) {
       }
     }
 
-    async function loadBatchDetails(contract, id) {
+    async function loadBatchDetails(contract, id, deployBlock) {
       try {
         const b = await contract.getBatch(id)
         const timelineData = await contract.getTimeline(id)
@@ -135,6 +150,39 @@ export function useBlockchainBatches(selectedBatchId) {
           status: evt.status === 1 ? 'complete' : 'pending'
         }))
 
+        let blockchainHash = 'simulated, not on-chain'
+        try {
+          const localHashes = JSON.parse(localStorage.getItem('duriantrust_tx_hashes') || '{}')
+          if (localHashes[id]) {
+            blockchainHash = localHashes[id]
+          } else {
+            const filter = contract.filters.BatchRegistered(id)
+            const events = await contract.queryFilter(filter, deployBlock || 0, 'latest')
+            if (events.length > 0) {
+              blockchainHash = events[0].transactionHash
+            }
+          }
+        } catch (e) {
+          console.warn('Could not query transaction hash for batch', id, e)
+        }
+
+        let labReports = []
+        try {
+          const reports = await contract.getLabReportHistory(id)
+          labReports = reports.map(r => ({
+            cadmiumPpm: Number(r.cadmiumPpm) / 10000,
+            thresholdPpm: Number(r.thresholdPpm) / 10000,
+            aiResult: { vi: r.aiResultVi, en: r.aiResultEn },
+            confidence: Number(r.confidence) / 10000,
+            riskLevel: mapRiskLevel(r.riskLevel),
+            riskCause: { vi: r.riskCauseVi, en: r.riskCauseEn },
+            timestamp: Number(r.timestamp),
+            reporter: r.reporter
+          }))
+        } catch (e) {
+          console.warn('Could not fetch lab report history for batch', id, e)
+        }
+
         const formattedBatch = {
           id: id,
           tokenId: tokenId,
@@ -148,7 +196,8 @@ export function useBlockchainBatches(selectedBatchId) {
           riskLevel: mapRiskLevel(b.riskLevel),
           riskCause: { vi: b.riskCauseVi, en: b.riskCauseEn },
           timeline: formattedTimeline,
-          blockchainHash: '0x' + id.split('').map(c => c.charCodeAt(0).toString(16)).join('').slice(0, 16) + '...verify'
+          blockchainHash: blockchainHash,
+          labReports: labReports
         }
 
         if (!active) return

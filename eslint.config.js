@@ -21,7 +21,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['test/**/*.js', 'scripts/**/*.js'],
+    files: ['test/**/*.js', 'scripts/**/*.js', 'hardhat.config.js', 'vite.config.js', 'eslint.config.js'],
     languageOptions: {
       globals: {
         ...globals.node,

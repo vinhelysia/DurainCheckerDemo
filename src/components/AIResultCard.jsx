@@ -87,6 +87,54 @@ function AIResultCard({ batch, loading, source }) {
           <dd>{copy.aiResult.notDetected}</dd>
         </div>
       </dl>
+
+      {batch.labReports && batch.labReports.length > 1 && (
+        <div style={{
+          marginTop: '16px',
+          paddingTop: '16px',
+          borderTop: '1px dashed rgba(94, 142, 134, 0.3)'
+        }}>
+          <h4 style={{
+            fontSize: '0.8rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: 'var(--color-ink-soft)',
+            marginBottom: '8px',
+            fontWeight: 700
+          }}>
+            {language === 'vi' ? 'Lịch sử kiểm định' : 'Audit History'}
+          </h4>
+          <ul style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px'
+          }}>
+            {batch.labReports.map((report, idx) => (
+              <li key={idx} style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontSize: '0.75rem',
+                color: 'var(--color-ink)',
+                background: 'rgba(94, 142, 134, 0.05)',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                border: '1px solid rgba(94, 142, 134, 0.1)'
+              }}>
+                <span>
+                  <strong>#{idx + 1}:</strong> {report.cadmiumPpm.toFixed(3)} ppm ({report.riskLevel === 'low' ? (language === 'vi' ? 'Đạt' : 'Safe') : report.riskLevel === 'medium' ? (language === 'vi' ? 'Cần khám' : 'Review') : (language === 'vi' ? 'Giữ lô' : 'Hold')})
+                </span>
+                <span style={{ color: 'var(--color-ink-soft)', fontSize: '0.7rem' }}>
+                  {new Date(report.timestamp * 1000).toLocaleDateString(language === 'vi' ? 'vi-VN' : 'en-US')}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </article>
   )
 }

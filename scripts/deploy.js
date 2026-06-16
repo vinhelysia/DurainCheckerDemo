@@ -73,7 +73,12 @@ async function main() {
     }
   ];
 
-  for (const batch of batches) {
+  const isSepolia = hre.network.name === "sepolia";
+  const batchesToSeed = isSepolia ? [batches[0]] : batches;
+
+  console.log(`Seeding ${batchesToSeed.length} batches (isSepolia = ${isSepolia})...`);
+
+  for (const batch of batchesToSeed) {
     const tx = await durianTrust.registerBatch(
       batch.id,
       batch.farm.vi,
@@ -117,12 +122,21 @@ async function main() {
   // Get the artifact JSON to extract ABI
   const artifact = await hre.artifacts.readArtifact("DurianTrust");
 
+  const deploymentTx = durianTrust.deploymentTransaction();
+  let deployBlock = 0;
+  if (deploymentTx) {
+    const receipt = await deploymentTx.wait();
+    deployBlock = receipt.blockNumber;
+  } else {
+    deployBlock = await hre.ethers.provider.getBlockNumber();
+  }
+
   fs.writeFileSync(
     path.join(contractsDir, "DurianTrust.json"),
-    JSON.stringify({ address: address, abi: artifact.abi }, null, 2)
+    JSON.stringify({ address: address, abi: artifact.abi, deployBlock: deployBlock }, null, 2)
   );
 
-  console.log(`Successfully wrote lean contract config to public/contracts/DurianTrust.json`);
+  console.log(`Successfully wrote lean contract config with deployBlock ${deployBlock} to public/contracts/DurianTrust.json`);
 }
 
 main().catch((error) => {

@@ -27,7 +27,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="section-shell footer-shell">
         <div>
-          <strong>DurianTrust AI</strong>
+          <strong>DurianTrust</strong>
           <p>
             {copy.footer.demoText}
           </p>

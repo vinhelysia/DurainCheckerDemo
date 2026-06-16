@@ -1,9 +1,44 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, QrCode, ShieldCheck, Camera, Sparkles } from 'lucide-react'
 
 export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess, language }) {
   const [scanState, setScanState] = useState('idle') // 'idle' | 'scanning' | 'success'
   const [scannedBatchId, setScannedBatchId] = useState('')
+
+  const closeButtonRef = useRef(null)
+  const previousFocusRef = useRef(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement
+      const timer = setTimeout(() => {
+        if (closeButtonRef.current) {
+          closeButtonRef.current.focus()
+        }
+      }, 50)
+      return () => clearTimeout(timer)
+    } else {
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus()
+        previousFocusRef.current = null
+      }
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setScanState('idle')
+        setScannedBatchId('')
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, onClose])
 
   if (!isOpen) return null
 
@@ -40,7 +75,13 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
               {language === 'vi' ? 'Trình giả lập quét mã QR' : 'Interactive QR Scanner'}
             </h2>
           </div>
-          <button type="button" className="close-button" onClick={handleClose} aria-label="Close scanner">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="close-button"
+            onClick={handleClose}
+            aria-label="Close scanner"
+          >
             <X size={20} />
           </button>
         </div>

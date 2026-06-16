@@ -57,13 +57,13 @@ export default function UnitDetails({ unitType }) {
       telemetry: [
         { label: language === 'vi' ? 'Hàm lượng Cadimi' : 'Cadmium Level', value: '0.024 ppm', status: 'optimal', limit: '< 0.05 ppm' },
         { label: language === 'vi' ? 'Chất Vàng O' : 'Auramine O Dye', value: language === 'vi' ? 'Không phát hiện' : 'Not Detected', status: 'optimal' },
-        { label: language === 'vi' ? 'Độ tin cậy quét AI' : 'AI Classification Conf', value: '98.7 %', status: 'optimal' },
+        { label: language === 'vi' ? 'Độ tin cậy quét' : 'Quality Gate Conf', value: '98.7 %', status: 'optimal' },
         { label: language === 'vi' ? 'Chứng nhận Phòng Lab' : 'Lab Accreditation', value: 'ISO/IEC 17025', status: 'normal' },
       ],
       blockchainLogs: [
         { height: '190605', hash: '0x99e2...0bda', event: language === 'vi' ? 'Tiếp nhận Mẫu thử Phòng Thí nghiệm' : 'Laboratory Sample Checked In', time: '11:30 - 15/06/2026' },
         { height: '190623', hash: '0xdac4...998f', event: language === 'vi' ? 'Ghi nhận Kết quả Kiểm nghiệm Cadimi' : 'Cadmium Assay Results Logged', time: '12:45 - 15/06/2026' },
-        { height: '190638', hash: '0x88f2...ee7c', event: language === 'vi' ? 'Ký mã hóa Xác nhận kiểm nghiệm AI' : 'AI Audit Sign-Off Broadcasted', time: '13:00 - 15/06/2026' }
+        { height: '190638', hash: '0x88f2...ee7c', event: language === 'vi' ? 'Ký mã hóa Xác nhận kiểm nghiệm' : 'Rule-Based Audit Sign-Off Broadcasted', time: '13:00 - 15/06/2026' }
       ]
     },
     export: {

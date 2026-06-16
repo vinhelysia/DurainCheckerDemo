@@ -21,6 +21,12 @@ const unitItems = [
 
 function Header() {
   const { language, copy } = useLanguage()
+  const getHref = (item) => {
+    if (item.key === 'nft') {
+      return `${import.meta.env.BASE_URL}nft.html`
+    }
+    return item.href
+  }
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDrawer, setActiveDrawer] = useState(null) // 'intro' | 'units' | null
   const [slideKey, setSlideKey] = useState(0) // bumped every time we switch drawers to retrigger slide-in
@@ -33,6 +39,26 @@ function Header() {
     width: 0,
     opacity: 0,
   })
+
+  const prevFocusRef = useRef(null)
+  const drawerCloseRef = useRef(null)
+
+  useEffect(() => {
+    if (activeDrawer) {
+      prevFocusRef.current = document.activeElement
+      const timer = setTimeout(() => {
+        if (drawerCloseRef.current) {
+          drawerCloseRef.current.focus()
+        }
+      }, 50)
+      return () => clearTimeout(timer)
+    } else {
+      if (prevFocusRef.current) {
+        prevFocusRef.current.focus()
+        prevFocusRef.current = null
+      }
+    }
+  }, [activeDrawer])
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -195,6 +221,7 @@ function Header() {
             {activeDrawer === 'intro' ? copy.header.nav.intro : copy.header.nav.units}
           </h2>
           <button
+            ref={drawerCloseRef}
             type="button"
             className="drawer-close-btn"
             onClick={() => setActiveDrawer(null)}
@@ -219,7 +246,7 @@ function Header() {
                     <strong>{copy.header.nav[item.key]}</strong>
                     <span className="drawer-item-desc">
                       {item.key === 'problem' && (language === 'vi' ? 'Phân tích thách thức, kiểm soát Cadimi & Auramine O' : 'Analysis of cadmium & dye challenges')}
-                      {item.key === 'solution' && (language === 'vi' ? 'Hợp đồng thông minh & mô hình kiểm định AI' : 'Smart contracts & AI validation model')}
+                      {item.key === 'solution' && (language === 'vi' ? 'Hợp đồng thông minh & Bộ quy tắc kiểm định' : 'Smart contracts & Rule-Based validation model')}
                       {item.key === 'impact' && (language === 'vi' ? 'Niềm tin thị trường & thông quan nhanh' : 'Market trust & fast custom clearance')}
                       {item.key === 'slides' && (language === 'vi' ? 'Tài liệu thuyết trình chiến lược kinh doanh' : 'Strategic business deck presentation')}
                     </span>
@@ -234,8 +261,8 @@ function Header() {
             <div className="drawer-section-list">
               {unitItems.map((item) => (
                 <a
-                  key={item.href}
-                  href={item.href}
+                  key={item.key}
+                  href={getHref(item)}
                   className="drawer-item-link"
                   onClick={() => setActiveDrawer(null)}
                 >
@@ -247,7 +274,7 @@ function Header() {
                       {item.key === 'testing' && (language === 'vi' ? 'Dữ liệu phân tích hóa chất & sàng lọc Cadimi' : 'Chemical assays & cadmium screening')}
                       {item.key === 'export' && (language === 'vi' ? 'Tờ khai hải quan & chứng thư số NFT' : 'Customs declarations & NFT certificates')}
                       {item.key === 'demo' && (language === 'vi' ? 'Tra cứu blockchain theo mã lô hàng' : 'Blockchain lookup by batch identifier')}
-                      {item.key === 'manage' && (language === 'vi' ? 'Đăng ký lô hàng & ghi nhật ký kiểm định AI' : 'Register batches & log AI quality audits')}
+                      {item.key === 'manage' && (language === 'vi' ? 'Đăng ký lô hàng & ghi nhật ký kiểm định theo Bộ quy tắc' : 'Register batches & log rule-based quality audits')}
                       {item.key === 'nft' && (language === 'vi' ? 'Kiểm chứng chữ ký mã hóa Web3' : 'Verify Web3 cryptographic signature')}
                     </span>
                   </div>
@@ -280,7 +307,7 @@ function Header() {
         <div className="mobile-nav-header">{copy.header.nav.units}</div>
         <div className="mobile-nav-section" aria-label={copy.header.landingMenuAria}>
           {unitItems.map((item) => (
-            <a key={item.href} href={item.href} onClick={closeMobileMenu}>
+            <a key={item.key} href={getHref(item)} onClick={closeMobileMenu}>
               <span>{copy.header.nav[item.key]}</span>
             </a>
           ))}

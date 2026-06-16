@@ -42,6 +42,109 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "FarmerAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "FarmerRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "LabAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "LabRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cadmiumPpm",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum DurianTrust.RiskLevel",
+          "name": "riskLevel",
+          "type": "uint8"
+        }
+      ],
+      "name": "LabReportUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "LogisticsAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "LogisticsRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
           "internalType": "string",
           "name": "id",
           "type": "string"
@@ -67,6 +170,45 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "addFarmer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "addLab",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "addLogistics",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -226,6 +368,148 @@
     {
       "inputs": [
         {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        }
+      ],
+      "name": "getLabReportHistory",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "cadmiumPpm",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "thresholdPpm",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "aiResultVi",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "aiResultEn",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "confidence",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum DurianTrust.RiskLevel",
+              "name": "riskLevel",
+              "type": "uint8"
+            },
+            {
+              "internalType": "string",
+              "name": "riskCauseVi",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "riskCauseEn",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "reporter",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct DurianTrust.LabReport[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        }
+      ],
+      "name": "getLatestLabReport",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "cadmiumPpm",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "thresholdPpm",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "aiResultVi",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "aiResultEn",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "confidence",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum DurianTrust.RiskLevel",
+              "name": "riskLevel",
+              "type": "uint8"
+            },
+            {
+              "internalType": "string",
+              "name": "riskCauseVi",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "riskCauseEn",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "reporter",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct DurianTrust.LabReport",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "uint256",
           "name": "tokenId",
           "type": "uint256"
@@ -307,6 +591,63 @@
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "isFarmer",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "isLab",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "isLogistics",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
@@ -402,6 +743,99 @@
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "removeFarmer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "removeLab",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "removeLogistics",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "cadmiumPpm",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "thresholdPpm",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "aiResultVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "aiResultEn",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "confidence",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DurianTrust.RiskLevel",
+          "name": "riskLevel",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "riskCauseVi",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riskCauseEn",
+          "type": "string"
+        }
+      ],
+      "name": "updateLabReport",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
-  ]
+  ],
+  "deployBlock": 1
 }

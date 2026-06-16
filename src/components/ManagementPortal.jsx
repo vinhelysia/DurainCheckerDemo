@@ -64,28 +64,28 @@ export default function ManagementPortal() {
     setTxMessage({ text: '', type: '' })
   }
 
-  // Live AI Auditor logic based on input Cadmium (deterministic/pure)
-  const runAiAuditor = (cdVal) => {
+  // Live Rule-Based Quality Gate Auditor logic based on input Cadmium (deterministic/pure)
+  const runRuleAuditor = (cdVal) => {
     const cd = parseFloat(cdVal) || 0
     const cdInt = Math.round(cd * 1000)
     let riskLevel = 'low'
-    let aiResultVi = 'Đạt chuẩn xuất khẩu'
-    let aiResultEn = 'Export-ready'
+    let ruleResultVi = 'Đạt chuẩn xuất khẩu'
+    let ruleResultEn = 'Export-ready'
     let confidence
     let riskCauseVi = 'Cadimi và Vàng O trong ngưỡng cho phép'
     let riskCauseEn = 'Cadmium and Yellow O within limits'
 
     if (cd > 0.05) {
       riskLevel = 'high'
-      aiResultVi = 'Không đạt - giữ lô'
-      aiResultEn = 'Hold - does not pass'
+      ruleResultVi = 'Không đạt - giữ lô'
+      ruleResultEn = 'Hold - does not pass'
       confidence = 82 + (cdInt % 14)
       riskCauseVi = 'Hàm lượng Cadimi vượt ngưỡng an toàn cho phép (> 0.05 ppm)'
       riskCauseEn = 'Cadmium level exceeds safe limits (> 0.05 ppm)'
     } else if (cd >= 0.045) {
       riskLevel = 'medium'
-      aiResultVi = 'Cần kiểm tra lại'
-      aiResultEn = 'Needs re-check'
+      ruleResultVi = 'Cần kiểm tra lại'
+      ruleResultEn = 'Needs re-check'
       confidence = 62 + (cdInt % 15)
       riskCauseVi = 'Hàm lượng Cadimi gần ngưỡng cảnh báo, đề nghị kiểm tra bổ sung'
       riskCauseEn = 'Cadmium level near threshold; supplementary assay recommended'
@@ -93,16 +93,16 @@ export default function ManagementPortal() {
       confidence = 90 + (cdInt % 9)
     }
 
-    return { riskLevel, aiResultVi, aiResultEn, confidence, riskCauseVi, riskCauseEn }
+    return { riskLevel, aiResultVi: ruleResultVi, aiResultEn: ruleResultEn, confidence, riskCauseVi, riskCauseEn }
   }
 
-  const aiAudit = runAiAuditor(cadmiumPpm)
+  const ruleAudit = runRuleAuditor(cadmiumPpm)
 
   // Initialize blockchain client connection
   useEffect(() => {
     async function loadContract() {
       try {
-        const configRes = await fetch('/contracts/DurianTrust.json')
+        const configRes = await fetch(`${import.meta.env.BASE_URL}contracts/DurianTrust.json`)
         if (!configRes.ok) throw new Error('Contract config not found')
         const config = await configRes.json()
         setContractInfo(config)
@@ -180,7 +180,10 @@ export default function ManagementPortal() {
   // Connect wallet manual trigger
   const handleConnectWallet = async () => {
     if (!window.ethereum) {
-      alert(language === 'vi' ? 'Vui lòng cài đặt Metamask!' : 'Please install MetaMask!')
+      setTxMessage({
+        text: language === 'vi' ? 'Vui lòng cài đặt Metamask!' : 'Please install MetaMask!',
+        type: 'error'
+      })
       return
     }
     try {
@@ -203,7 +206,10 @@ export default function ManagementPortal() {
   const handleRegisterBatch = async (e) => {
     e.preventDefault()
     if (!batchId) {
-      alert(language === 'vi' ? 'Vui lòng nhập Mã Lô hàng!' : 'Please enter Batch ID!')
+      setTxMessage({
+        text: language === 'vi' ? 'Vui lòng nhập Mã Lô hàng!' : 'Please enter Batch ID!',
+        type: 'error'
+      })
       return
     }
 
@@ -212,8 +218,8 @@ export default function ManagementPortal() {
 
     const cadmiumValueScaled = Math.round(parseFloat(cadmiumPpm) * 10000)
     const thresholdValueScaled = 500 // 0.05 ppm * 10000
-    const confidenceScaled = Math.round(aiAudit.confidence * 100)
-    const riskLevelEnum = aiAudit.riskLevel === 'low' ? 0 : aiAudit.riskLevel === 'medium' ? 1 : 2
+    const confidenceScaled = Math.round(ruleAudit.confidence * 100)
+    const riskLevelEnum = ruleAudit.riskLevel === 'low' ? 0 : ruleAudit.riskLevel === 'medium' ? 1 : 2
 
     if (providerMode === 'chain' && contractInfo) {
       try {
@@ -235,18 +241,27 @@ export default function ManagementPortal() {
           harvestDate || new Date().toISOString().split('T')[0],
           cadmiumValueScaled,
           thresholdValueScaled,
-          aiAudit.aiResultVi,
-          aiAudit.aiResultEn,
+          ruleAudit.aiResultVi,
+          ruleAudit.aiResultEn,
           confidenceScaled,
           riskLevelEnum,
-          aiAudit.riskCauseVi,
-          aiAudit.riskCauseEn
+          ruleAudit.riskCauseVi,
+          ruleAudit.riskCauseEn
         )
 
         setTxMessage({
           text: language === 'vi' ? 'Đang gửi giao dịch lên Blockchain...' : 'Broadcasting transaction to blockchain...',
           type: 'info'
         })
+
+        // Save the transaction hash in local storage duriantrust_tx_hashes mapping
+        try {
+          const localHashes = JSON.parse(localStorage.getItem('duriantrust_tx_hashes') || '{}')
+          localHashes[batchId] = tx.hash
+          localStorage.setItem('duriantrust_tx_hashes', JSON.stringify(localHashes))
+        } catch (e) {
+          console.warn('Failed to save tx hash to localStorage', e)
+        }
 
         await tx.wait()
         
@@ -299,10 +314,10 @@ export default function ManagementPortal() {
           harvestDate: harvestDate || new Date().toISOString().split('T')[0],
           cadmiumPpm: parseFloat(cadmiumPpm),
           thresholdPpm: 0.05,
-          aiResult: { vi: aiAudit.aiResultVi, en: aiAudit.aiResultEn },
-          confidence: aiAudit.confidence / 100,
-          riskLevel: aiAudit.riskLevel,
-          riskCause: { vi: aiAudit.riskCauseVi, en: aiAudit.riskCauseEn },
+          aiResult: { vi: ruleAudit.aiResultVi, en: ruleAudit.aiResultEn },
+          confidence: ruleAudit.confidence / 100,
+          riskLevel: ruleAudit.riskLevel,
+          riskCause: { vi: ruleAudit.riskCauseVi, en: ruleAudit.riskCauseEn },
           timeline: [
             {
               stage: { vi: 'Thu hoạch', en: 'Harvest' },
@@ -311,7 +326,19 @@ export default function ManagementPortal() {
               status: 'complete'
             }
           ],
-          blockchainHash: '0x' + Math.random().toString(16).slice(2, 18) + '...simulated'
+          blockchainHash: 'simulated, not on-chain',
+          labReports: [
+            {
+              cadmiumPpm: parseFloat(cadmiumPpm),
+              thresholdPpm: 0.05,
+              aiResult: { vi: ruleAudit.aiResultVi, en: ruleAudit.aiResultEn },
+              confidence: ruleAudit.confidence / 100,
+              riskLevel: ruleAudit.riskLevel,
+              riskCause: { vi: ruleAudit.riskCauseVi, en: ruleAudit.riskCauseEn },
+              timestamp: Math.floor(Date.now() / 1000),
+              reporter: '0xDevSimulatorAccountAddress000000000000'
+            }
+          ]
         }
 
         localBatches.push(newBatch)
@@ -340,11 +367,17 @@ export default function ManagementPortal() {
   const handleAddTimeline = async (e) => {
     e.preventDefault()
     if (!selectedBatchId) {
-      alert(language === 'vi' ? 'Vui lòng chọn Lô sầu riêng!' : 'Please select a Batch ID!')
+      setTxMessage({
+        text: language === 'vi' ? 'Vui lòng chọn Lô sầu riêng!' : 'Please select a Batch ID!',
+        type: 'error'
+      })
       return
     }
     if (!locationVi) {
-      alert(language === 'vi' ? 'Vui lòng nhập địa điểm!' : 'Please enter location!')
+      setTxMessage({
+        text: language === 'vi' ? 'Vui lòng nhập địa điểm!' : 'Please enter location!',
+        type: 'error'
+      })
       return
     }
 
@@ -462,8 +495,8 @@ export default function ManagementPortal() {
             <h1>{language === 'vi' ? 'Cổng Quản Trị Chuỗi Cung Ứng' : 'Supply Chain Operator Console'}</h1>
             <p className="unit-subtitle">
               {language === 'vi' 
-                ? 'Ghi nhật ký kiểm nghiệm AI và cập nhật dòng thời gian minh bạch lên Blockchain' 
-                : 'Log AI quality audits and broadcast transparent timeline events on-chain'}
+                ? 'Ghi nhật ký kiểm nghiệm theo Bộ quy tắc và cập nhật dòng thời gian minh bạch lên Blockchain' 
+                : 'Log rule-based quality audits and broadcast transparent timeline events on-chain'}
             </p>
           </div>
         </div>
@@ -597,26 +630,26 @@ export default function ManagementPortal() {
                 <span className="input-hint">{language === 'vi' ? 'Ngưỡng an toàn tối đa của Hải quan là 0.050 ppm' : 'Customs safety limit is 0.050 ppm'}</span>
               </div>
 
-              {/* Real-time AI auditor indicator card */}
-              <div className={`ai-preview-panel risk-${aiAudit.riskLevel}`}>
+              {/* Real-time Rule-Based Quality Gate auditor indicator card */}
+              <div className={`ai-preview-panel risk-${ruleAudit.riskLevel}`}>
                 <div className="ai-preview-header">
                   <Cpu size={16} />
-                  <span>{language === 'vi' ? 'ĐÁNH GIÁ CHẤT LƯỢNG AI (TẠM TÍNH)' : 'AI REAL-TIME AUDITING PREVIEW'}</span>
+                  <span>{language === 'vi' ? 'ĐÁNH GIÁ CHẤT LƯỢNG THEO BỘ QUY TẮC (TẠM TÍNH)' : 'RULE-BASED REAL-TIME AUDITING PREVIEW'}</span>
                 </div>
                 <div className="ai-preview-body">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-semibold">
-                      {language === 'vi' ? aiAudit.aiResultVi : aiAudit.aiResultEn}
+                      {language === 'vi' ? ruleAudit.aiResultVi : ruleAudit.aiResultEn}
                     </span>
-                    <span className={`risk-badge risk-${aiAudit.riskLevel}`}>
-                      {aiAudit.riskLevel === 'low' ? (language === 'vi' ? 'Đạt chuẩn' : 'Safe') : (aiAudit.riskLevel === 'medium' ? (language === 'vi' ? 'Cần kiểm tra' : 'Review') : (language === 'vi' ? 'Giữ lại' : 'Critical'))}
+                    <span className={`risk-badge risk-${ruleAudit.riskLevel}`}>
+                      {ruleAudit.riskLevel === 'low' ? (language === 'vi' ? 'Đạt chuẩn' : 'Safe') : (ruleAudit.riskLevel === 'medium' ? (language === 'vi' ? 'Cần kiểm tra' : 'Review') : (language === 'vi' ? 'Giữ lại' : 'Critical'))}
                     </span>
                   </div>
                   <div className="text-xs opacity-80">
-                    <strong>{language === 'vi' ? 'Độ tin cậy: ' : 'Confidence: '}</strong> {aiAudit.confidence}%
+                    <strong>{language === 'vi' ? 'Độ tin cậy: ' : 'Confidence: '}</strong> {ruleAudit.confidence}%
                   </div>
                   <div className="text-xs mt-1 italic opacity-90">
-                    &ldquo;{language === 'vi' ? aiAudit.riskCauseVi : aiAudit.riskCauseEn}&rdquo;
+                    &ldquo;{language === 'vi' ? ruleAudit.riskCauseVi : ruleAudit.riskCauseEn}&rdquo;
                   </div>
                 </div>
               </div>
@@ -739,7 +772,11 @@ export default function ManagementPortal() {
 
         {/* Transaction Messages & Feedback Panel */}
         {txMessage.text && (
-          <div className={`tx-feedback-banner tx-type-${txMessage.type} dashboard-card mt-6`}>
+          <div 
+            className={`tx-feedback-banner tx-type-${txMessage.type} dashboard-card mt-6`}
+            role={txMessage.type === 'error' ? 'alert' : 'status'}
+            aria-live={txMessage.type === 'error' ? 'assertive' : 'polite'}
+          >
             {txMessage.type === 'success' && <CheckCircle2 className="tx-icon text-green-mid" />}
             {txMessage.type === 'error' && <AlertTriangle className="tx-icon text-red-500" />}
             {txMessage.type === 'info' && <RefreshCw className="tx-icon text-gold animate-spin" />}
@@ -759,7 +796,7 @@ export default function ManagementPortal() {
           <p className="callout-text">
             {language === 'vi' 
               ? 'Tất cả các giao dịch gửi từ Cổng quản trị này được ký trực tiếp bằng Khóa bí mật (Private Key) của ví kiểm định viên. Dữ liệu khi đã nạp vào chuỗi khối Hardhat sẽ sinh ra một địa chỉ TxHash bất biến duy nhất. Người tiêu dùng sử dụng Trình quét mã QR có thể hoàn toàn yên tâm thông tin kiểm định hóa chất Cadmium này đã được xác thực mã hóa 100%, không bị sửa đổi bởi các bên trung gian.'
-              : 'Every log submitted via this Operator console is cryptographically signed by the Inspector\'s private key. Once accepted into the EVM blockchain, it generates an immutable, timestamped transaction proof. Consumers scanning the package QR code can rest assured that this Cadmium assay and AI safety rating was certified directly at the source, preventing any tampering by distributors.'}
+              : 'Every log submitted via this Operator console is cryptographically signed by the Inspector\'s private key. Once accepted into the EVM blockchain, it generates an immutable, timestamped transaction proof. Consumers scanning the package QR code can rest assured that this Cadmium assay and quality safety rating was certified directly at the source, preventing any tampering by distributors.'}
           </p>
         </div>
 
