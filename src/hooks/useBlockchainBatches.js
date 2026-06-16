@@ -34,14 +34,14 @@ export function useBlockchainBatches(selectedBatchId) {
           throw new Error('Contract address is not yet set')
         }
 
-        // Try connecting to the local Hardhat node via Vite proxy `/rpc` first.
-        // If that fails, try http://127.0.0.1:8545 directly.
+        // Try connecting to the RPC provider from env, Vite proxy `/rpc`, or localhost:8545
         let provider
         try {
-          provider = new JsonRpcProvider('/rpc')
+          const rpcUrl = import.meta.env.VITE_RPC_URL || '/rpc'
+          provider = new JsonRpcProvider(rpcUrl)
           await provider.getNetwork()
         } catch (e) {
-          console.warn('Vite proxy /rpc failed, attempting direct localhost:8545...', e)
+          console.warn('VITE_RPC_URL or proxy /rpc failed, attempting direct localhost:8545...', e)
           provider = new JsonRpcProvider('http://127.0.0.1:8545')
           await provider.getNetwork()
         }

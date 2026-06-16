@@ -123,18 +123,19 @@ export default function ManagementPortal() {
           }
         }
 
-        // 2. If no browser account, check direct Hardhat Node via localhost
+        // 2. If no browser account, check RPC URL from env or fallback direct Hardhat Node via localhost
         if (!currentAccount) {
           try {
-            const tempProvider = new JsonRpcProvider('http://127.0.0.1:8545')
+            const rpcUrl = import.meta.env.VITE_RPC_URL || 'http://127.0.0.1:8545'
+            const tempProvider = new JsonRpcProvider(rpcUrl)
             const signers = await tempProvider.listAccounts()
             if (signers.length > 0) {
               provider = tempProvider
               currentAccount = signers[0].address
-              console.log('Using Hardhat dev account:', currentAccount)
+              console.log('Using dev/RPC account:', currentAccount)
             }
           } catch (e) {
-            console.warn('Hardhat local node unreachable', e)
+            console.warn('RPC/Hardhat node unreachable', e)
           }
         }
 
