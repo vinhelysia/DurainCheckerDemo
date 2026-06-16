@@ -30,6 +30,7 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDrawer, setActiveDrawer] = useState(null) // 'intro' | 'units' | null
   const [slideKey, setSlideKey] = useState(0) // bumped every time we switch drawers to retrigger slide-in
+  const [slideDirection, setSlideDirection] = useState('right')
   const prevDrawerRef = useRef(null)
   const [currentPath, setCurrentPath] = useState(() => {
     return window.location.hash || '#/'
@@ -48,13 +49,13 @@ function Header() {
       prevFocusRef.current = document.activeElement
       const timer = setTimeout(() => {
         if (drawerCloseRef.current) {
-          drawerCloseRef.current.focus()
+          drawerCloseRef.current.focus({ preventScroll: true })
         }
       }, 50)
       return () => clearTimeout(timer)
     } else {
       if (prevFocusRef.current) {
-        prevFocusRef.current.focus()
+        prevFocusRef.current.focus({ preventScroll: true })
         prevFocusRef.current = null
       }
     }
@@ -95,6 +96,23 @@ function Header() {
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [])
+
+  useEffect(() => {
+    if (activeDrawer === null) {
+      prevDrawerRef.current = null
+    }
+  }, [activeDrawer])
+
+  useEffect(() => {
+    if (activeDrawer || isMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [activeDrawer, isMenuOpen])
 
   const closeMobileMenu = () => setIsMenuOpen(false)
 
@@ -150,6 +168,7 @@ function Header() {
                 if (next && prev !== next) {
                   prevDrawerRef.current = prev
                   setSlideKey((k) => k + 1)
+                  setSlideDirection(prev === 'units' ? 'left' : 'right')
                 }
                 return next
               })
@@ -172,6 +191,7 @@ function Header() {
                 if (next && prev !== next) {
                   prevDrawerRef.current = prev
                   setSlideKey((k) => k + 1)
+                  setSlideDirection(prev === 'intro' ? 'right' : 'right')
                 }
                 return next
               })
@@ -232,7 +252,11 @@ function Header() {
         </div>
 
         {/* Keyed so React remounts (and slide-in fires) on every drawer switch */}
-        <div key={`${activeDrawer}-${slideKey}`} className="drawer-content drawer-slide-in">
+        <div 
+          key={`${activeDrawer}-${slideKey}`} 
+          className={`drawer-content ${prevDrawerRef.current ? `drawer-slide-in-${slideDirection}` : ''}`}
+          data-lenis-prevent
+        >
           {activeDrawer === 'intro' && (
             <div className="drawer-section-list">
               {introItems.map((item) => (

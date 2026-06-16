@@ -17,8 +17,8 @@
   --color-risk-low-bg: #e7f0ea;
   --color-risk-medium-bg: #fbeddb;
   --color-risk-high-bg: #fbe6e2;
-  --font-display: 'Be Vietnam Pro', Inter, sans-serif;
-  --font-body: Inter, 'Be Vietnam Pro', sans-serif;
+  --font-display: 'Be Vietnam Pro', sans-serif;
+  --font-body: 'Be Vietnam Pro', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas,
     monospace;
   --fs-h1: 3.25rem;

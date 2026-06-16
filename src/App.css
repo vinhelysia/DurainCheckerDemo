@@ -418,7 +418,7 @@
 
 .svg-label {
   fill: #1e2a22;
-  font-family: 'Be Vietnam Pro', Inter, sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-size: 17px;
   font-weight: 700;
 }
@@ -2506,8 +2506,8 @@ button.nav-link:focus-visible {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Slide-in animation when switching between drawers */
-@keyframes drawerSlideIn {
+/* Slide-in animations when switching between drawers */
+@keyframes drawerSlideInRight {
   from {
     opacity: 0;
     transform: translateX(40px);
@@ -2518,8 +2518,23 @@ button.nav-link:focus-visible {
   }
 }
 
-.drawer-slide-in {
-  animation: drawerSlideIn 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+@keyframes drawerSlideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.drawer-slide-in-right {
+  animation: drawerSlideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer-slide-in-left {
+  animation: drawerSlideInLeft 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Custom Scrollbar for Drawer Panel */
