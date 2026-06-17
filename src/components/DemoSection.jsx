@@ -10,6 +10,7 @@ import HashProofChip from './HashProofChip'
 
 const QRScannerModal = lazy(() => import('./QRScannerModal'))
 const BatchQRLabel = lazy(() => import('./BatchQRLabel'))
+const LeafDiseaseScanner = lazy(() => import('./LeafDiseaseScanner'))
 
 function DemoSection() {
   const { language, copy } = useLanguage()
@@ -170,6 +171,13 @@ function DemoSection() {
               <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} loading={loading} />
             </div>
           </div>
+        </div>
+
+        {/* Leaf Disease Scanner Section */}
+        <div className="leaf-scanner-wrapper">
+          <Suspense fallback={<div className="skeleton" style={{ minHeight: '200px', borderRadius: 'var(--radius-card)', background: 'var(--color-surface-alt)', opacity: 0.5 }}></div>}>
+            <LeafDiseaseScanner />
+          </Suspense>
         </div>
 
         {isScannerOpen && (

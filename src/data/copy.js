@@ -127,6 +127,33 @@ export const copyData = {
         high: 'Giữ lô',
       },
     },
+    leafScanner: {
+      kicker: 'Chẩn đoán hình ảnh',
+      title: 'Nhận diện bệnh lá bằng AI',
+      desc: 'Chụp hoặc tải ảnh lá sầu riêng để phân tích bệnh nhanh chóng qua mô hình học máy trên máy chủ.',
+      button: 'Chụp/Tải ảnh lá sầu riêng',
+      analyzing: 'Đang gửi dữ liệu và phân tích...',
+      resultHeader: 'Kết quả phân tích từ máy chủ',
+      diseaseLabel: 'Bệnh chẩn đoán',
+      probabilityLabel: 'Độ tin cậy',
+      treatmentHeader: 'Thông tin tham khảo xử lý',
+      sourceAi: '🧠 Mô hình AI',
+      sourceOffline: '⚠️ Lỗi/Offline',
+      diseases: {
+        healthy: 'Lá khỏe mạnh',
+        algal_leaf_spot: 'Bệnh đốm rong (tảo)',
+        leaf_blight: 'Bệnh cháy lá',
+        phomopsis_leaf_spot: 'Bệnh đốm lá Phomopsis',
+        allocaridara_attack: 'Rầy nhảy gây hại'
+      },
+      treatments: {
+        healthy: 'Thông tin tham khảo: Lá sầu riêng khỏe mạnh bình thường. Duy trì chế độ dinh dưỡng và giám sát định kỳ.',
+        algal_leaf_spot: 'Thông tin tham khảo: Triệu chứng đốm rong (tảo). Cắt tỉa cành tạo độ thoáng cho cây nhận ánh sáng tốt hơn, hạn chế ẩm thấp.',
+        leaf_blight: 'Thông tin tham khảo: Triệu chứng cháy lá. Giữ vườn thông thoáng, hạn chế tưới nước trực tiếp lên tán lá vào buổi tối.',
+        phomopsis_leaf_spot: 'Thông tin tham khảo: Triệu chứng đốm lá Phomopsis. Dọn sạch tàn dư lá bệnh dưới gốc, theo dõi kỹ vì dễ nhầm với lá khỏe.',
+        allocaridara_attack: 'Thông tin tham khảo: Dấu hiệu rầy nhảy (Allocaridara) gây hại. Kiểm tra mặt dưới lá, theo dõi mật độ côn trùng và xử lý theo khuyến cáo nông học.'
+      }
+    },
     timeline: {
       kicker: 'Blockchain ledger',
       title: 'Nhật ký truy xuất lô hàng',
@@ -363,6 +390,33 @@ export const copyData = {
         medium: 'Needs review',
         high: 'Hold batch',
       },
+    },
+    leafScanner: {
+      kicker: 'Computer Vision',
+      title: 'AI Leaf Disease Diagnostics',
+      desc: 'Take a photo or upload an image of a durian leaf to instantly detect common diseases via serverless machine learning.',
+      button: 'Capture/Upload Leaf Photo',
+      analyzing: 'Uploading pixels and analyzing...',
+      resultHeader: 'Server Analysis Result',
+      diseaseLabel: 'Detected Condition',
+      probabilityLabel: 'Confidence Level',
+      treatmentHeader: 'Informational General Remedy',
+      sourceAi: '🧠 AI Model',
+      sourceOffline: '⚠️ Error/Offline',
+      diseases: {
+        healthy: 'Healthy Leaf',
+        algal_leaf_spot: 'Algal Leaf Spot',
+        leaf_blight: 'Leaf Blight',
+        phomopsis_leaf_spot: 'Phomopsis Leaf Spot',
+        allocaridara_attack: 'Allocaridara (Psyllid) Attack'
+      },
+      treatments: {
+        healthy: 'Informational: Leaf appears healthy. Continue normal nutrition and monitoring schedules.',
+        algal_leaf_spot: 'Informational: Algal leaf spot symptoms detected. Prune branches to improve light penetration and airflow, reduce humidity.',
+        leaf_blight: 'Informational: Leaf blight symptoms detected. Keep canopy ventilated, avoid watering late in the evening.',
+        phomopsis_leaf_spot: 'Informational: Phomopsis leaf spot symptoms detected. Clear fallen leaf debris; monitor closely as it can resemble healthy leaves.',
+        allocaridara_attack: 'Informational: Signs of Allocaridara (durian psyllid) attack. Inspect leaf undersides, monitor pest density, and treat per agronomic guidance.'
+      }
     },
     timeline: {
       kicker: 'Blockchain ledger',
