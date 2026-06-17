@@ -203,6 +203,38 @@ export const copyData = {
       },
       simulatedLabel: 'Vai trò giả lập (Chỉ dùng kiểm thử offline):',
     },
+    diseaseModel: {
+      kicker: 'DỰ BÁO BỆNH SẦU RIÊNG (AI EXTENSION)',
+      title: 'ĐÁNH GIÁ NGUY CƠ DỊCH BỆNH VÙNG TRỒNG',
+      tempLabel: 'Nhiệt độ môi trường (°C)',
+      humidityLabel: 'Độ ẩm không khí (%)',
+      wetnessLabel: 'Số giờ ướt lá (giờ)',
+      drainageLabel: 'Khả năng thoát nước đất',
+      ageLabel: 'Tuổi cây sầu riêng (năm)',
+      priorLabel: 'Lịch sử nhiễm bệnh vùng trồng',
+      priorYes: 'Đã từng bị nhiễm dịch bệnh',
+      priorNo: 'Chưa từng bị nhiễm dịch bệnh',
+      drainageOptions: {
+        good: 'Thoát nước tốt',
+        medium: 'Thoát nước trung bình',
+        poor: 'Thoát nước kém (dễ ngập úng)'
+      },
+      diseases: {
+        healthy: 'Khỏe mạnh - Rủi ro thấp',
+        phytophthora: 'Nứt thân xì mủ (Phytophthora)',
+        anthracnose: 'Bệnh thán thư (Anthracnose)',
+        leaf_blight: 'Bệnh cháy lá (Leaf blight)'
+      },
+      healthyDesc: 'Môi trường sinh trưởng lý tưởng, đề xuất tiếp tục chế độ canh tác hiện tại.',
+      phytophthoraDesc: 'Độ ẩm quá cao kết hợp thoát nước kém kích thích nấm Phytophthora phát triển. Cần phun phòng và khơi thông mương rãnh.',
+      anthracnoseDesc: 'Nhiệt độ ấm và độ ẩm cao là tác nhân trực tiếp cho bào tử thán thư phát tán. Khuyến nghị tỉa cành tạo tán thoáng.',
+      leaf_blightDesc: 'Lá sầu riêng bị ướt liên tục trên 12 giờ tạo điều kiện cho nấm cháy lá tấn công. Tránh tưới phun mưa vào chiều muộn.',
+      riskLabels: {
+        low: 'Rủi ro thấp (An toàn)',
+        medium: 'Rủi ro trung bình (Cảnh báo)',
+        high: 'Rủi ro cao (Nguy hiểm)'
+      }
+    },
   },
   en: {
     skipLink: 'Skip to content',
@@ -407,6 +439,38 @@ export const copyData = {
         norole: 'No Role',
       },
       simulatedLabel: 'Offline simulated testing only:',
+    },
+    diseaseModel: {
+      kicker: 'DURIAN DISEASE PREDICTION (AI EXTENSION)',
+      title: 'ORCHARD PATHOGEN RISK ASSESSMENT',
+      tempLabel: 'Ambient Temperature (°C)',
+      humidityLabel: 'Relative Air Humidity (%)',
+      wetnessLabel: 'Leaf Wetness Duration (hours)',
+      drainageLabel: 'Soil Drainage Capacity',
+      ageLabel: 'Durian Tree Age (years)',
+      priorLabel: 'Prior Orchard Infection History',
+      priorYes: 'Prior infections recorded',
+      priorNo: 'No prior infections recorded',
+      drainageOptions: {
+        good: 'Good drainage',
+        medium: 'Medium drainage',
+        poor: 'Poor drainage (waterlogged)'
+      },
+      diseases: {
+        healthy: 'Healthy - Low risk',
+        phytophthora: 'Phytophthora (Stem Canker)',
+        anthracnose: 'Anthracnose Leaf Spot',
+        leaf_blight: 'Rhizoctonia Leaf Blight'
+      },
+      healthyDesc: 'Optimal environmental conditions. Continue standard orchard maintenance.',
+      phytophthoraDesc: 'Excessive humidity and waterlogged soil trigger Phytophthora growth. Clear trenches and apply preventative fungicides.',
+      anthracnoseDesc: 'Warm temperatures combined with high humidity spread anthracnose spores. Prune branches to improve airflow.',
+      leaf_blightDesc: 'Leaf wetness exceeding 12 hours fosters leaf blight. Avoid overhead sprinkler irrigation during late afternoon.',
+      riskLabels: {
+        low: 'Low Risk (Safe)',
+        medium: 'Medium Risk (Warning)',
+        high: 'High Risk (Critical)'
+      }
     },
   },
 }

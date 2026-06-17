@@ -1,0 +1,23 @@
+{
+  "feature_order": [
+    "temperature_c",
+    "humidity_pct",
+    "rainfall_mm",
+    "leaf_wetness_hours",
+    "soil_drainage",
+    "harvest_month",
+    "tree_age_years",
+    "prior_infection"
+  ],
+  "soil_drainage_mapping": {
+    "good": 0.0,
+    "medium": 1.0,
+    "poor": 2.0
+  },
+  "label_mapping": {
+    "0": "healthy",
+    "1": "phytophthora",
+    "2": "anthracnose",
+    "3": "leaf_blight"
+  }
+}

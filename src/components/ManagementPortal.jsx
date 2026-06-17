@@ -12,7 +12,7 @@ function mapRiskLevel(enumVal) {
 }
 
 export default function ManagementPortal() {
-  const { language } = useLanguage()
+  const { language, copy } = useLanguage()
   
   // Navigation back to home
   const handleBackToHome = (e) => {
@@ -53,6 +53,17 @@ export default function ManagementPortal() {
   const [aiResult, setAiResult] = useState(null)
   const [aiError, setAiError] = useState('')
   const [newlyRegisteredBatchId, setNewlyRegisteredBatchId] = useState('')
+
+  // Disease Risk Form State (Farmer/Extension)
+  const [temperature, setTemperature] = useState('28.0')
+  const [humidity, setHumidity] = useState('80.0')
+  const [leafWetness, setLeafWetness] = useState('6.0')
+  const [soilDrainage, setSoilDrainage] = useState('good')
+  const [treeAge, setTreeAge] = useState('8.0')
+  const [priorInfection, setPriorInfection] = useState(0) // 0 or 1
+  const [diseasePredicting, setDiseasePredicting] = useState(false)
+  const [diseaseResult, setDiseaseResult] = useState(null)
+  const [diseaseError, setDiseaseError] = useState('')
 
   // Timeline Form State (Logistics)
   const [selectedBatchId, setSelectedBatchId] = useState('')
@@ -96,6 +107,15 @@ export default function ManagementPortal() {
     setCadmiumPpm(randomCd)
     setViolations(Math.floor(Math.random() * 4))
     setRainfall(Math.floor(Math.random() * 250 + 50))
+
+    // Pre-fill environmental details for pathogen prediction
+    setTemperature((Math.random() * 12 + 20).toFixed(1))
+    setHumidity((Math.random() * 40 + 60).toFixed(1))
+    setLeafWetness((Math.random() * 18 + 1).toFixed(1))
+    setSoilDrainage(['good', 'medium', 'poor'][Math.floor(Math.random() * 3)])
+    setTreeAge((Math.random() * 20 + 2).toFixed(1))
+    setPriorInfection(Math.random() > 0.7 ? 1 : 0)
+
     setTxMessage({ text: '', type: '' })
   }
 
@@ -131,6 +151,138 @@ export default function ManagementPortal() {
 
   const ruleAudit = runRuleAuditor(cadmiumPpm)
   const ruleAuditLab = runRuleAuditor(cadmiumPpmLab)
+
+  // Pure disease risk auditor mirroring python rules
+  const runDiseaseAuditor = (tempVal, humVal, rainVal, wetVal, drainageVal, priorVal) => {
+    const temp = parseFloat(tempVal) || 28.0
+    const hum = parseFloat(humVal) || 80.0
+    const rain = parseFloat(rainVal) || 150.0
+    const wet = parseFloat(wetVal) || 6.0
+    const prior = Number(priorVal) || 0
+    const drain = drainageVal === 'poor' ? 2.0 : (drainageVal === 'medium' ? 1.0 : 0.0)
+
+    let phyScore = 0.0
+    if (hum > 85.0 && drain === 2.0 && rain > 200.0) {
+      phyScore = 6.0 + prior * 1.5
+    } else {
+      phyScore = (hum - 85.0) * 0.04 + (drain - 1.0) * 0.5 + (rain - 200.0) * 0.003 + prior * 0.4
+    }
+
+    let antScore = 0.0
+    if (hum > 80.0 && temp >= 24.0 && temp <= 32.0) {
+      antScore = 5.0
+    } else {
+      antScore = (hum - 80.0) * 0.04 + (temp >= 24.0 && temp <= 32.0 ? 1.5 : -1.5)
+    }
+
+    let blightScore = 0.0
+    if (wet > 12.0) {
+      blightScore = 4.0
+    } else {
+      blightScore = (wet - 12.0) * 0.3
+    }
+
+    const healthyScore = 1.0
+
+    const scores = [
+      { name: 'healthy', val: healthyScore },
+      { name: 'phytophthora', val: phyScore },
+      { name: 'anthracnose', val: antScore },
+      { name: 'leaf_blight', val: blightScore }
+    ]
+
+    scores.sort((a, b) => b.val - a.val)
+    const best = scores[0]
+
+    let prob = 0.85
+    if (best.name === 'healthy') {
+      prob = 0.7 + (Math.abs(temp - 25.0) % 0.15)
+    } else if (best.name === 'phytophthora') {
+      prob = 0.5 + ((hum - 85.0) * 0.02)
+    } else if (best.name === 'anthracnose') {
+      prob = 0.6 + ((temp - 24.0) * 0.02)
+    } else if (best.name === 'leaf_blight') {
+      prob = 0.55 + ((wet - 12.0) * 0.03)
+    }
+    prob = Math.min(0.99, Math.max(0.4, prob))
+
+    const risk = best.name === 'healthy' ? 'low' : (prob >= 0.5 ? 'high' : 'medium')
+
+    return {
+      disease: best.name,
+      probability: parseFloat(prob.toFixed(4)),
+      risk: risk,
+      source: 'fallback'
+    }
+  }
+
+  // Debounced AI Disease Prediction (Extension feature)
+  useEffect(() => {
+    if (!harvestDate) {
+      setDiseaseResult(null)
+      return
+    }
+
+    const fetchDiseasePrediction = async () => {
+      setDiseasePredicting(true)
+      setDiseaseError('')
+      
+      const parsedMonth = new Date(harvestDate).getMonth() + 1
+      const month = Number.isNaN(parsedMonth) ? 6 : parsedMonth
+      
+      const tempVal = parseFloat(temperature) || 28.0
+      const humVal = parseFloat(humidity) || 80.0
+      const rainVal = parseFloat(rainfall) || 150.0
+      const wetVal = parseFloat(leafWetness) || 6.0
+      const ageVal = parseFloat(treeAge) || 8.0
+      const priorVal = Number(priorInfection) || 0
+
+      try {
+        const response = await fetch('/api/predict_disease', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            temperature_c: tempVal,
+            humidity_pct: humVal,
+            rainfall_mm: rainVal,
+            leaf_wetness_hours: wetVal,
+            soil_drainage: soilDrainage,
+            harvest_month: month,
+            tree_age_years: ageVal,
+            prior_infection: priorVal
+          })
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setDiseaseResult({
+            ...data,
+            source: 'model'
+          })
+        } else {
+          throw new Error('API server returned error status')
+        }
+      } catch (err) {
+        console.warn('Disease AI backend offline. Falling back to local JS auditor simulation.', err)
+        const fallbackRes = runDiseaseAuditor(
+          tempVal,
+          humVal,
+          rainVal,
+          wetVal,
+          soilDrainage,
+          priorVal
+        )
+        setDiseaseResult(fallbackRes)
+      } finally {
+        setDiseasePredicting(false)
+      }
+    }
+
+    const timer = setTimeout(fetchDiseasePrediction, 300)
+    return () => clearTimeout(timer)
+  }, [temperature, humidity, rainfall, leafWetness, soilDrainage, harvestDate, treeAge, priorInfection])
 
   // Listen for account switching in Metamask
   useEffect(() => {
@@ -1061,6 +1213,113 @@ export default function ManagementPortal() {
             </div>
           </div>
 
+          {/* Environmental & Orchard Conditions (Extension Feature) */}
+          <div style={{
+            margin: '24px 0 12px 0',
+            borderTop: '1px solid rgba(31, 71, 52, 0.1)',
+            paddingTop: '16px'
+          }}>
+            <h3 style={{
+              fontSize: '0.85rem',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'var(--color-green-deep)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <Compass size={16} />
+              <span>
+                {copy.diseaseModel.title}
+              </span>
+            </h3>
+          </div>
+
+          <div className="form-grid-2">
+            <div className="form-group">
+              <label htmlFor="m-temperature">{copy.diseaseModel.tempLabel}</label>
+              <input
+                id="m-temperature"
+                type="number"
+                step="0.1"
+                min="0"
+                max="50"
+                value={temperature}
+                onChange={(e) => setTemperature(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="m-humidity">{copy.diseaseModel.humidityLabel}</label>
+              <input
+                id="m-humidity"
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                value={humidity}
+                onChange={(e) => setHumidity(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-grid-2">
+            <div className="form-group">
+              <label htmlFor="m-leaf-wetness">{copy.diseaseModel.wetnessLabel}</label>
+              <input
+                id="m-leaf-wetness"
+                type="number"
+                step="0.1"
+                min="0"
+                max="24"
+                value={leafWetness}
+                onChange={(e) => setLeafWetness(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="m-soil-drainage">{copy.diseaseModel.drainageLabel}</label>
+              <select
+                id="m-soil-drainage"
+                value={soilDrainage}
+                onChange={(e) => setSoilDrainage(e.target.value)}
+              >
+                <option value="good">{copy.diseaseModel.drainageOptions.good}</option>
+                <option value="medium">{copy.diseaseModel.drainageOptions.medium}</option>
+                <option value="poor">{copy.diseaseModel.drainageOptions.poor}</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-grid-2" style={{ marginBottom: '16px' }}>
+            <div className="form-group">
+              <label htmlFor="m-tree-age">{copy.diseaseModel.ageLabel}</label>
+              <input
+                id="m-tree-age"
+                type="number"
+                step="0.5"
+                min="0"
+                max="100"
+                value={treeAge}
+                onChange={(e) => setTreeAge(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="m-prior-infection">{copy.diseaseModel.priorLabel}</label>
+              <select
+                id="m-prior-infection"
+                value={priorInfection}
+                onChange={(e) => setPriorInfection(Number(e.target.value))}
+              >
+                <option value={0}>{copy.diseaseModel.priorNo}</option>
+                <option value={1}>{copy.diseaseModel.priorYes}</option>
+              </select>
+            </div>
+          </div>
+
           {/* AI Predicted Risk Panel */}
           {provinceVi && (
             <div className={`ai-preview-panel risk-${aiResult ? aiResult.risk : 'low'}`} style={{ marginBottom: '18px' }}>
@@ -1122,6 +1381,53 @@ export default function ManagementPortal() {
                         </span>
                       )}
                     </div>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          )}
+
+          {/* Disease Risk Forecast AI Result Panel (Extension Feature) */}
+          {harvestDate && (
+            <div className={`ai-preview-panel risk-${diseaseResult ? diseaseResult.risk : 'low'}`} style={{ marginBottom: '18px' }}>
+              <div className="ai-preview-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Cpu size={16} />
+                  <span>
+                    {copy.diseaseModel.kicker}
+                  </span>
+                </div>
+                {diseaseResult && (
+                  <span className={`status-badge-pill ${diseaseResult.source === 'model' ? 'chain-mode' : 'fallback-mode'}`} style={{ fontSize: '0.68rem', padding: '1px 8px', textTransform: 'none', height: 'fit-content', lineHeight: 'normal' }}>
+                    {diseaseResult.source === 'model' ? '🧠 AI Model' : '⚠️ Simulated'}
+                  </span>
+                )}
+              </div>
+              <div className="ai-preview-body">
+                {diseasePredicting ? (
+                  <div className="text-xs py-2 opacity-80" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <RefreshCw size={12} className="animate-spin" />
+                    <span>{language === 'vi' ? 'Đang phân tích điều kiện môi trường...' : 'Analyzing environmental variables...'}</span>
+                  </div>
+                ) : diseaseError ? (
+                  <div className="text-xs text-red-500 py-1">{diseaseError}</div>
+                ) : diseaseResult ? (
+                  <>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-semibold">
+                        {copy.diseaseModel.diseases[diseaseResult.disease] || diseaseResult.disease}
+                      </span>
+                      <span className={`risk-badge risk-${diseaseResult.risk}`}>
+                        {copy.diseaseModel.riskLabels[diseaseResult.risk]}
+                      </span>
+                    </div>
+                    <div className="text-xs opacity-80 mb-1">
+                      <strong>{language === 'vi' ? 'Độ tin cậy dự báo: ' : 'Prediction Confidence: '}</strong> 
+                      {Math.round(diseaseResult.probability * 100)}%
+                    </div>
+                    <p style={{ margin: '8px 0 0 0', fontSize: '0.74rem', color: 'var(--color-ink-soft)', fontStyle: 'italic', lineHeight: '1.4' }}>
+                      &ldquo;{copy.diseaseModel[diseaseResult.disease + 'Desc']}&rdquo;
+                    </p>
                   </>
                 ) : null}
               </div>
