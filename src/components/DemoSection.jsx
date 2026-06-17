@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { BadgeCheck, CalendarDays, MapPin, QrCode, Sprout } from 'lucide-react'
 import { defaultBatchId, localized, formatDate } from '../data/batches'
 import { useLanguage } from './LanguageContext'
@@ -7,8 +7,9 @@ import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 import AIResultCard from './AIResultCard'
 import BlockchainTimeline from './BlockchainTimeline'
 import HashProofChip from './HashProofChip'
-import QRScannerModal from './QRScannerModal'
-import BatchQRLabel from './BatchQRLabel'
+
+const QRScannerModal = lazy(() => import('./QRScannerModal'))
+const BatchQRLabel = lazy(() => import('./BatchQRLabel'))
 
 function DemoSection() {
   const { language, copy } = useLanguage()
@@ -163,19 +164,25 @@ function DemoSection() {
             <BlockchainTimeline timeline={currentBatch.timeline} loading={loading} source={source} />
             <div className="ai-result-stack">
               <AIResultCard batch={currentBatch} loading={loading} source={source} />
-              <BatchQRLabel batchId={currentBatch.id} language={language} loading={loading} />
+              <Suspense fallback={<div className="qr-fallback" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-ink-soft)', fontStyle: 'italic', fontSize: '0.85rem' }}>{language === 'vi' ? 'Đang tải mã QR...' : 'Loading QR Code...'}</div>}>
+                <BatchQRLabel batchId={currentBatch.id} language={language} loading={loading} />
+              </Suspense>
               <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} loading={loading} />
             </div>
           </div>
         </div>
 
-        <QRScannerModal
-          isOpen={isScannerOpen}
-          onClose={() => setIsScannerOpen(false)}
-          batches={batches}
-          onScanSuccess={handleSelect}
-          language={language}
-        />
+        {isScannerOpen && (
+          <Suspense fallback={null}>
+            <QRScannerModal
+              isOpen={isScannerOpen}
+              onClose={() => setIsScannerOpen(false)}
+              batches={batches}
+              onScanSuccess={handleSelect}
+              language={language}
+            />
+          </Suspense>
+        )}
       </div>
     </section>
   )

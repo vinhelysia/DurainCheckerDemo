@@ -1,14 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserProvider, JsonRpcProvider, Contract } from 'ethers'
 import { useLanguage } from './LanguageContext'
 import { Sprout, Plus, Compass, ShieldCheck, Cpu, Wallet, Send, CheckCircle2, AlertTriangle, FileText, ArrowLeft, RefreshCw, X, ShieldAlert, Award } from 'lucide-react'
-import BatchQRLabel from './BatchQRLabel'
+
+const BatchQRLabel = lazy(() => import('./BatchQRLabel'))
 
 const RISK_LEVELS = ['low', 'medium', 'high']
 
 function mapRiskLevel(enumVal) {
   const index = Number(enumVal)
   return RISK_LEVELS[index] || 'low'
+}
+
+async function getFallbackProvider() {
+  const rpcUrl = import.meta.env.VITE_RPC_URL || '/rpc'
+  const provider = new JsonRpcProvider(rpcUrl)
+  try {
+    await provider.getNetwork()
+    return provider
+  } catch (e) {
+    if (import.meta.env.DEV) {
+      console.warn('VITE_RPC_URL or proxy /rpc failed, attempting direct localhost:8545...', e)
+      const devProvider = new JsonRpcProvider('http://127.0.0.1:8545')
+      await devProvider.getNetwork()
+      return devProvider
+    } else {
+      throw e
+    }
+  }
 }
 
 export default function ManagementPortal() {
@@ -330,8 +349,7 @@ export default function ManagementPortal() {
 
         if (!currentAccount) {
           try {
-            const rpcUrl = import.meta.env.VITE_RPC_URL || 'http://127.0.0.1:8545'
-            const tempProvider = new JsonRpcProvider(rpcUrl)
+            const tempProvider = await getFallbackProvider()
             const signers = await tempProvider.listAccounts()
             if (signers.length > 0) {
               provider = tempProvider
@@ -424,8 +442,7 @@ export default function ManagementPortal() {
           if (window.ethereum) {
             provider = new BrowserProvider(window.ethereum)
           } else {
-            const rpcUrl = import.meta.env.VITE_RPC_URL || 'http://127.0.0.1:8545'
-            provider = new JsonRpcProvider(rpcUrl)
+            provider = await getFallbackProvider()
           }
           const contract = new Contract(contractInfo.address, contractInfo.abi, provider)
           const reports = await contract.getLabReportHistory(selectedBatchId)
@@ -620,7 +637,7 @@ export default function ManagementPortal() {
         if (window.ethereum) {
           provider = new BrowserProvider(window.ethereum)
         } else {
-          provider = new JsonRpcProvider('http://127.0.0.1:8545')
+          provider = await getFallbackProvider()
         }
         const signer = await provider.getSigner()
         const contract = new Contract(contractInfo.address, contractInfo.abi, signer)
@@ -780,7 +797,7 @@ export default function ManagementPortal() {
         if (window.ethereum) {
           provider = new BrowserProvider(window.ethereum)
         } else {
-          provider = new JsonRpcProvider('http://127.0.0.1:8545')
+          provider = await getFallbackProvider()
         }
         const signer = await provider.getSigner()
         const contract = new Contract(contractInfo.address, contractInfo.abi, signer)
@@ -927,7 +944,7 @@ export default function ManagementPortal() {
         if (window.ethereum) {
           provider = new BrowserProvider(window.ethereum)
         } else {
-          provider = new JsonRpcProvider('http://127.0.0.1:8545')
+          provider = await getFallbackProvider()
         }
         const signer = await provider.getSigner()
         const contract = new Contract(contractInfo.address, contractInfo.abi, signer)
@@ -1023,7 +1040,7 @@ export default function ManagementPortal() {
         if (window.ethereum) {
           provider = new BrowserProvider(window.ethereum)
         } else {
-          provider = new JsonRpcProvider('http://127.0.0.1:8545')
+          provider = await getFallbackProvider()
         }
         const signer = await provider.getSigner()
         const contract = new Contract(contractInfo.address, contractInfo.abi, signer)
@@ -2037,7 +2054,9 @@ export default function ManagementPortal() {
               </button>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
-              <BatchQRLabel batchId={newlyRegisteredBatchId} language={language} loading={false} />
+              <Suspense fallback={<div className="qr-fallback" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-ink-soft)', fontStyle: 'italic', fontSize: '0.85rem' }}>{language === 'vi' ? 'Đang tải mã QR...' : 'Loading QR Code...'}</div>}>
+                <BatchQRLabel batchId={newlyRegisteredBatchId} language={language} loading={false} />
+              </Suspense>
             </div>
           </div>
         )}

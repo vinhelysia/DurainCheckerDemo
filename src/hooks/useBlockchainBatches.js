@@ -43,9 +43,13 @@ export function useBlockchainBatches(selectedBatchId) {
           provider = new JsonRpcProvider(rpcUrl)
           await provider.getNetwork()
         } catch (e) {
-          console.warn('VITE_RPC_URL or proxy /rpc failed, attempting direct localhost:8545...', e)
-          provider = new JsonRpcProvider('http://127.0.0.1:8545')
-          await provider.getNetwork()
+          if (import.meta.env.DEV) {
+            console.warn('VITE_RPC_URL or proxy /rpc failed, attempting direct localhost:8545...', e)
+            provider = new JsonRpcProvider('http://127.0.0.1:8545')
+            await provider.getNetwork()
+          } else {
+            throw e
+          }
         }
 
         const contract = new Contract(

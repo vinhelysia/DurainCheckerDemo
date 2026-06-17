@@ -418,14 +418,14 @@
 
 .svg-label {
   fill: #1e2a22;
-  font-family: 'Be Vietnam Pro', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
   font-weight: 700;
 }
 
 .svg-chip {
   fill: #fffdf7;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 15px;
   font-weight: 600;
 }

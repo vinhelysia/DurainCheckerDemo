@@ -19,8 +19,18 @@ function HashProofChip({ hash, tokenId, loading }) {
             if (window.ethereum) {
               provider = new BrowserProvider(window.ethereum)
             } else {
-              const rpcUrl = import.meta.env.VITE_RPC_URL || 'http://127.0.0.1:8545'
-              provider = new JsonRpcProvider(rpcUrl)
+              try {
+                const rpcUrl = import.meta.env.VITE_RPC_URL || '/rpc'
+                provider = new JsonRpcProvider(rpcUrl)
+                await provider.getNetwork()
+              } catch (e) {
+                if (import.meta.env.DEV) {
+                  provider = new JsonRpcProvider('http://127.0.0.1:8545')
+                  await provider.getNetwork()
+                } else {
+                  throw e
+                }
+              }
             }
             const network = await provider.getNetwork()
             if (active) {
