@@ -26,6 +26,7 @@ coverage/
 *.sw?
 
 # Environment variables
+# Solana signing is done in Phantom; the old EVM PRIVATE_KEY is no longer needed.
 .env
 .env.local
 .env.*.local

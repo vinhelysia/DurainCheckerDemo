@@ -1,28 +1,29 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  base: process.env.VERCEL ? '/' : '/DurainCheckerDemo/',
-  server: {
-    proxy: {
-      '/rpc': {
-        target: 'http://127.0.0.1:8545',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/rpc/, ''),
+  plugins: [
+    react(),
+    nodePolyfills({
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
       },
-    },
-  },
+    }),
+  ],
+  base: process.env.VERCEL ? '/' : '/DurainCheckerDemo/',
   build: {
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules/ethers')) {
-            return 'ethers'
+          if (id.includes('@solana/') || id.includes('@coral-xyz/anchor')) {
+            return 'solana-vendor'
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 })

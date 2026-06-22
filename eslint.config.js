@@ -16,6 +16,8 @@ export default defineConfig([
     languageOptions: {
       globals: {
         ...globals.browser,
+        Buffer: 'readonly',
+        process: 'readonly',
       },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },

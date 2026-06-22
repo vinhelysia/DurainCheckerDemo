@@ -15,13 +15,36 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
   
   const scannerId = 'qr-reader-preview-area'
 
+  const handleClose = async () => {
+    const scanner = html5QrCodeRef.current
+    if (scanner) {
+      try {
+        await scanner.stop()
+      } catch (e) {
+        console.warn('Failed to stop scanner on manual close:', e)
+      } finally {
+        try {
+          scanner.clear()
+        } catch (e) {
+          console.warn('Failed to clear scanner on manual close:', e)
+        }
+        html5QrCodeRef.current = null
+      }
+    }
+    setScanState('idle')
+    setScannedBatchId('')
+    setManualInput('')
+    setManualError('')
+    onClose()
+  }
+
   // Track prefers-reduced-motion
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    return typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false
+  })
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    
     const handleMotionChange = (e) => setPrefersReducedMotion(e.matches)
     mediaQuery.addEventListener('change', handleMotionChange)
     return () => mediaQuery.removeEventListener('change', handleMotionChange)
@@ -57,6 +80,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   // Camera initialization and lifecycle
@@ -184,32 +208,12 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
       cleanupScanner()
       html5QrCodeRef.current = null
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
-  if (!isOpen) return null
 
-  const handleClose = async () => {
-    const scanner = html5QrCodeRef.current
-    if (scanner) {
-      try {
-        await scanner.stop()
-      } catch (e) {
-        console.warn('Failed to stop scanner on manual close:', e)
-      } finally {
-        try {
-          scanner.clear()
-        } catch (e) {
-          console.warn('Failed to clear scanner on manual close:', e)
-        }
-        html5QrCodeRef.current = null
-      }
-    }
-    setScanState('idle')
-    setScannedBatchId('')
-    setManualInput('')
-    setManualError('')
-    onClose()
-  }
+
+  if (!isOpen) return null
 
   const handleManualVerify = (e) => {
     e.preventDefault()
@@ -239,7 +243,9 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
       if (html5QrCodeRef.current) {
         try {
           html5QrCodeRef.current.stop().then(() => html5QrCodeRef.current.clear())
-        } catch (e) {}
+        } catch {
+          // ignore if scanner was already stopped
+        }
       }
       setScanState('success')
       setTimeout(() => {

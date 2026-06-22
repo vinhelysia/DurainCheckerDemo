@@ -1,56 +1,18 @@
 import { Fingerprint } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
-import { useState, useEffect } from 'react'
-import { BrowserProvider, JsonRpcProvider } from 'ethers'
 
-function HashProofChip({ hash, tokenId, loading }) {
+function HashProofChip({ hash, batchId, loading }) {
   const { copy, language } = useLanguage()
-  const [chainId, setChainId] = useState(null)
 
-  useEffect(() => {
-    let active = true
-    async function detectChain() {
-      try {
-        const configRes = await fetch(`${import.meta.env.BASE_URL}contracts/DurianTrust.json`)
-        if (configRes.ok) {
-          const contractConfig = await configRes.json()
-          if (contractConfig.address) {
-            let provider
-            if (window.ethereum) {
-              provider = new BrowserProvider(window.ethereum)
-            } else {
-              try {
-                const rpcUrl = import.meta.env.VITE_RPC_URL || '/rpc'
-                provider = new JsonRpcProvider(rpcUrl)
-                await provider.getNetwork()
-              } catch (e) {
-                if (import.meta.env.DEV) {
-                  provider = new JsonRpcProvider('http://127.0.0.1:8545')
-                  await provider.getNetwork()
-                } else {
-                  throw e
-                }
-              }
-            }
-            const network = await provider.getNetwork()
-            if (active) {
-              setChainId(Number(network.chainId))
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('Error detecting chainId in HashProofChip', e)
-      }
-    }
-    detectChain()
-    return () => { active = false }
-  }, [])
-
-  const certificateHref = `${import.meta.env.BASE_URL}nft.html${tokenId ? `?q=${tokenId}` : ''}`
+  const certificateHref = `${import.meta.env.BASE_URL}#/unit/demo?batchId=${batchId || ''}`
   
-  const isChain = hash && hash !== 'simulated, not on-chain' && hash.startsWith('0x')
-  const showEtherscan = isChain && chainId === 11155111
-  const etherscanHref = showEtherscan ? `https://sepolia.etherscan.io/tx/${hash}` : null
+  const isChain = hash && 
+                  hash !== 'simulated, not on-chain' && 
+                  hash !== 'on-chain (Solana)' && 
+                  hash !== 'on-chain (signature not cached)' &&
+                  !hash.startsWith('simulated')
+                  
+  const explorerHref = isChain ? `https://explorer.solana.com/tx/${hash}?cluster=devnet` : null
 
   return (
     <div className={`hash-proof ${loading ? 'skeleton' : ''}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '8px', minHeight: 'auto' }}>
@@ -68,14 +30,14 @@ function HashProofChip({ hash, tokenId, loading }) {
         >
           {language === 'vi' ? 'Xem Chứng Thư' : 'View Certificate'}
         </a>
-        {etherscanHref && (
+        {explorerHref && (
           <a
-            href={etherscanHref}
+            href={explorerHref}
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: 'var(--color-gold)', fontWeight: 600, textDecoration: 'underline' }}
           >
-            {language === 'vi' ? 'Xem giao dịch Sepolia' : 'View on Sepolia'}
+            {language === 'vi' ? 'Xem giao dịch Solana' : 'View on Solana Explorer'}
           </a>
         )}
       </div>

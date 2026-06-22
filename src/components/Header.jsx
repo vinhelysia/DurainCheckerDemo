@@ -16,14 +16,14 @@ const unitItems = [
   { href: '#/unit/export', key: 'export' },
   { href: '#/unit/demo', key: 'demo' },
   { href: '#/manage', key: 'manage' },
-  { href: 'nft.html', key: 'nft' },
+  { href: '#/unit/demo', key: 'nft' },
 ]
 
 function Header() {
   const { language, copy } = useLanguage()
   const getHref = (item) => {
     if (item.key === 'nft') {
-      return `${import.meta.env.BASE_URL}nft.html`
+      return `${import.meta.env.BASE_URL}#/unit/demo`
     }
     return item.href
   }
@@ -31,7 +31,14 @@ function Header() {
   const [activeDrawer, setActiveDrawer] = useState(null) // 'intro' | 'units' | null
   const [slideKey, setSlideKey] = useState(0) // bumped every time we switch drawers to retrigger slide-in
   const [slideDirection, setSlideDirection] = useState('right')
-  const prevDrawerRef = useRef(null)
+  const [prevDrawer, setPrevDrawer] = useState(null)
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPrevDrawer(activeDrawer)
+  }, [activeDrawer])
+
+  const hasPrevDrawer = prevDrawer !== null && activeDrawer !== null && prevDrawer !== activeDrawer
   const [currentPath, setCurrentPath] = useState(() => {
     return window.location.hash || '#/'
   })
@@ -97,11 +104,7 @@ function Header() {
     return () => document.removeEventListener('keydown', handleEscape)
   }, [])
 
-  useEffect(() => {
-    if (activeDrawer === null) {
-      prevDrawerRef.current = null
-    }
-  }, [activeDrawer])
+  // prevDrawer is automatically updated via useEffect above
 
   useEffect(() => {
     if (activeDrawer || isMenuOpen) {
@@ -166,7 +169,6 @@ function Header() {
               setActiveDrawer((prev) => {
                 const next = prev === 'intro' ? null : 'intro'
                 if (next && prev !== next) {
-                  prevDrawerRef.current = prev
                   setSlideKey((k) => k + 1)
                   setSlideDirection(prev === 'units' ? 'left' : 'right')
                 }
@@ -189,7 +191,6 @@ function Header() {
               setActiveDrawer((prev) => {
                 const next = prev === 'units' ? null : 'units'
                 if (next && prev !== next) {
-                  prevDrawerRef.current = prev
                   setSlideKey((k) => k + 1)
                   setSlideDirection(prev === 'intro' ? 'right' : 'right')
                 }
@@ -254,7 +255,7 @@ function Header() {
         {/* Keyed so React remounts (and slide-in fires) on every drawer switch */}
         <div 
           key={`${activeDrawer}-${slideKey}`} 
-          className={`drawer-content ${prevDrawerRef.current ? `drawer-slide-in-${slideDirection}` : ''}`}
+          className={`drawer-content ${hasPrevDrawer ? `drawer-slide-in-${slideDirection}` : ''}`}
           data-lenis-prevent
         >
           {activeDrawer === 'intro' && (

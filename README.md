@@ -1,63 +1,69 @@
-# DurianTrust AI - Blockchain & AI Durian Traceability
+# DurianTrust AI - Solana Durian Traceability
 
-A Web3 blockchain traceability system integrated with real-time AI quality auditing to secure durian exports from Vietnam to worldwide markets.
+DurianTrust is a mobile-first traceability app for Vietnamese durian exports. It combines a Solana Anchor ledger, serverless ONNX quality models, QR-code verification, and camera scanning so inspectors and consumers can follow a batch journey from farm to lab to export.
 
-## Setup Instructions
+## Architecture
 
-Ensure you have [Node.js](https://nodejs.org/) installed, then run the following commands:
+### Solana ledger
 
-### 1. Install Dependencies
+- The chain layer is the Solana Anchor program `durian_trust`, deployed on devnet.
+- The React app loads the Anchor IDL from `public/solana/idl.json`, connects with `@coral-xyz/anchor` and `@solana/web3.js`, and signs user actions through Phantom via the Solana wallet adapter.
+- Program-derived addresses store batch records, role accounts, timeline events, and lab reports. Timeline and lab report entries are append-only so every journey update remains auditable.
+- Transaction proofs are displayed as Solana devnet signatures and link to Solana Explorer.
+- The app can fall back to local demo data when the devnet RPC or wallet connection is unavailable.
+
+### AI services
+
+Three Python serverless functions run ONNX models on Vercel:
+
+- `api/predict.py`: cadmium-risk prediction for export quality screening.
+- `api/predict_disease.py`: environmental disease-risk prediction from orchard conditions.
+- `api/predict_leaf.py`: image-based durian leaf disease scanner using a MobileNetV3 classifier with about 88% accuracy.
+
+The management portal calls these endpoints before writing quality reports or batch registrations to Solana.
+
+### Verification UX
+
+- Real QR labels are generated with `qrcode` and encode batch lookup URLs.
+- Camera scanning uses `html5-qrcode` with manual fallback input for devices without camera permission.
+- The batch verification page is designed mobile-first and presents the batch journey, lab history, risk status, and Solana transaction proof for consumers.
+
+## Setup
+
+Install dependencies:
+
 ```bash
 npm install
 ```
 
-### 2. Start Local Blockchain Node (Hardhat)
+Create a local environment file if you need a custom devnet RPC:
+
 ```bash
-npm run chain
+VITE_RPC_URL=https://api.devnet.solana.com
 ```
 
-### 3. Deploy Smart Contract and Seed Batches
-In a new terminal window, run:
-```bash
-npm run deploy
-```
-This compiles the Solidity contract, deploys it to the local chain, seeds three mock batches (low risk, medium risk, high risk), and writes the configuration mapping directly to `public/contracts/DurianTrust.json`.
+Run the app locally:
 
-### 4. Run Development Server
 ```bash
 npm run dev
 ```
-Open `http://localhost:5173/` in your browser.
 
-### 5. Build for Production
-To bundle the application for production deployment under the GitHub Pages subpath `/DurainCheckerDemo/`, run:
+Open `http://localhost:5173/` and connect Phantom on Solana devnet to submit signed transactions.
+
+Build for production:
+
 ```bash
 npm run build
 ```
 
----
+## Anchor Program
 
-## Demo Flows and Features
+The Anchor program is maintained and deployed through Solana Playground on devnet. After a Playground build/deploy, export the updated IDL and program address into `public/solana/idl.json` so the React app can derive the correct PDAs and submit transactions.
 
-### 1. Landing Page (`#/`)
-- Dynamic interactive overview of Viet Nam durian export hurdles (Cadmium levels & Yellow O chemical dyes).
-- Highlighting key solution pillars: Immutable Blockchain Ledger, AI Quality Auditing, and Smart Quarantine Controls.
+Solana signing is handled by Phantom in the browser. The old EVM `.env` `PRIVATE_KEY` is no longer required and should not be used by this app.
 
-### 2. Batch Lookup / Telemetry Demo (`#/unit/demo`)
-- Search by Certificate ID (`8801`, `8802`, `8803`) or Batch ID (`DRN-2026-LD-0428`) to query the EVM contract.
-- Interactive tabs to simulate:
-  - **Safe Batch (Low Risk)**: Cadmium level below threshold, AI rating is export-ready.
-  - **Review Needed (Medium Risk)**: Near safety limit, prompts warning.
-  - **Hold Batch (High Risk)**: Exceeds regulatory limit, AI locks batch quarantine flag.
-- Triggers dynamic blockchain timeline and cryptographic hash proofs.
+## App Flows
 
-### 3. Operator Console / Management Portal (`#/manage`)
-- Admin dashboard to sign transactions and register new durian batches onto the Hardhat ledger.
-- Real-time AI Quality Auditor simulation checks input Cadmium values and assigns a quarantine status on-the-fly.
-- Append supply chain steps (Harvest, Lab test, Packing, Export) to registered batches.
-- *Supports full offline simulation using LocalStorage if local node is unreachable.*
-
-### 4. QR Code & Certificate Verification (`/nft.html`)
-- Every registered batch displays a scannable QR code label linking to the verification page.
-- Simulates scanning with on-camera guides and laser sweeps.
-- Navigates to the certificate verification page (`nft.html`), querying the blockchain ledger by signature and registrant key.
+- `#/`: bilingual product overview for durian traceability, AI screening, and blockchain verification.
+- `#/unit/demo`: batch lookup by QR or batch ID, journey timeline, lab report history, and Solana Explorer proof.
+- `#/manage`: operator portal for Phantom-signed batch registration, role management, lab report updates, timeline updates, QR label generation, and AI model checks.

@@ -16,7 +16,7 @@ const UnitDetails = lazy(() => import('./components/UnitDetails'))
 const ManagementPortal = lazy(() => import('./components/ManagementPortal'))
 
 function App() {
-  const { copy } = useLanguage()
+  const { language, copy } = useLanguage()
   const [preloaderComplete, setPreloaderComplete] = useState(() => {
     return sessionStorage.getItem('duriantrust-preloader-seen') === 'true'
   })
@@ -93,7 +93,8 @@ function App() {
   }, [])
 
   const renderRouteView = () => {
-    switch (currentRoute) {
+    const routePath = currentRoute.split('?')[0]
+    switch (routePath) {
       case '#/':
       case '#/home':
         return <Hero />
@@ -132,7 +133,7 @@ function App() {
           <Suspense fallback={
             <div className="route-loading" role="status" aria-live="polite">
               <div className="spinner"></div>
-              <span>{copy.header.ariaLabel === 'Điều hướng chính' ? 'Đang tải...' : 'Loading...'}</span>
+              <span>{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span>
             </div>
           }>
             {renderRouteView()}

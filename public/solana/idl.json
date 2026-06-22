@@ -1,0 +1,224 @@
+{
+  "address": "durian1111111111111111111111111111111111111",
+  "metadata": {
+    "name": "durian_trust",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "accounts": [
+        { "name": "config", "writable": true },
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "systemProgram" }
+      ],
+      "args": []
+    },
+    {
+      "name": "addFarmer",
+      "discriminator": [223, 234, 56, 12, 99, 12, 15, 34],
+      "accounts": [
+        { "name": "config" },
+        { "name": "farmerRole", "writable": true },
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "systemProgram" }
+      ],
+      "args": [
+        { "name": "user", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "removeFarmer",
+      "discriminator": [11, 22, 33, 44, 55, 66, 77, 88],
+      "accounts": [
+        { "name": "config" },
+        { "name": "farmerRole", "writable": true },
+        { "name": "authority", "writable": true, "signer": true }
+      ],
+      "args": [
+        { "name": "user", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "addLab",
+      "discriminator": [12, 23, 34, 45, 56, 67, 78, 89],
+      "accounts": [
+        { "name": "config" },
+        { "name": "labRole", "writable": true },
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "systemProgram" }
+      ],
+      "args": [
+        { "name": "user", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "removeLab",
+      "discriminator": [23, 34, 45, 56, 67, 78, 89, 90],
+      "accounts": [
+        { "name": "config" },
+        { "name": "labRole", "writable": true },
+        { "name": "authority", "writable": true, "signer": true }
+      ],
+      "args": [
+        { "name": "user", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "addLogistics",
+      "discriminator": [34, 45, 56, 67, 78, 89, 90, 101],
+      "accounts": [
+        { "name": "config" },
+        { "name": "logisticsRole", "writable": true },
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "systemProgram" }
+      ],
+      "args": [
+        { "name": "user", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "removeLogistics",
+      "discriminator": [45, 56, 67, 78, 89, 90, 101, 112],
+      "accounts": [
+        { "name": "config" },
+        { "name": "logisticsRole", "writable": true },
+        { "name": "authority", "writable": true, "signer": true }
+      ],
+      "args": [
+        { "name": "user", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "registerBatch",
+      "discriminator": [1, 2, 3, 4, 5, 6, 7, 8],
+      "accounts": [
+        { "name": "config", "writable": true },
+        { "name": "batch", "writable": true },
+        { "name": "labReport", "writable": true },
+        { "name": "signer", "writable": true, "signer": true },
+        { "name": "systemProgram" },
+        { "name": "farmerRole", "optional": true }
+      ],
+      "args": [
+        { "name": "id", "type": "string" },
+        { "name": "farm", "type": "string" },
+        { "name": "province", "type": "string" },
+        { "name": "harvestDate", "type": "string" },
+        { "name": "cadmiumPpm", "type": "u64" },
+        { "name": "thresholdPpm", "type": "u64" },
+        { "name": "confidence", "type": "u64" },
+        { "name": "riskLevel", "type": "u8" },
+        { "name": "aiResult", "type": "string" },
+        { "name": "riskCause", "type": "string" }
+      ]
+    },
+    {
+      "name": "addTimelineEvent",
+      "discriminator": [9, 10, 11, 12, 13, 14, 15, 16],
+      "accounts": [
+        { "name": "batch", "writable": true },
+        { "name": "timelineEvent", "writable": true },
+        { "name": "signer", "writable": true, "signer": true },
+        { "name": "systemProgram" },
+        { "name": "logisticsRole", "optional": true }
+      ],
+      "args": [
+        { "name": "id", "type": "string" },
+        { "name": "stage", "type": "string" },
+        { "name": "location", "type": "string" },
+        { "name": "date", "type": "string" },
+        { "name": "status", "type": "u8" }
+      ]
+    },
+    {
+      "name": "updateLabReport",
+      "discriminator": [17, 18, 19, 20, 21, 22, 23, 24],
+      "accounts": [
+        { "name": "batch", "writable": true },
+        { "name": "labReport", "writable": true },
+        { "name": "signer", "writable": true, "signer": true },
+        { "name": "systemProgram" },
+        { "name": "labRole", "optional": true }
+      ],
+      "args": [
+        { "name": "id", "type": "string" },
+        { "name": "cadmiumPpm", "type": "u64" },
+        { "name": "thresholdPpm", "type": "u64" },
+        { "name": "confidence", "type": "u64" },
+        { "name": "riskLevel", "type": "u8" },
+        { "name": "aiResult", "type": "string" },
+        { "name": "riskCause", "type": "string" }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Config",
+      "discriminator": [155, 12, 33, 44, 55, 66, 77, 88],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "authority", "type": "pubkey" },
+          { "name": "nextTokenId", "type": "u64" }
+        ]
+      }
+    },
+    {
+      "name": "Batch",
+      "discriminator": [100, 111, 122, 133, 144, 155, 166, 177],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "id", "type": "string" },
+          { "name": "farm", "type": "string" },
+          { "name": "province", "type": "string" },
+          { "name": "harvestDate", "type": "string" },
+          { "name": "cadmiumPpm", "type": "u64" },
+          { "name": "thresholdPpm", "type": "u64" },
+          { "name": "confidence", "type": "u64" },
+          { "name": "riskLevel", "type": "u8" },
+          { "name": "aiResult", "type": "string" },
+          { "name": "riskCause", "type": "string" },
+          { "name": "registrant", "type": "pubkey" },
+          { "name": "tokenId", "type": "u64" },
+          { "name": "timelineCount", "type": "u32" },
+          { "name": "labCount", "type": "u32" },
+          { "name": "createdAt", "type": "i64" }
+        ]
+      }
+    },
+    {
+      "name": "TimelineEvent",
+      "discriminator": [200, 210, 220, 230, 240, 250, 260, 270],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "stage", "type": "string" },
+          { "name": "location", "type": "string" },
+          { "name": "date", "type": "string" },
+          { "name": "status", "type": "u8" }
+        ]
+      }
+    },
+    {
+      "name": "LabReport",
+      "discriminator": [11, 22, 33, 44, 55, 66, 77, 88],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "cadmiumPpm", "type": "u64" },
+          { "name": "thresholdPpm", "type": "u64" },
+          { "name": "confidence", "type": "u64" },
+          { "name": "riskLevel", "type": "u8" },
+          { "name": "aiResult", "type": "string" },
+          { "name": "riskCause", "type": "string" },
+          { "name": "reporter", "type": "pubkey" },
+          { "name": "timestamp", "type": "i64" }
+        ]
+      }
+    }
+  ]
+}

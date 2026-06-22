@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import { Camera, Sparkles, AlertCircle, RefreshCw } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Camera, Sparkles, AlertCircle } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 
 export default function LeafDiseaseScanner() {
@@ -11,8 +11,6 @@ export default function LeafDiseaseScanner() {
   const [prediction, setPrediction] = useState(null)
   const [errorState, setErrorState] = useState(null)
   const [badgeSource, setBadgeSource] = useState(null) // 'ai' | 'error'
-
-  const canvasRef = useRef(null)
 
   // Clean up object URLs to avoid memory leaks
   useEffect(() => {
@@ -39,55 +37,19 @@ export default function LeafDiseaseScanner() {
     setBadgeSource(null)
     setLoading(true)
 
-    const img = new Image()
-    img.onload = () => {
-      try {
-        const canvas = canvasRef.current
-        if (!canvas) {
-          throw new Error('Canvas ref not available')
-        }
-        const ctx = canvas.getContext('2d')
-        if (!ctx) {
-          throw new Error('Could not get 2D canvas context')
-        }
-
-        // Stretch resize to exactly 224x224 to match the training pipeline
-        ctx.drawImage(img, 0, 0, 224, 224)
-
-        const imgData = ctx.getImageData(0, 0, 224, 224)
-        const pixels = []
-
-        // Extract RGB channels row-major (ignoring alpha channel)
-        for (let i = 0; i < imgData.data.length; i += 4) {
-          pixels.push(imgData.data[i])     // Red
-          pixels.push(imgData.data[i + 1]) // Green
-          pixels.push(imgData.data[i + 2]) // Blue
-        }
-
-        sendInferenceRequest(pixels)
-      } catch (err) {
-        console.error('Error preprocessing image:', err)
-        setErrorState(err.message || 'Image processing failed')
-        setBadgeSource('error')
-        setLoading(false)
-      }
-    }
-    img.onerror = () => {
-      setErrorState(language === 'vi' ? 'Lỗi tải hình ảnh' : 'Error loading image')
-      setBadgeSource('error')
-      setLoading(false)
-    }
-    img.src = previewUrl
+    sendInferenceRequest(file)
   }
 
-  const sendInferenceRequest = async (pixels) => {
+  const sendInferenceRequest = async (file) => {
     try {
+      const formData = new FormData()
+      // TODO: Backend /api/predict_leaf endpoint must accept FormData containing the raw image file (key 'image'),
+      // resize it to 224x224, and perform model inference.
+      formData.append('image', file)
+
       const response = await fetch('/api/predict_leaf', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ pixels }),
+        body: formData,
       })
 
       if (response.ok) {
@@ -153,14 +115,6 @@ export default function LeafDiseaseScanner() {
           </div>
         )}
       </div>
-
-      {/* Hidden canvas for image resizing */}
-      <canvas
-        ref={canvasRef}
-        width="224"
-        height="224"
-        style={{ display: 'none' }}
-      />
 
       {/* Error state */}
       {errorState && (

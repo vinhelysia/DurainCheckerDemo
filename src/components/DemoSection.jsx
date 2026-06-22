@@ -168,7 +168,7 @@ function DemoSection() {
               <Suspense fallback={<div className="qr-fallback" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-ink-soft)', fontStyle: 'italic', fontSize: '0.85rem' }}>{language === 'vi' ? 'Đang tải mã QR...' : 'Loading QR Code...'}</div>}>
                 <BatchQRLabel batchId={currentBatch.id} language={language} loading={loading} />
               </Suspense>
-              <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} loading={loading} />
+              <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} batchId={currentBatch.id} loading={loading} />
             </div>
           </div>
         </div>
