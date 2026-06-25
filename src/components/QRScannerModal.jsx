@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, QrCode, ShieldCheck, Camera, Sparkles, AlertCircle, ArrowRight } from 'lucide-react'
 import { Html5Qrcode } from 'html5-qrcode'
+import { useLanguage } from './LanguageContext'
 
-export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess, language }) {
+export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess }) {
+  const { copy } = useLanguage()
   const [scanState, setScanState] = useState('idle') // 'idle' | 'scanning' | 'success' | 'failed'
   const [scannedBatchId, setScannedBatchId] = useState('')
   const [hasCamera, setHasCamera] = useState(null) // null = checking, true = has camera + permission, false = no camera or denied
@@ -219,7 +221,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
     e.preventDefault()
     const cleanInput = manualInput.trim().toUpperCase()
     if (!cleanInput) {
-      setManualError(language === 'vi' ? 'Vui lòng điền mã lô!' : 'Please enter a batch ID!')
+      setManualError(copy.qrScanner.error.empty)
       return
     }
 
@@ -263,7 +265,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
           <div className="flex items-center gap-2">
             <QrCode className="text-green-mid" size={20} />
             <h2 className="text-lg font-bold">
-              {language === 'vi' ? 'Trình quét mã QR sầu riêng' : 'Durian QR Code Scanner'}
+              {copy.qrScanner.title}
             </h2>
           </div>
           <button
@@ -309,7 +311,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
               {!hasCamera && scanState === 'scanning' && (
                 <div className="feed-instruction">
                   <Camera size={36} className={`mb-2 opacity-60 ${!prefersReducedMotion ? 'animate-pulse' : ''}`} />
-                  <p>{language === 'vi' ? 'Đang khởi chạy camera...' : 'Initializing device camera...'}</p>
+                  <p>{copy.qrScanner.initCamera}</p>
                 </div>
               )}
               {hasCamera && scanState === 'scanning' && (
@@ -321,19 +323,17 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
                 <div className="feed-instruction text-red-400" style={{ padding: '20px' }}>
                   <AlertCircle size={36} className="mb-2 opacity-80" />
                   <p style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>
-                    {language === 'vi' ? 'Không thể truy cập Camera' : 'Camera Access Failed'}
+                    {copy.qrScanner.cameraFailed}
                   </p>
                   <p style={{ fontSize: '0.75rem', opacity: 0.8, marginTop: '4px' }}>
-                    {language === 'vi' 
-                      ? 'Vui lòng kiểm tra quyền camera hoặc nhập mã bên dưới' 
-                      : 'Please check browser permissions or type the batch ID below'}
+                    {copy.qrScanner.cameraHint}
                   </p>
                 </div>
               )}
               {scanState === 'success' && (
                 <div className="feed-instruction success-text text-green-mid" style={{ zIndex: 10 }}>
                   <ShieldCheck size={40} className="mb-2" />
-                  <p className="font-bold">{language === 'vi' ? 'ĐÃ XÁC THỰC LÔ HÀNG' : 'BATCH VERIFIED'}</p>
+                  <p className="font-bold">{copy.qrScanner.verified}</p>
                   <code style={{ fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{scannedBatchId}</code>
                 </div>
               )}
@@ -345,7 +345,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
         <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(31,71,52,0.08)' }}>
           <form onSubmit={handleManualVerify} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label htmlFor="manual-batch-input" style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--color-ink)' }}>
-              {language === 'vi' ? 'Nhập mã lô hàng thủ công:' : 'Or enter batch ID manually:'}
+              {copy.qrScanner.manualLabel}
             </label>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
@@ -370,7 +370,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
                 type="submit"
                 style={{ minHeight: '38px', padding: '0 16px', fontSize: '0.85rem' }}
               >
-                <span>{language === 'vi' ? 'Xác thực' : 'Verify'}</span>
+                <span>{copy.qrScanner.verifyBtn}</span>
                 <ArrowRight size={14} />
               </button>
             </div>
@@ -383,7 +383,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
         {/* Fallback Selection Panel */}
         <div className="scanner-labels-panel">
           <h3>
-            {language === 'vi' ? 'Chọn nhanh lô hàng mẫu:' : 'Or select a demo batch to simulate:'}
+            {copy.qrScanner.selectDemo}
           </h3>
           <div className="qr-labels-grid">
             {batches.map((batch) => (
@@ -400,9 +400,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
                 <div className="qr-label-info">
                   <strong>{batch.id}</strong>
                   <span className="risk-indicator">
-                    {language === 'vi'
-                      ? (batch.riskLevel === 'low' ? 'Đạt chuẩn' : batch.riskLevel === 'medium' ? 'Cần khám' : 'Giữ lô')
-                      : (batch.riskLevel === 'low' ? 'Export Ready' : batch.riskLevel === 'medium' ? 'Needs Review' : 'Hold Batch')}
+                    {copy.qrScanner.riskLabels[batch.riskLevel || 'low']}
                   </span>
                 </div>
               </button>
@@ -414,9 +412,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
         <div className="scanner-modal-footer">
           <Sparkles size={14} className="text-gold" />
           <p className="text-xs italic opacity-85">
-            {language === 'vi'
-              ? 'Mã QR liên kết trực tiếp với Smart Contract trên blockchain'
-              : 'QR code links directly to Smart Contract records on the blockchain'}
+            {copy.qrScanner.footer}
           </p>
         </div>
       </div>

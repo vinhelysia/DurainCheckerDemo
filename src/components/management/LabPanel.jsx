@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Award, FileText, RefreshCw, Cpu, Send } from 'lucide-react'
 import { getBatchPda, getLabPda } from '../../lib/pda'
+import { runRuleAuditor } from '../../lib/ruleAuditor'
 
 const RISK_LEVELS = ['low', 'medium', 'high']
 
@@ -9,37 +10,8 @@ function mapRiskLevel(enumVal) {
   return RISK_LEVELS[index] || 'low'
 }
 
-function runRuleAuditor(cdVal) {
-  const cd = parseFloat(cdVal) || 0
-  const cdInt = Math.round(cd * 1000)
-  let riskLevel = 'low'
-  let ruleResultVi = 'Đạt chuẩn xuất khẩu'
-  let ruleResultEn = 'Export-ready'
-  let confidence = 90 + (cdInt % 9)
-  let riskCauseVi = 'Cadimi và Vàng O trong ngưỡng cho phép'
-  let riskCauseEn = 'Cadmium and Yellow O within limits'
-
-  if (cd > 0.05) {
-    riskLevel = 'high'
-    ruleResultVi = 'Không đạt - giữ lô'
-    ruleResultEn = 'Hold - does not pass'
-    confidence = 82 + (cdInt % 14)
-    riskCauseVi = 'Hàm lượng Cadimi vượt ngưỡng an toàn cho phép (> 0.05 ppm)'
-    riskCauseEn = 'Cadmium level exceeds safe limits (> 0.05 ppm)'
-  } else if (cd >= 0.045) {
-    riskLevel = 'medium'
-    ruleResultVi = 'Cần kiểm tra lại'
-    ruleResultEn = 'Needs re-check'
-    confidence = 62 + (cdInt % 15)
-    riskCauseVi = 'Hàm lượng Cadimi gần ngưỡng cảnh báo, đề nghị kiểm tra bổ sung'
-    riskCauseEn = 'Cadmium level near threshold; supplementary assay recommended'
-  }
-
-  return { riskLevel, aiResultVi: ruleResultVi, aiResultEn: ruleResultEn, confidence, riskCauseVi, riskCauseEn }
-}
-
 export default function LabPanel({
-  language,
+  copy,
   loading,
   registeredIds,
   selectedBatchId,
@@ -147,24 +119,24 @@ export default function LabPanel({
   }
 
   return (
-    <div className="unit-dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', width: '100%' }}>
+    <div className="unit-dashboard-grid manage-dashboard-grid">
       {/* Lab Report Form */}
       <div className="dashboard-card telemetry-card">
         <div className="card-header-with-icon">
           <Award className="card-icon" size={20} />
-          <h2>{language === 'vi' ? 'Cập Nhật Kết Quả Kiểm Nghiệm Phòng Lab' : 'Submit Lab Chemical Audit Report'}</h2>
+          <h2>{copy.labPanel.title}</h2>
         </div>
 
         <form onSubmit={onSubmit} className="manage-form">
           <div className="form-group">
-            <label htmlFor="m-lab-select-batch">{language === 'vi' ? 'Chọn Lô Sầu Riêng cần kiểm định' : 'Select Target Batch ID'}</label>
+            <label htmlFor="m-lab-select-batch">{copy.labPanel.selectBatchLabel}</label>
             <select 
               id="m-lab-select-batch"
               value={selectedBatchId} 
               onChange={(e) => setSelectedBatchId(e.target.value)}
               required
             >
-              <option value="">-- {language === 'vi' ? 'Chọn lô sầu riêng' : 'Select Batch ID'} --</option>
+              <option value="">{copy.labPanel.selectBatchPlaceholder}</option>
               {registeredIds.map(id => (
                 <option key={id} value={id}>{id}</option>
               ))}
@@ -173,7 +145,7 @@ export default function LabPanel({
 
           <div className="form-grid-2">
             <div className="form-group">
-              <label htmlFor="m-lab-cadmium">{language === 'vi' ? 'Hàm lượng Cadimi phân tích (ppm)' : 'Assayed Cadmium (ppm)'}</label>
+              <label htmlFor="m-lab-cadmium">{copy.labPanel.cadmiumLabel}</label>
               <input 
                 id="m-lab-cadmium"
                 type="number"
@@ -186,7 +158,7 @@ export default function LabPanel({
               />
             </div>
             <div className="form-group">
-              <label htmlFor="m-lab-threshold">{language === 'vi' ? 'Ngưỡng kiểm định tối đa (ppm)' : 'Max Threshold (ppm)'}</label>
+              <label htmlFor="m-lab-threshold">{copy.labPanel.thresholdLabel}</label>
               <input 
                 id="m-lab-threshold"
                 type="number"
@@ -199,25 +171,25 @@ export default function LabPanel({
           </div>
 
           {/* Quality gate simulation preview */}
-          <div className={`ai-preview-panel risk-${ruleAuditLab.riskLevel}`} style={{ margin: '12px 0' }}>
+          <div className={`ai-preview-panel risk-${ruleAuditLab.riskLevel} manage-preview-panel`}>
             <div className="ai-preview-header">
               <Cpu size={16} />
-              <span>{language === 'vi' ? 'KẾT QUẢ ĐỐI CHIẾU QUY TẮC' : 'RULE AUDITOR ANALYSIS'}</span>
+              <span>{copy.labPanel.ruleAudit.title}</span>
             </div>
             <div className="ai-preview-body">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-semibold">
-                  {language === 'vi' ? ruleAuditLab.aiResultVi : ruleAuditLab.aiResultEn}
+                  {copy.getRuleResult(ruleAuditLab)}
                 </span>
                 <span className={`risk-badge risk-${ruleAuditLab.riskLevel}`}>
-                  {ruleAuditLab.riskLevel === 'low' ? (language === 'vi' ? 'Đạt chuẩn' : 'Safe') : (ruleAuditLab.riskLevel === 'medium' ? (language === 'vi' ? 'Cần khám' : 'Review') : (language === 'vi' ? 'Giữ lại' : 'Critical'))}
+                  {copy.labPanel.ruleAudit.statusLabels[ruleAuditLab.riskLevel]}
                 </span>
               </div>
               <div className="text-xs opacity-80">
-                <strong>{language === 'vi' ? 'Độ tin cậy:' : 'Audit Confidence:'}</strong> {ruleAuditLab.confidence}%
+                <strong>{copy.labPanel.ruleAudit.confidenceLabel}</strong> {ruleAuditLab.confidence}%
               </div>
               <div className="text-xs mt-1 italic opacity-90">
-                &ldquo;{language === 'vi' ? ruleAuditLab.riskCauseVi : ruleAuditLab.riskCauseEn}&rdquo;
+                &ldquo;{copy.getRuleCause(ruleAuditLab)}&rdquo;
               </div>
             </div>
           </div>
@@ -229,7 +201,7 @@ export default function LabPanel({
           >
             <Send size={16} />
             <span>
-              {loading ? (language === 'vi' ? 'Đang thực thi Web3...' : 'Executing Web3...') : (language === 'vi' ? 'Ký Giao Dịch & Ghi Phòng Lab' : 'Sign & Broadcast Lab Report')}
+              {loading ? copy.labPanel.submitBtn.loading : copy.labPanel.submitBtn.normal}
             </span>
           </button>
         </form>
@@ -239,42 +211,36 @@ export default function LabPanel({
       <div className="dashboard-card blockchain-logs-card">
         <div className="card-header-with-icon">
           <FileText className="card-icon" size={20} />
-          <h2>{language === 'vi' ? 'Lịch Sử Báo Cáo của Lô Hàng' : 'Batch Chemical Assay History'}</h2>
+          <h2>{copy.labPanel.history.title}</h2>
         </div>
         
         {loadingHistory ? (
           <div className="text-center py-8 opacity-75">
             <RefreshCw className="animate-spin inline-block mr-2" size={18} />
-            <span>{language === 'vi' ? 'Đang tải lịch sử từ blockchain...' : 'Querying history from smart contract...'}</span>
+            <span>{copy.labPanel.history.loading}</span>
           </div>
         ) : selectedBatchId && labHistory.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <p className="text-xs font-semibold" style={{ color: 'var(--color-ink-soft)', margin: '0 0 4px 0' }}>
-              {language === 'vi' ? `Có ${labHistory.length} báo cáo hóa chất được tìm thấy:` : `${labHistory.length} reports logged for batch:`}
+          <div className="lab-history-wrap">
+            <p className="text-xs font-semibold lab-history-title">
+              {copy.labPanel.history.summary(labHistory.length)}
             </p>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <ul className="lab-history-list">
               {labHistory.map((report, idx) => (
-                <li key={idx} style={{
-                  padding: '12px',
-                  borderRadius: '8px',
-                  background: 'rgba(31,71,52,0.03)',
-                  border: '1px solid rgba(31,71,52,0.08)',
-                  fontSize: '0.8rem'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <strong style={{ color: 'var(--color-green-deep)' }}>{language === 'vi' ? `Lần kiểm nghiệm #${idx + 1}` : `Assay Run #${idx + 1}`}</strong>
-                    <span className={`risk-badge risk-${report.riskLevel}`} style={{ transform: 'scale(0.9)', transformOrigin: 'right' }}>
+                <li key={idx} className="lab-history-item">
+                  <div className="lab-history-item-header">
+                    <strong className="lab-history-item-run">{copy.labPanel.history.run(idx + 1)}</strong>
+                    <span className={`risk-badge risk-${report.riskLevel} lab-history-risk-badge`}>
                       {report.riskLevel.toUpperCase()}
                     </span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', margin: '4px 0' }}>
+                  <div className="lab-history-item-grid">
                     <div>Cadmium: <strong>{report.cadmiumPpm.toFixed(3)} ppm</strong></div>
                     <div>Threshold: <strong>{report.thresholdPpm.toFixed(3)} ppm</strong></div>
                   </div>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: 'var(--color-ink-soft)', fontStyle: 'italic' }}>
-                    &ldquo;{language === 'vi' ? report.riskCause.vi : report.riskCause.en}&rdquo;
+                  <p className="lab-history-item-cause">
+                    &ldquo;{copy.getLocalizedText(report.riskCause)}&rdquo;
                   </p>
-                  <div style={{ marginTop: '8px', borderTop: '1px dashed rgba(31,71,52,0.1)', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--color-ink-soft)' }}>
+                  <div className="lab-history-item-footer">
                     <span>Reporter: <code>{report.reporter.slice(0, 6)}...{report.reporter.slice(-6)}</code></span>
                     <span>{new Date(report.timestamp * 1000).toLocaleString()}</span>
                   </div>
@@ -284,11 +250,11 @@ export default function LabPanel({
           </div>
         ) : selectedBatchId ? (
           <p className="text-xs italic py-8 text-center opacity-70">
-            {language === 'vi' ? 'Không tìm thấy lịch sử báo cáo nào của lô hàng này.' : 'No chemical assays recorded for this batch yet.'}
+            {copy.labPanel.history.noData}
           </p>
         ) : (
           <p className="text-xs italic py-8 text-center opacity-70">
-            {language === 'vi' ? 'Vui lòng chọn Lô hàng để xem lịch sử.' : 'Please select a Batch ID above to fetch history.'}
+            {copy.labPanel.history.selectPrompt}
           </p>
         )}
       </div>

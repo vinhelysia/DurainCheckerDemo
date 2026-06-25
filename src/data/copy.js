@@ -9,14 +9,12 @@ export const copyData = {
         problem: 'Vấn đề',
         solution: 'Giải pháp',
         impact: 'Tác động',
-        slides: 'Tài liệu Chiến lược',
         farm: 'Vườn trồng',
         transport: 'Vận chuyển',
         testing: 'Kiểm nghiệm',
         export: 'Xuất khẩu',
         demo: 'Demo Tra cứu',
         manage: 'Cổng Quản lý',
-        nft: 'Xác thực Chứng thư',
       },
       ariaLabel: 'Điều hướng chính',
       landingMenuAria: 'Các phần trong giới thiệu',
@@ -212,7 +210,7 @@ export const copyData = {
       testingTitle: 'Đơn vị Kiểm nghiệm chất lượng',
       testingSubtitle: 'Phân tích Cadimi, Vàng O & Phân loại chất lượng theo Quy tắc',
       exportTitle: 'Cảng xuất khẩu & Hải quan',
-      exportSubtitle: 'Thông quan xuất khẩu & Chứng thư số NFT',
+      exportSubtitle: 'Thông quan xuất khẩu & Hồ sơ kỹ thuật số',
       backToHome: 'Quay lại Trang chủ',
       iotTelemetry: 'Dữ liệu đo lường IoT thực tế',
       blockchainProof: 'Bằng chứng chuỗi khối Blockchain',
@@ -229,6 +227,150 @@ export const copyData = {
         norole: 'Không có vai trò',
       },
       simulatedLabel: 'Vai trò giả lập (Chỉ dùng kiểm thử offline):',
+      simulatedRoleSelector: 'Bộ chọn vai trò giả lập',
+      tabsAriaLabel: 'Các vai trò quản lý chuỗi cung ứng',
+      rolesDetail: {
+        owner: 'Chủ Sở Hữu (Admin)',
+        farmer: 'Nông Dân',
+        lab: 'Kiểm Nghiệm (Lab)',
+        logistics: 'Vận Chuyển',
+        norole: 'Không có vai trò'
+      },
+      gating: {
+        accessDenied: 'Quyền truy cập bị từ chối',
+        farmerDenied: 'Ví của bạn không được phân quyền Nông Dân (Farmer) để ghi thông tin.',
+        labDenied: 'Ví của bạn không được phân quyền Kiểm Nghiệm (Lab) để cập nhật kết quả.',
+        logisticsDenied: 'Ví của bạn không được phân quyền Vận Chuyển (Logistics) để ghi chặng.',
+        adminDenied: 'Chỉ có Chủ sở hữu Hợp đồng (Contract Owner) mới được cấu hình phân quyền.',
+        initProgram: 'Khởi tạo Chương trình'
+      },
+      admin: {
+        initTitle: 'Khởi Tạo Chương Trình',
+        initDesc: 'Chương trình đã được khởi tạo, nhưng bạn có thể chạy lại lệnh khởi tạo nếu cần (nó sẽ báo lỗi nếu đã khởi tạo).'
+      },
+      backToHome: 'Quay lại Trang chủ',
+      title: 'Cổng Quản Trị Chuỗi Cung Ứng',
+      subtitle: 'Ghi nhật ký kiểm nghiệm theo Bộ quy tắc và phân quyền, cập nhật các chặng sổ cái bất biến lên Blockchain',
+      walletLabel: 'Ví kết nối: ',
+      devnet: '🔗 Solana Devnet',
+      fallbackMode: '⚠️ Giả Lập LocalLedger',
+      simulatedRoles: {
+        owner: 'Quản trị viên (Owner)',
+        farmer: 'Nông Dân (Farmer)',
+        lab: 'Phòng Lab (Lab Testing)',
+        logistics: 'Vận Chuyển (Logistics)',
+        norole: 'Không có vai trò'
+      },
+      tabs: {
+        farmer: 'Nông Dân',
+        lab: 'Kiểm Nghiệm',
+        logistics: 'Vận Chuyển',
+        admin: 'Quản Trị Hợp Đồng'
+      },
+      qr: {
+        ready: 'Tạo Nhãn QR Cho Lô Hàng',
+        loading: 'Đang tải mã QR...'
+      },
+      tx: {
+        success: 'Thực thi giao dịch thành công',
+        error: 'Lỗi hệ thống',
+        processing: 'Đang gửi giao dịch...',
+        viewExplorer: 'Xem giao dịch trên Solana Explorer'
+      },
+      security: {
+        title: 'Cơ Chế Bảo Mật Blockchain',
+        desc: 'Tất cả các giao dịch gửi từ Cổng quản trị này được ký trực tiếp bằng Khóa bí mật (Private Key) của ví kiểm định viên. Dữ liệu khi đã nạp vào sổ cái Solana devnet sẽ sinh ra một địa chỉ TxHash bất biến duy nhất. Người tiêu dùng sử dụng Trình quét mã QR có thể hoàn toàn yên tâm thông tin kiểm định hóa chất Cadmium này đã được xác thực mã hóa 100%, không bị sửa đổi bởi các bên trung gian.'
+      }
+    },
+    getRuleResult: (audit) => audit.aiResultVi,
+    getRuleCause: (audit) => audit.riskCauseVi,
+    getLocalizedText: (obj) => obj?.vi || '',
+    farmerPanel: {
+      title: 'Đăng Ký Lô Hàng Sầu Riêng',
+      preFill: 'Tự điền nhanh dữ liệu mẫu',
+      batchIdLabel: 'Mã Lô Sầu Riêng (Batch ID)',
+      harvestDateLabel: 'Ngày thu hoạch',
+      violationsLabel: 'Lịch sử vi phạm của vườn (0-5)',
+      rainfallLabel: 'Lượng mưa ước tính (mm)',
+      cadmiumLabel: 'Kết quả kiểm nghiệm Cadimi tạm tính (ppm)',
+      cadmiumHint: 'Ngưỡng an toàn tối đa của Hải quan là 0.050 ppm',
+      aiForecast: {
+        title: 'DỰ BÁO NGUY CƠ Cd BỞI AI (TRƯỚC PHÒNG LAB)',
+        loading: 'Đang phân tích dữ liệu...',
+        riskText: (risk) => `Nguy cơ: ${risk === 'low' ? 'Thấp' : risk === 'medium' ? 'Trung bình' : 'Cao'}`,
+        statusLabels: {
+          low: 'Đạt chuẩn',
+          medium: 'Cần kiểm tra',
+          high: 'Nguy cơ cao'
+        },
+        probabilityLabel: 'Khả năng xảy ra: ',
+        requiresTesting: 'Yêu cầu kiểm nghiệm đầy đủ trong phòng thí nghiệm',
+        eligibleFastTrack: 'Đạt điều kiện miễn giảm quy trình kiểm nghiệm phụ'
+      },
+      diseaseForecast: {
+        loading: 'Đang phân tích điều kiện môi trường...',
+        confidenceLabel: 'Độ tin cậy dự báo: '
+      },
+      ruleAudit: {
+        title: 'ĐÁNH GIÁ CHẤT LƯỢNG THEO QUY TẮC (TẠM TÍNH)',
+        statusLabels: {
+          low: 'Đạt chuẩn',
+          medium: 'Cần kiểm tra',
+          high: 'Giữ lại'
+        },
+        confidenceLabel: 'Độ tin cậy: '
+      },
+      submitBtn: {
+        loading: 'Đang thực thi Web3...',
+        normal: 'Ký Giao Dịch & Đăng Ký Lô Hàng'
+      }
+    },
+    labPanel: {
+      title: 'Cập Nhật Kết Quả Kiểm Nghiệm Phòng Lab',
+      selectBatchLabel: 'Chọn Lô Sầu Riêng cần kiểm định',
+      selectBatchPlaceholder: '-- Chọn lô sầu riêng --',
+      cadmiumLabel: 'Hàm lượng Cadimi phân tích (ppm)',
+      thresholdLabel: 'Ngưỡng kiểm định tối đa (ppm)',
+      ruleAudit: {
+        title: 'KẾT QUẢ ĐỐI CHIẾU QUY TẮC',
+        statusLabels: {
+          low: 'Đạt chuẩn',
+          medium: 'Cần khám',
+          high: 'Giữ lại'
+        },
+        confidenceLabel: 'Độ tin cậy:'
+      },
+      submitBtn: {
+        loading: 'Đang thực thi Web3...',
+        normal: 'Ký Giao Dịch & Ghi Phòng Lab'
+      },
+      history: {
+        title: 'Lịch Sử Báo Cáo của Lô Hàng',
+        loading: 'Đang tải lịch sử từ blockchain...',
+        summary: (count) => `Có ${count} báo cáo hóa chất được tìm thấy:`,
+        run: (index) => `Lần kiểm nghiệm #${index}`,
+        noData: 'Không tìm thấy lịch sử báo cáo nào của lô hàng này.',
+        selectPrompt: 'Vui lòng chọn Lô hàng để xem lịch sử.'
+      }
+    },
+    qrScanner: {
+      title: 'Trình quét mã QR sầu riêng',
+      initCamera: 'Đang khởi chạy camera...',
+      cameraFailed: 'Không thể truy cập Camera',
+      cameraHint: 'Vui lòng kiểm tra quyền camera hoặc nhập mã bên dưới',
+      verified: 'ĐÃ XÁC THỰC LÔ HÀNG',
+      manualLabel: 'Nhập mã lô hàng thủ công:',
+      verifyBtn: 'Xác thực',
+      selectDemo: 'Chọn nhanh lô hàng mẫu:',
+      footer: 'Mã QR liên kết trực tiếp với Smart Contract trên blockchain',
+      error: {
+        empty: 'Vui lòng điền mã lô!'
+      },
+      riskLabels: {
+        low: 'Đạt chuẩn',
+        medium: 'Cần khám',
+        high: 'Giữ lô'
+      }
     },
     diseaseModel: {
       kicker: 'DỰ BÁO BỆNH SẦU RIÊNG (AI EXTENSION)',
@@ -262,6 +404,49 @@ export const copyData = {
         high: 'Rủi ro cao (Nguy hiểm)'
       }
     },
+    unitDetails: {
+      operationalStatus: 'Trạng thái hoạt động',
+      connected: 'Đã liên kết',
+      safetyTitle: 'Quy chuẩn an toàn chuỗi cung ứng',
+      safetyDesc: 'Dữ liệu được cập nhật tự động từ các bộ cảm biến thông minh (IoT Sensors) gắn tại hiện trường. Mọi tham số đo lường vượt ngưỡng sẽ kích hoạt trạng thái cảnh báo trên hợp đồng thông minh blockchain và khóa tự động lô hàng để thanh tra thêm.',
+      farm: {
+        soilMoisture: 'Độ ẩm đất',
+        soilPh: 'Độ pH của đất',
+        ambientTemp: 'Nhiệt độ môi trường',
+        soilOrganicMatter: 'Hàm lượng hữu cơ',
+        plotRegistered: 'Đăng ký Lô đất trồng sầu riêng',
+        runoffCleared: 'Kiểm nghiệm Dư lượng Đất & Nước',
+        harvestDeclared: 'Khai báo Thu hoạch Lô hàng #B882'
+      },
+      transport: {
+        containerTemp: 'Nhiệt độ thùng lạnh',
+        containerHumidity: 'Độ ẩm thùng lạnh',
+        gpsSpeed: 'Vận tốc trung bình',
+        vibration: 'Độ rung chấn cơ học',
+        journeyInitiated: 'Khởi tạo Hành trình Vận chuyển',
+        pingLogged: 'Ghi nhận Định vị GPS & Nhiệt độ IoT',
+        arrivedHub: 'Cập cảng Trung chuyển Cát Lái'
+      },
+      testing: {
+        cadmiumLevel: 'Hàm lượng Cadimi',
+        yellowODye: 'Chất Vàng O',
+        notDetected: 'Không phát hiện',
+        qualityConf: 'Độ tin cậy quét',
+        labAccreditation: 'Chứng nhận Phòng Lab',
+        sampleCheckedIn: 'Tiếp nhận Mẫu thử Phòng Thí nghiệm',
+        assayResultsLogged: 'Ghi nhận Kết quả Kiểm nghiệm Cadimi',
+        auditSignOff: 'Ký mã hóa Xác nhận kiểm nghiệm'
+      },
+      export: {
+        declarationId: 'Mã số Tờ khai Hải quan',
+        sealId: 'Mã chì Niêm phong',
+        eCert: 'Chứng thư thông quan số',
+        smartContractStatus: 'Trạng thái Hợp đồng Thông minh',
+        filesDeposited: 'Nộp hồ sơ Hải quan lên Blockchain',
+        clearanceVerified: 'Thông quan Cảng xuất khẩu thành công',
+        recordFinalized: 'Hồ sơ lô hàng xác nhận & lưu sổ cái'
+      }
+    },
   },
   en: {
     skipLink: 'Skip to content',
@@ -273,14 +458,12 @@ export const copyData = {
         problem: 'Problems',
         solution: 'Solutions',
         impact: 'Impact',
-        slides: 'Strategic Slides',
         farm: 'Farm',
         transport: 'Transport',
         testing: 'Lab Testing',
         export: 'Export Port',
         demo: 'Batch Lookup Demo',
         manage: 'Operator Portal',
-        nft: 'Verify Certificates',
       },
       ariaLabel: 'Main navigation',
       landingMenuAria: 'Introduction sections',
@@ -476,7 +659,7 @@ export const copyData = {
       testingTitle: 'Quality Lab Testing Unit',
       testingSubtitle: 'Cadmium & Yellow O analysis and Rule-Based screening',
       exportTitle: 'Customs & Export Port Unit',
-      exportSubtitle: 'Export clearance & NFT certificate validation',
+      exportSubtitle: 'Export clearance & digital batch records',
       backToHome: 'Back to Home',
       iotTelemetry: 'Real-time IoT Telemetry',
       blockchainProof: 'Blockchain Proof of Record',
@@ -493,6 +676,150 @@ export const copyData = {
         norole: 'No Role',
       },
       simulatedLabel: 'Offline simulated testing only:',
+      simulatedRoleSelector: 'Simulated role selector',
+      tabsAriaLabel: 'Supply chain management roles',
+      rolesDetail: {
+        owner: 'Owner (Admin)',
+        farmer: 'Farmer',
+        lab: 'Lab Tester',
+        logistics: 'Logistics',
+        norole: 'No Role'
+      },
+      gating: {
+        accessDenied: 'Access Denied',
+        farmerDenied: 'Your wallet is not authorized as a Farmer to register new batches.',
+        labDenied: 'Your wallet is not authorized as a Lab operator to submit chemical reports.',
+        logisticsDenied: 'Your wallet is not authorized as a Logistics agent to log timeline events.',
+        adminDenied: 'Only the Smart Contract Owner has access to configure roles.',
+        initProgram: 'Initialize Program'
+      },
+      admin: {
+        initTitle: 'Initialize Program',
+        initDesc: 'The program is already initialized, but you can trigger initialization again if needed (it will return an error if already initialized).'
+      },
+      backToHome: 'Back to Home',
+      title: 'Supply Chain Operator Console',
+      subtitle: 'Log rule-based quality reports, manage roles, and record immutable timeline stages on-chain',
+      walletLabel: 'Auditor Wallet: ',
+      devnet: '🔗 Solana Devnet',
+      fallbackMode: '⚠️ LocalLedger Simulator',
+      simulatedRoles: {
+        owner: 'Owner / Admin',
+        farmer: 'Farmer',
+        lab: 'Lab Tester',
+        logistics: 'Logistics Operator',
+        norole: 'No Role / Consumer'
+      },
+      tabs: {
+        farmer: 'Farmer',
+        lab: 'Lab Analyst',
+        logistics: 'Logistics',
+        admin: 'Role Admin'
+      },
+      qr: {
+        ready: 'Batch Printable QR Label Ready',
+        loading: 'Loading QR Code...'
+      },
+      tx: {
+        success: 'Transaction Success',
+        error: 'System Error',
+        processing: 'Processing Transaction...',
+        viewExplorer: 'View transaction on Solana Explorer'
+      },
+      security: {
+        title: 'Blockchain Ledger Security Architecture',
+        desc: 'Every log submitted via this Operator console is cryptographically signed by the Inspector\'s private key. Once accepted into the Solana devnet ledger, it generates an immutable, timestamped transaction proof. Consumers scanning the package QR code can rest assured that this Cadmium assay and quality safety rating was certified directly at the source, preventing any tampering by distributors.'
+      }
+    },
+    getRuleResult: (audit) => audit.aiResultEn,
+    getRuleCause: (audit) => audit.riskCauseEn,
+    getLocalizedText: (obj) => obj?.en || '',
+    farmerPanel: {
+      title: 'Register New Durian Batch',
+      preFill: 'Quick pre-fill sample data',
+      batchIdLabel: 'Batch ID (Unique)',
+      harvestDateLabel: 'Harvest Date',
+      violationsLabel: 'Farm Violation History (0-5)',
+      rainfallLabel: 'Estimated Rainfall (mm)',
+      cadmiumLabel: 'Estimated Cadmium Level (ppm)',
+      cadmiumHint: 'Customs safety limit is 0.050 ppm',
+      aiForecast: {
+        title: 'AI RISK PRE-LAB FORECAST',
+        loading: 'Analyzing farm data...',
+        riskText: (risk) => `Risk Level: ${risk.toUpperCase()}`,
+        statusLabels: {
+          low: 'Safe',
+          medium: 'Review',
+          high: 'Critical'
+        },
+        probabilityLabel: 'Probability: ',
+        requiresTesting: 'Requires comprehensive lab assay',
+        eligibleFastTrack: 'Eligible for fast-track processing'
+      },
+      diseaseForecast: {
+        loading: 'Analyzing environmental variables...',
+        confidenceLabel: 'Prediction Confidence: '
+      },
+      ruleAudit: {
+        title: 'RULE-BASED REAL-TIME AUDITING PREVIEW',
+        statusLabels: {
+          low: 'Safe',
+          medium: 'Review',
+          high: 'Critical'
+        },
+        confidenceLabel: 'Confidence: '
+      },
+      submitBtn: {
+        loading: 'Executing Web3...',
+        normal: 'Sign & Register Batch'
+      }
+    },
+    labPanel: {
+      title: 'Submit Lab Chemical Audit Report',
+      selectBatchLabel: 'Select Target Batch ID',
+      selectBatchPlaceholder: '-- Select Batch ID --',
+      cadmiumLabel: 'Assayed Cadmium (ppm)',
+      thresholdLabel: 'Max Threshold (ppm)',
+      ruleAudit: {
+        title: 'RULE AUDITOR ANALYSIS',
+        statusLabels: {
+          low: 'Safe',
+          medium: 'Review',
+          high: 'Critical'
+        },
+        confidenceLabel: 'Audit Confidence:'
+      },
+      submitBtn: {
+        loading: 'Executing Web3...',
+        normal: 'Sign & Broadcast Lab Report'
+      },
+      history: {
+        title: 'Batch Chemical Assay History',
+        loading: 'Querying history from smart contract...',
+        summary: (count) => `${count} reports logged for batch:`,
+        run: (index) => `Assay Run #${index}`,
+        noData: 'No chemical assays recorded for this batch yet.',
+        selectPrompt: 'Please select a Batch ID above to fetch history.'
+      }
+    },
+    qrScanner: {
+      title: 'Durian QR Code Scanner',
+      initCamera: 'Initializing device camera...',
+      cameraFailed: 'Camera Access Failed',
+      cameraHint: 'Please check browser permissions or type the batch ID below',
+      verified: 'BATCH VERIFIED',
+      manualLabel: 'Or enter batch ID manually:',
+      verifyBtn: 'Verify',
+      selectDemo: 'Or select a demo batch to simulate:',
+      footer: 'QR code links directly to Smart Contract records on the blockchain',
+      error: {
+        empty: 'Please enter a batch ID!'
+      },
+      riskLabels: {
+        low: 'Export Ready',
+        medium: 'Needs Review',
+        high: 'Hold Batch'
+      }
     },
     diseaseModel: {
       kicker: 'DURIAN DISEASE PREDICTION (AI EXTENSION)',
@@ -524,6 +851,49 @@ export const copyData = {
         low: 'Low Risk (Safe)',
         medium: 'Medium Risk (Warning)',
         high: 'High Risk (Critical)'
+      }
+    },
+    unitDetails: {
+      operationalStatus: 'Operational Status',
+      connected: 'Connected',
+      safetyTitle: 'Supply Chain Safety Compliance',
+      safetyDesc: 'Data is synchronized in real-time from on-field smart IoT sensors. Any parameter violating set thresholds automatically triggers a warning flag on the blockchain smart contract, locking the batch for inspector review.',
+      farm: {
+        soilMoisture: 'Soil Moisture',
+        soilPh: 'Soil pH',
+        ambientTemp: 'Ambient Temp',
+        soilOrganicMatter: 'Soil Organic Matter',
+        plotRegistered: 'Orchard Plot Registered',
+        runoffCleared: 'Soil & Water Runoff Cleared',
+        harvestDeclared: 'Batch #B882 Harvest Declared'
+      },
+      transport: {
+        containerTemp: 'Container Temperature',
+        containerHumidity: 'Container Humidity',
+        gpsSpeed: 'Average GPS Speed',
+        vibration: 'Mechanical Vibration',
+        journeyInitiated: 'Transit Journey Initiated',
+        pingLogged: 'GPS & Cold Chain Ping Logged',
+        arrivedHub: 'Arrived at Cat Lai Export Hub'
+      },
+      testing: {
+        cadmiumLevel: 'Cadmium Level',
+        yellowODye: 'Auramine O Dye',
+        notDetected: 'Not Detected',
+        qualityConf: 'Quality Gate Conf',
+        labAccreditation: 'Lab Accreditation',
+        sampleCheckedIn: 'Laboratory Sample Checked In',
+        assayResultsLogged: 'Cadmium Assay Results Logged',
+        auditSignOff: 'Rule-Based Audit Sign-Off Broadcasted'
+      },
+      export: {
+        declarationId: 'Customs Declaration ID',
+        sealId: 'Container Seal ID',
+        eCert: 'Phytosanitary E-Cert',
+        smartContractStatus: 'Smart Contract Status',
+        filesDeposited: 'Customs Files Deposited to Web3',
+        clearanceVerified: 'Port Clearance Verified',
+        recordFinalized: 'Batch record finalized on ledger'
       }
     },
   },

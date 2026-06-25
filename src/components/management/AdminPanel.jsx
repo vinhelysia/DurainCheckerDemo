@@ -25,13 +25,13 @@ export default function AdminPanel({
       
       <form onSubmit={(e) => e.preventDefault()} className="manage-form">
         <div className="form-group">
-          <label htmlFor="m-target-addr">{language === 'vi' ? 'Địa chỉ ví kiểm định viên (EVM Address)' : 'Target Wallet EVM Address'}</label>
+          <label htmlFor="m-target-addr">{language === 'vi' ? 'Địa chỉ ví Solana' : 'Solana Wallet Address'}</label>
           <input 
             id="m-target-addr"
             type="text" 
             value={targetAddress} 
             onChange={(e) => setTargetAddress(e.target.value)}
-            placeholder="0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+            placeholder="7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"
             required
           />
         </div>

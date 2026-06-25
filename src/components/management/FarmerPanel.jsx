@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Sprout, Compass, Cpu, AlertTriangle, CheckCircle2, RefreshCw, Send } from 'lucide-react'
+import { runRuleAuditor } from '../../lib/ruleAuditor'
 
 const PROVINCES = {
   'Lâm Đồng': 'Lam Dong',
@@ -9,34 +10,6 @@ const PROVINCES = {
   'Đồng Nai': 'Dong Nai'
 }
 
-function runRuleAuditor(cdVal) {
-  const cd = parseFloat(cdVal) || 0
-  const cdInt = Math.round(cd * 1000)
-  let riskLevel = 'low'
-  let ruleResultVi = 'Đạt chuẩn xuất khẩu'
-  let ruleResultEn = 'Export-ready'
-  let confidence = 90 + (cdInt % 9)
-  let riskCauseVi = 'Cadimi và Vàng O trong ngưỡng cho phép'
-  let riskCauseEn = 'Cadmium and Yellow O within limits'
-
-  if (cd > 0.05) {
-    riskLevel = 'high'
-    ruleResultVi = 'Không đạt - giữ lô'
-    ruleResultEn = 'Hold - does not pass'
-    confidence = 82 + (cdInt % 14)
-    riskCauseVi = 'Hàm lượng Cadimi vượt ngưỡng an toàn cho phép (> 0.05 ppm)'
-    riskCauseEn = 'Cadmium level exceeds safe limits (> 0.05 ppm)'
-  } else if (cd >= 0.045) {
-    riskLevel = 'medium'
-    ruleResultVi = 'Cần kiểm tra lại'
-    ruleResultEn = 'Needs re-check'
-    confidence = 62 + (cdInt % 15)
-    riskCauseVi = 'Hàm lượng Cadimi gần ngưỡng cảnh báo, đề nghị kiểm tra bổ sung'
-    riskCauseEn = 'Cadmium level near threshold; supplementary assay recommended'
-  }
-
-  return { riskLevel, aiResultVi: ruleResultVi, aiResultEn: ruleResultEn, confidence, riskCauseVi, riskCauseEn }
-}
 
 function runDiseaseAuditor(tempVal, humVal, rainVal, wetVal, drainageVal, priorVal) {
   const temp = parseFloat(tempVal) || 28.0
@@ -93,7 +66,6 @@ function runDiseaseAuditor(tempVal, humVal, rainVal, wetVal, drainageVal, priorV
 }
 
 export default function FarmerPanel({
-  language,
   copy,
   loading,
   registerBatch
@@ -312,7 +284,7 @@ export default function FarmerPanel({
     <div className="dashboard-card telemetry-card">
       <div className="card-header-with-icon">
         <Sprout className="card-icon" size={20} />
-        <h2>{language === 'vi' ? 'Đăng Ký Lô Hàng Sầu Riêng' : 'Register New Durian Batch'}</h2>
+        <h2>{copy.farmerPanel.title}</h2>
       </div>
       
       <form onSubmit={onSubmit} className="manage-form">
@@ -322,12 +294,12 @@ export default function FarmerPanel({
             onClick={handlePreFill}
             className="button button-secondary w-full text-xs py-2 mb-3 min-h-0"
           >
-            ✨ {language === 'vi' ? 'Tự điền nhanh dữ liệu mẫu' : 'Quick pre-fill sample data'}
+            ✨ {copy.farmerPanel.preFill}
           </button>
         </div>
 
         <div className="form-group">
-          <label htmlFor="m-batch-id">{language === 'vi' ? 'Mã Lô Sầu Riêng (Batch ID)' : 'Batch ID (Unique)'}</label>
+          <label htmlFor="m-batch-id">{copy.farmerPanel.batchIdLabel}</label>
           <input 
             id="m-batch-id"
             type="text" 
@@ -382,7 +354,7 @@ export default function FarmerPanel({
             </select>
           </div>
           <div className="form-group">
-            <label htmlFor="m-harvest-date">{language === 'vi' ? 'Ngày thu hoạch' : 'Harvest Date'}</label>
+            <label htmlFor="m-harvest-date">{copy.farmerPanel.harvestDateLabel}</label>
             <input 
               id="m-harvest-date"
               type="date" 
@@ -396,7 +368,7 @@ export default function FarmerPanel({
         <div className="form-grid-2">
           <div className="form-group">
             <label htmlFor="m-violations">
-              {language === 'vi' ? 'Lịch sử vi phạm của vườn (0-5)' : 'Farm Violation History (0-5)'}
+              {copy.farmerPanel.violationsLabel}
             </label>
             <select
               id="m-violations"
@@ -413,7 +385,7 @@ export default function FarmerPanel({
           </div>
           <div className="form-group">
             <label htmlFor="m-rainfall">
-              {language === 'vi' ? 'Lượng mưa ước tính (mm)' : 'Estimated Rainfall (mm)'}
+              {copy.farmerPanel.rainfallLabel}
             </label>
             <input
               id="m-rainfall"
@@ -428,21 +400,8 @@ export default function FarmerPanel({
         </div>
 
         {/* Environmental & Orchard Conditions (Extension Feature) */}
-        <div style={{
-          margin: '24px 0 12px 0',
-          borderTop: '1px solid rgba(31, 71, 52, 0.1)',
-          paddingTop: '16px'
-        }}>
-          <h3 style={{
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            color: 'var(--color-green-deep)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-          }}>
+        <div className="farmer-section-divider">
+          <h3 className="farmer-section-title">
             <Compass size={16} />
             <span>
               {copy.diseaseModel.title}
@@ -507,7 +466,7 @@ export default function FarmerPanel({
           </div>
         </div>
 
-        <div className="form-grid-2" style={{ marginBottom: '16px' }}>
+        <div className="form-grid-2 farmer-mb-16">
           <div className="form-group">
             <label htmlFor="m-tree-age">{copy.diseaseModel.ageLabel}</label>
             <input
@@ -536,25 +495,25 @@ export default function FarmerPanel({
 
         {/* AI Predicted Risk Panel */}
         {provinceVi && (
-          <div className={`ai-preview-panel risk-${aiResult ? aiResult.risk : 'low'}`} style={{ marginBottom: '18px' }}>
-            <div className="ai-preview-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className={`ai-preview-panel risk-${aiResult ? aiResult.risk : 'low'} ai-preview-panel-margin`}>
+            <div className="ai-preview-header ai-preview-header-row">
+              <div className="flex items-center gap-2">
                 <Cpu size={16} />
                 <span>
-                  {language === 'vi' ? 'DỰ BÁO NGUY CƠ Cd BỞI AI (TRƯỚC PHÒNG LAB)' : 'AI RISK PRE-LAB FORECAST'}
+                  {copy.farmerPanel.aiForecast.title}
                 </span>
               </div>
               {aiResult && (
-                <span className={`status-badge-pill ${aiResult.source === 'model' ? 'chain-mode' : 'fallback-mode'}`} style={{ fontSize: '0.68rem', padding: '1px 8px', textTransform: 'none', height: 'fit-content', lineHeight: 'normal' }}>
+                <span className={`status-badge-pill ${aiResult.source === 'model' ? 'chain-mode' : 'fallback-mode'} ai-badge-override`}>
                   {aiResult.source === 'model' ? '🧠 AI Model' : '⚠️ Simulated'}
                 </span>
               )}
             </div>
             <div className="ai-preview-body">
               {aiPredicting ? (
-                <div className="text-xs py-2 opacity-80" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="text-xs py-2 opacity-80 flex items-center gap-2">
                   <RefreshCw size={12} className="animate-spin" />
-                  <span>{language === 'vi' ? 'Đang phân tích dữ liệu...' : 'Analyzing farm data...'}</span>
+                  <span>{copy.farmerPanel.aiForecast.loading}</span>
                 </div>
               ) : aiError ? (
                 <div className="text-xs text-red-500 py-1">{aiError}</div>
@@ -562,36 +521,26 @@ export default function FarmerPanel({
                 <>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-semibold">
-                      {language === 'vi' 
-                        ? `Nguy cơ: ${aiResult.risk === 'low' ? 'Thấp' : aiResult.risk === 'medium' ? 'Trung bình' : 'Cao'}`
-                        : `Risk Level: ${aiResult.risk.toUpperCase()}`}
+                      {copy.farmerPanel.aiForecast.riskText(aiResult.risk)}
                     </span>
                     <span className={`risk-badge risk-${aiResult.risk}`}>
-                      {aiResult.risk === 'low' 
-                        ? (language === 'vi' ? 'Đạt chuẩn' : 'Safe') 
-                        : aiResult.risk === 'medium' 
-                          ? (language === 'vi' ? 'Cần kiểm tra' : 'Review') 
-                          : (language === 'vi' ? 'Nguy cơ cao' : 'Critical')}
+                      {copy.farmerPanel.aiForecast.statusLabels[aiResult.risk]}
                     </span>
                   </div>
                   <div className="text-xs opacity-80 mb-1">
-                    <strong>{language === 'vi' ? 'Khả năng xảy ra: ' : 'Probability: '}</strong> 
+                    <strong>{copy.farmerPanel.aiForecast.probabilityLabel}</strong> 
                     {Math.round(aiResult.probability * 100)}%
                   </div>
                   <div className="text-xs font-semibold mt-1">
                     {aiResult.needs_full_testing ? (
-                      <span className="text-red-500" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ef4444' }}>
+                      <span className="text-red-500 risk-text-high">
                         <AlertTriangle size={12} />
-                        {language === 'vi' 
-                          ? 'Yêu cầu kiểm nghiệm đầy đủ trong phòng thí nghiệm' 
-                          : 'Requires comprehensive lab assay'}
+                        {copy.farmerPanel.aiForecast.requiresTesting}
                       </span>
                     ) : (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#10b981' }}>
+                      <span className="risk-text-low">
                         <CheckCircle2 size={12} />
-                        {language === 'vi' 
-                          ? 'Đạt điều kiện miễn giảm quy trình kiểm nghiệm phụ' 
-                          : 'Eligible for fast-track processing'}
+                        {copy.farmerPanel.aiForecast.eligibleFastTrack}
                       </span>
                     )}
                   </div>
@@ -603,25 +552,25 @@ export default function FarmerPanel({
 
         {/* Disease Risk Forecast AI Result Panel (Extension Feature) */}
         {harvestDate && (
-          <div className={`ai-preview-panel risk-${diseaseResult ? diseaseResult.risk : 'low'}`} style={{ marginBottom: '18px' }}>
-            <div className="ai-preview-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className={`ai-preview-panel risk-${diseaseResult ? diseaseResult.risk : 'low'} ai-preview-panel-margin`}>
+            <div className="ai-preview-header ai-preview-header-row">
+              <div className="flex items-center gap-2">
                 <Cpu size={16} />
                 <span>
                   {copy.diseaseModel.kicker}
                 </span>
               </div>
               {diseaseResult && (
-                <span className={`status-badge-pill ${diseaseResult.source === 'model' ? 'chain-mode' : 'fallback-mode'}`} style={{ fontSize: '0.68rem', padding: '1px 8px', textTransform: 'none', height: 'fit-content', lineHeight: 'normal' }}>
+                <span className={`status-badge-pill ${diseaseResult.source === 'model' ? 'chain-mode' : 'fallback-mode'} ai-badge-override`}>
                   {diseaseResult.source === 'model' ? '🧠 AI Model' : '⚠️ Simulated'}
                 </span>
               )}
             </div>
             <div className="ai-preview-body">
               {diseasePredicting ? (
-                <div className="text-xs py-2 opacity-80" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="text-xs py-2 opacity-80 flex items-center gap-2">
                   <RefreshCw size={12} className="animate-spin" />
-                  <span>{language === 'vi' ? 'Đang phân tích điều kiện môi trường...' : 'Analyzing environmental variables...'}</span>
+                  <span>{copy.farmerPanel.diseaseForecast.loading}</span>
                 </div>
               ) : diseaseError ? (
                 <div className="text-xs text-red-500 py-1">{diseaseError}</div>
@@ -636,10 +585,10 @@ export default function FarmerPanel({
                     </span>
                   </div>
                   <div className="text-xs opacity-80 mb-1">
-                    <strong>{language === 'vi' ? 'Độ tin cậy dự báo: ' : 'Prediction Confidence: '}</strong> 
+                    <strong>{copy.farmerPanel.diseaseForecast.confidenceLabel}</strong> 
                     {Math.round(diseaseResult.probability * 100)}%
                   </div>
-                  <p style={{ margin: '8px 0 0 0', fontSize: '0.74rem', color: 'var(--color-ink-soft)', fontStyle: 'italic', lineHeight: '1.4' }}>
+                  <p className="farmer-disease-desc">
                     &ldquo;{copy.diseaseModel[diseaseResult.disease + 'Desc']}&rdquo;
                   </p>
                 </>
@@ -649,7 +598,7 @@ export default function FarmerPanel({
         )}
 
         <div className="form-group">
-          <label htmlFor="m-cadmium">{language === 'vi' ? 'Kết quả kiểm nghiệm Cadimi tạm tính (ppm)' : 'Estimated Cadmium Level (ppm)'}</label>
+          <label htmlFor="m-cadmium">{copy.farmerPanel.cadmiumLabel}</label>
           <input 
             id="m-cadmium"
             type="number" 
@@ -660,29 +609,29 @@ export default function FarmerPanel({
             onChange={(e) => setCadmiumPpm(e.target.value)}
             required
           />
-          <span className="input-hint">{language === 'vi' ? 'Ngưỡng an toàn tối đa của Hải quan là 0.050 ppm' : 'Customs safety limit is 0.050 ppm'}</span>
+          <span className="input-hint">{copy.farmerPanel.cadmiumHint}</span>
         </div>
 
         {/* Rule-Based indicator card */}
         <div className={`ai-preview-panel risk-${ruleAudit.riskLevel}`}>
           <div className="ai-preview-header">
             <Cpu size={16} />
-            <span>{language === 'vi' ? 'ĐÁNH GIÁ CHẤT LƯỢNG THEO QUY TẮC (TẠM TÍNH)' : 'RULE-BASED REAL-TIME AUDITING PREVIEW'}</span>
+            <span>{copy.farmerPanel.ruleAudit.title}</span>
           </div>
           <div className="ai-preview-body">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-semibold">
-                {language === 'vi' ? ruleAudit.aiResultVi : ruleAudit.aiResultEn}
+                {copy.getRuleResult(ruleAudit)}
               </span>
               <span className={`risk-badge risk-${ruleAudit.riskLevel}`}>
-                {ruleAudit.riskLevel === 'low' ? (language === 'vi' ? 'Đạt chuẩn' : 'Safe') : (ruleAudit.riskLevel === 'medium' ? (language === 'vi' ? 'Cần kiểm tra' : 'Review') : (language === 'vi' ? 'Giữ lại' : 'Critical'))}
+                {copy.farmerPanel.ruleAudit.statusLabels[ruleAudit.riskLevel]}
               </span>
             </div>
             <div className="text-xs opacity-80">
-              <strong>{language === 'vi' ? 'Độ tin cậy: ' : 'Confidence: '}</strong> {ruleAudit.confidence}%
+              <strong>{copy.farmerPanel.ruleAudit.confidenceLabel}</strong> {ruleAudit.confidence}%
             </div>
             <div className="text-xs mt-1 italic opacity-90">
-              &ldquo;{language === 'vi' ? ruleAudit.riskCauseVi : ruleAudit.riskCauseEn}&rdquo;
+              &ldquo;{copy.getRuleCause(ruleAudit)}&rdquo;
             </div>
           </div>
         </div>
@@ -694,7 +643,7 @@ export default function FarmerPanel({
         >
           <Send size={16} />
           <span>
-            {loading ? (language === 'vi' ? 'Đang thực thi Web3...' : 'Executing Web3...') : (language === 'vi' ? 'Ký Giao Dịch & Đăng Ký Lô Hàng' : 'Sign & Register Batch')}
+            {loading ? copy.farmerPanel.submitBtn.loading : copy.farmerPanel.submitBtn.normal}
           </span>
         </button>
       </form>

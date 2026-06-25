@@ -16,17 +16,11 @@ const unitItems = [
   { href: '#/unit/export', key: 'export' },
   { href: '#/unit/demo', key: 'demo' },
   { href: '#/manage', key: 'manage' },
-  { href: '#/unit/demo', key: 'nft' },
 ]
 
 function Header() {
   const { language, copy } = useLanguage()
-  const getHref = (item) => {
-    if (item.key === 'nft') {
-      return `${import.meta.env.BASE_URL}#/unit/demo`
-    }
-    return item.href
-  }
+  const getHref = (item) => item.href
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDrawer, setActiveDrawer] = useState(null) // 'intro' | 'units' | null
   const [slideKey, setSlideKey] = useState(0) // bumped every time we switch drawers to retrigger slide-in
@@ -273,7 +267,6 @@ function Header() {
                       {item.key === 'problem' && (language === 'vi' ? 'Phân tích thách thức, kiểm soát Cadimi & Auramine O' : 'Analysis of cadmium & dye challenges')}
                       {item.key === 'solution' && (language === 'vi' ? 'Hợp đồng thông minh & Bộ quy tắc kiểm định' : 'Smart contracts & Rule-Based validation model')}
                       {item.key === 'impact' && (language === 'vi' ? 'Niềm tin thị trường & thông quan nhanh' : 'Market trust & fast custom clearance')}
-                      {item.key === 'slides' && (language === 'vi' ? 'Tài liệu thuyết trình chiến lược kinh doanh' : 'Strategic business deck presentation')}
                     </span>
                   </div>
                   <ChevronRight className="drawer-item-chevron" size={18} />
@@ -297,10 +290,9 @@ function Header() {
                       {item.key === 'farm' && (language === 'vi' ? 'Nhật ký IoT đất trồng, tưới tiêu & bón phân' : 'IoT soil logs, irrigation & harvests')}
                       {item.key === 'transport' && (language === 'vi' ? 'Theo dõi xe lạnh, cảm biến nhiệt độ & GPS' : 'Cold chain telemetry, sensors & tracks')}
                       {item.key === 'testing' && (language === 'vi' ? 'Dữ liệu phân tích hóa chất & sàng lọc Cadimi' : 'Chemical assays & cadmium screening')}
-                      {item.key === 'export' && (language === 'vi' ? 'Tờ khai hải quan & chứng thư số NFT' : 'Customs declarations & NFT certificates')}
+                      {item.key === 'export' && (language === 'vi' ? 'Tờ khai hải quan & hồ sơ kỹ thuật số' : 'Customs declarations & digital batch records')}
                       {item.key === 'demo' && (language === 'vi' ? 'Tra cứu blockchain theo mã lô hàng' : 'Blockchain lookup by batch identifier')}
                       {item.key === 'manage' && (language === 'vi' ? 'Đăng ký lô hàng & ghi nhật ký kiểm định theo Bộ quy tắc' : 'Register batches & log rule-based quality audits')}
-                      {item.key === 'nft' && (language === 'vi' ? 'Kiểm chứng chữ ký mã hóa Web3' : 'Verify Web3 cryptographic signature')}
                     </span>
                   </div>
                   <ChevronRight className="drawer-item-chevron" size={18} />

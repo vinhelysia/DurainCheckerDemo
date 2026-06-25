@@ -180,11 +180,11 @@ function ManagementPortalContent() {
 
   // Resolved role string for displaying on wallet chip
   const getRoleLabel = () => {
-    if (activeRoles.isOwner) return language === 'vi' ? 'Chủ Sở Hữu (Admin)' : 'Owner (Admin)'
-    if (activeRoles.isFarmer) return language === 'vi' ? 'Nông Dân' : 'Farmer'
-    if (activeRoles.isLab) return language === 'vi' ? 'Kiểm Nghiệm (Lab)' : 'Lab Tester'
-    if (activeRoles.isLogistics) return language === 'vi' ? 'Vận Chuyển' : 'Logistics'
-    return language === 'vi' ? 'Không có vai trò' : 'No Role'
+    if (activeRoles.isOwner) return copy.managePortal.rolesDetail.owner
+    if (activeRoles.isFarmer) return copy.managePortal.rolesDetail.farmer
+    if (activeRoles.isLab) return copy.managePortal.rolesDetail.lab
+    if (activeRoles.isLogistics) return copy.managePortal.rolesDetail.logistics
+    return copy.managePortal.rolesDetail.norole
   }
 
   // Sub-Render functions for tabs with role gating
@@ -195,11 +195,9 @@ function ManagementPortalContent() {
           return (
             <div className="tab-gating-alert">
               <AlertTriangle className="text-red-500 animate-bounce" size={42} />
-              <h3>{language === 'vi' ? 'Quyền truy cập bị từ chối' : 'Access Denied'}</h3>
+              <h3>{copy.managePortal.gating.accessDenied}</h3>
               <p>
-                {language === 'vi' 
-                  ? 'Ví của bạn không được phân quyền Nông Dân (Farmer) để ghi thông tin.' 
-                  : 'Your wallet is not authorized as a Farmer to register new batches.'}
+                {copy.managePortal.gating.farmerDenied}
               </p>
             </div>
           )
@@ -219,11 +217,9 @@ function ManagementPortalContent() {
           return (
             <div className="tab-gating-alert">
               <AlertTriangle className="text-red-500 animate-bounce" size={42} />
-              <h3>{language === 'vi' ? 'Quyền truy cập bị từ chối' : 'Access Denied'}</h3>
+              <h3>{copy.managePortal.gating.accessDenied}</h3>
               <p>
-                {language === 'vi' 
-                  ? 'Ví của bạn không được phân quyền Kiểm Nghiệm (Lab) để cập nhật kết quả.' 
-                  : 'Your wallet is not authorized as a Lab operator to submit chemical reports.'}
+                {copy.managePortal.gating.labDenied}
               </p>
             </div>
           )
@@ -249,11 +245,9 @@ function ManagementPortalContent() {
           return (
             <div className="tab-gating-alert">
               <AlertTriangle className="text-red-500 animate-bounce" size={42} />
-              <h3>{language === 'vi' ? 'Quyền truy cập bị từ chối' : 'Access Denied'}</h3>
+              <h3>{copy.managePortal.gating.accessDenied}</h3>
               <p>
-                {language === 'vi' 
-                  ? 'Ví của bạn không được phân quyền Vận Chuyển (Logistics) để ghi chặng.' 
-                  : 'Your wallet is not authorized as a Logistics agent to log timeline events.'}
+                {copy.managePortal.gating.logisticsDenied}
               </p>
             </div>
           )
@@ -274,20 +268,18 @@ function ManagementPortalContent() {
           return (
             <div className="tab-gating-alert">
               <AlertTriangle className="text-red-500 animate-bounce" size={42} />
-              <h3>{language === 'vi' ? 'Quyền truy cập bị từ chối' : 'Access Denied'}</h3>
+              <h3>{copy.managePortal.gating.accessDenied}</h3>
               <p>
-                {language === 'vi' 
-                  ? 'Chỉ có Chủ sở hữu Hợp đồng (Contract Owner) mới được cấu hình phân quyền.' 
-                  : 'Only the Smart Contract Owner has access to configure roles.'}
+                {copy.managePortal.gating.adminDenied}
               </p>
               {wallet.publicKey && (
-                <div style={{ marginTop: '20px' }}>
+                <div className="manage-init-btn-wrap">
                   <button
                     onClick={handleInitializeProgram}
                     disabled={loading}
                     className="button button-primary"
                   >
-                    <span>{language === 'vi' ? 'Khởi tạo Chương trình' : 'Initialize Program'}</span>
+                    <span>{copy.managePortal.gating.initProgram}</span>
                   </button>
                 </div>
               )}
@@ -295,25 +287,23 @@ function ManagementPortalContent() {
           )
         }
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="manage-admin-container">
             {wallet.publicKey && (
               <div className="dashboard-card telemetry-card">
                 <div className="card-header-with-icon">
                   <ShieldCheck className="card-icon" size={20} />
-                  <h2>{language === 'vi' ? 'Khởi Tạo Chương Trình' : 'Initialize Program'}</h2>
+                  <h2>{copy.managePortal.admin.initTitle}</h2>
                 </div>
-                <div style={{ marginTop: '16px' }}>
-                  <p style={{ fontSize: '0.85rem', marginBottom: '16px', color: 'var(--color-ink-soft)' }}>
-                    {language === 'vi'
-                      ? 'Chương trình đã được khởi tạo, nhưng bạn có thể chạy lại lệnh khởi tạo nếu cần (nó sẽ báo lỗi nếu đã khởi tạo).'
-                      : 'The program is already initialized, but you can trigger initialization again if needed (it will return an error if already initialized).'}
+                <div className="manage-init-body">
+                  <p className="manage-init-text">
+                    {copy.managePortal.admin.initDesc}
                   </p>
                   <button
                     onClick={handleInitializeProgram}
                     disabled={loading}
                     className="button button-primary"
                   >
-                    <span>{language === 'vi' ? 'Khởi tạo Chương trình' : 'Initialize Program'}</span>
+                    <span>{copy.managePortal.gating.initProgram}</span>
                   </button>
                 </div>
               </div>
@@ -337,7 +327,7 @@ function ManagementPortalContent() {
         {/* Back Link */}
         <a href="#/" onClick={handleBackToHome} className="back-link">
           <ArrowLeft size={16} />
-          <span>{language === 'vi' ? 'Quay lại Trang chủ' : 'Back to Home'}</span>
+          <span>{copy.managePortal.backToHome}</span>
         </a>
 
         {/* Page Header */}
@@ -346,23 +336,21 @@ function ManagementPortalContent() {
             <Compass size={32} className="text-green-mid" />
           </div>
           <div>
-            <h1>{language === 'vi' ? 'Cổng Quản Trị Chuỗi Cung Ứng' : 'Supply Chain Operator Console'}</h1>
+            <h1>{copy.managePortal.title}</h1>
             <p className="unit-subtitle">
-              {language === 'vi' 
-                ? 'Ghi nhật ký kiểm nghiệm theo Bộ quy tắc và phân quyền, cập nhật các chặng sổ cái bất biến lên Blockchain' 
-                : 'Log rule-based quality reports, manage roles, and record immutable timeline stages on-chain'}
+              {copy.managePortal.subtitle}
             </p>
           </div>
         </div>
 
         {/* Connection/Wallet Banner */}
-        <div className="status-banner" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+        <div className="status-banner manage-status-banner">
+          <div className="manage-status-row">
             <div className="status-left">
               <Wallet size={22} className="status-shield-icon" />
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div className="manage-status-left-details">
                 <span>
-                  <strong>{language === 'vi' ? 'Ví kết nối: ' : 'Auditor Wallet: '}</strong>
+                  <strong>{copy.managePortal.walletLabel}</strong>
                   <code className="text-xs">{account ? `${account.slice(0, 8)}...${account.slice(-8)}` : 'Disconnected'}</code>
                 </span>
                 <span className={`role-badge-pill role-${activeRoles.isOwner ? 'owner' : activeRoles.isFarmer ? 'farmer' : activeRoles.isLab ? 'lab' : activeRoles.isLogistics ? 'logistics' : 'norole'}`}>
@@ -371,127 +359,131 @@ function ManagementPortalContent() {
               </div>
             </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="manage-status-right-details">
               <span className={`status-badge-pill ${providerMode === 'chain' ? 'chain-mode' : 'fallback-mode'}`}>
                 {providerMode === 'chain' 
-                  ? (language === 'vi' ? '🔗 Solana Devnet' : '🔗 Solana Devnet')
-                  : (language === 'vi' ? '⚠️ Giả Lập LocalLedger' : '⚠️ LocalLedger Simulator')}
+                  ? copy.managePortal.devnet
+                  : copy.managePortal.fallbackMode}
               </span>
               <Suspense fallback={<span className="text-xs opacity-70">Loading Wallet...</span>}>
-                <WalletMultiButton className="button button-secondary text-xs py-1 px-3 min-h-0" style={{ height: 'auto', lineHeight: 'normal', padding: '6px 12px', fontSize: '0.75rem', background: 'var(--color-surface-alt)', border: '1px solid var(--color-green-mid)', color: 'var(--color-green-deep)', borderRadius: '4px' }} />
+                <WalletMultiButton className="button button-secondary text-xs py-1 px-3 min-h-0 manage-wallet-button" />
               </Suspense>
             </div>
           </div>
-
+          
           {/* Simulated Role selector for sandbox testing */}
           {providerMode === 'fallback' && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: 'rgba(217, 164, 65, 0.05)',
-              border: '1px solid rgba(217, 164, 65, 0.2)',
-              borderRadius: '8px',
-              padding: '8px 12px',
-              marginTop: '4px'
-            }}>
-              <span className="text-xs" style={{ color: 'var(--color-gold)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div className="sim-role-box">
+              <span className="text-xs sim-role-label">
                 <RefreshCw size={14} />
-                <span>⚙️ {language === 'vi' ? 'Vai trò giả lập (Chỉ dùng kiểm thử offline):' : 'Offline simulated testing only:'}</span>
+                <span>⚙️ {copy.managePortal.simulatedLabel}</span>
               </span>
               <select
                 value={simulatedRole}
                 onChange={(e) => setSimulatedRole(e.target.value)}
-                style={{
-                  fontSize: '0.75rem',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: '1px solid var(--color-gold)',
-                  background: 'var(--color-surface)',
-                  color: 'var(--color-ink)',
-                  fontWeight: 600
-                }}
+                className="sim-role-select"
+                aria-label={copy.managePortal.simulatedRoleSelector}
               >
-                <option value="owner">{language === 'vi' ? 'Quản trị viên (Owner)' : 'Owner / Admin'}</option>
-                <option value="farmer">{language === 'vi' ? 'Nông Dân (Farmer)' : 'Farmer'}</option>
-                <option value="lab">{language === 'vi' ? 'Phòng Lab (Lab Testing)' : 'Lab Tester'}</option>
-                <option value="logistics">{language === 'vi' ? 'Vận Chuyển (Logistics)' : 'Logistics Operator'}</option>
-                <option value="norole">{language === 'vi' ? 'Không có vai trò' : 'No Role / Consumer'}</option>
+                <option value="owner">{copy.managePortal.simulatedRoles.owner}</option>
+                <option value="farmer">{copy.managePortal.simulatedRoles.farmer}</option>
+                <option value="lab">{copy.managePortal.simulatedRoles.lab}</option>
+                <option value="logistics">{copy.managePortal.simulatedRoles.logistics}</option>
+                <option value="norole">{copy.managePortal.simulatedRoles.norole}</option>
               </select>
             </div>
           )}
         </div>
 
         {/* Console Operator Navigation Tabs */}
-        <div className="portal-tabs" style={{ display: 'flex', gap: '4px', margin: '24px 0', borderBottom: '1px solid rgba(31,71,52,0.1)', paddingBottom: '1px', flexWrap: 'wrap' }}>
+        <div className="portal-tabs" role="tablist" aria-label={copy.managePortal.tabsAriaLabel}>
           <button
+            id="tab-farmer"
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'farmer'}
+            aria-controls="manage-tab-panel"
+            tabIndex={activeTab === 'farmer' ? 0 : -1}
             className={`portal-tab-btn ${activeTab === 'farmer' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('farmer')
               setTxMessage({ text: '', type: '' })
             }}
           >
-            {language === 'vi' ? 'Nông Dân' : 'Farmer'}
+            {copy.managePortal.tabs.farmer}
           </button>
           <button
+            id="tab-lab"
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'lab'}
+            aria-controls="manage-tab-panel"
+            tabIndex={activeTab === 'lab' ? 0 : -1}
             className={`portal-tab-btn ${activeTab === 'lab' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('lab')
               setTxMessage({ text: '', type: '' })
             }}
           >
-            {language === 'vi' ? 'Kiểm Nghiệm' : 'Lab Analyst'}
+            {copy.managePortal.tabs.lab}
           </button>
           <button
+            id="tab-logistics"
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'logistics'}
+            aria-controls="manage-tab-panel"
+            tabIndex={activeTab === 'logistics' ? 0 : -1}
             className={`portal-tab-btn ${activeTab === 'logistics' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('logistics')
               setTxMessage({ text: '', type: '' })
             }}
           >
-            {language === 'vi' ? 'Vận Chuyển' : 'Logistics'}
+            {copy.managePortal.tabs.logistics}
           </button>
           <button
+            id="tab-admin"
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'admin'}
+            aria-controls="manage-tab-panel"
+            tabIndex={activeTab === 'admin' ? 0 : -1}
             className={`portal-tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('admin')
               setTxMessage({ text: '', type: '' })
             }}
           >
-            {language === 'vi' ? 'Quản Trị Hợp Đồng' : 'Role Admin'}
+            {copy.managePortal.tabs.admin}
           </button>
         </div>
 
         {/* Tab content panel */}
-        <div style={{ minHeight: '360px', display: 'flex', flexDirection: 'column' }}>
+        <div id="manage-tab-panel" role="tabpanel" aria-labelledby={`tab-${activeTab}`} className="manage-tab-content">
           {renderTabWithGating()}
         </div>
 
         {/* Success QR display code */}
         {newlyRegisteredBatchId && activeTab === 'farmer' && (
-          <div className="dashboard-card qr-success-card" style={{ marginTop: '24px', border: '2px solid var(--color-green-mid)', background: 'rgba(31, 71, 52, 0.02)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="dashboard-card qr-success-card">
+            <div className="qr-success-header">
+              <div className="qr-success-title-wrap">
                 <CheckCircle2 className="text-green-mid" size={20} />
-                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--color-green-deep)', fontWeight: 700 }}>
-                  {language === 'vi' ? 'Tạo Nhãn QR Cho Lô Hàng' : 'Batch Printable QR Label Ready'}
+                <h3 className="qr-success-title">
+                  {copy.managePortal.qr.ready}
                 </h3>
               </div>
               <button 
                 type="button" 
                 onClick={() => setNewlyRegisteredBatchId('')} 
-                style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--color-ink-soft)' }}
+                className="qr-success-close"
                 aria-label="Dismiss QR"
               >
                 <X size={18} />
               </button>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
-              <Suspense fallback={<div className="qr-fallback" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-ink-soft)', fontStyle: 'italic', fontSize: '0.85rem' }}>{language === 'vi' ? 'Đang tải mã QR...' : 'Loading QR Code...'}</div>}>
+            <div className="qr-success-body">
+              <Suspense fallback={<div className="qr-fallback">{copy.managePortal.qr.loading}</div>}>
                 <BatchQRLabel batchId={newlyRegisteredBatchId} language={language} loading={false} />
               </Suspense>
             </div>
@@ -504,32 +496,28 @@ function ManagementPortalContent() {
             className={`tx-feedback-banner tx-type-${txMessage.type} dashboard-card mt-6`}
             role={txMessage.type === 'error' ? 'alert' : 'status'}
             aria-live={txMessage.type === 'error' ? 'assertive' : 'polite'}
-            style={{ marginTop: '24px' }}
           >
             {txMessage.type === 'success' && <CheckCircle2 className="tx-icon text-green-mid" />}
             {txMessage.type === 'error' && <AlertTriangle className="tx-icon text-red-500" />}
             {txMessage.type === 'info' && <RefreshCw className="tx-icon text-gold animate-spin" />}
             <div>
-              <h3>{txMessage.type === 'success' ? (language === 'vi' ? 'Thực thi giao dịch thành công' : 'Transaction Success') : (txMessage.type === 'error' ? (language === 'vi' ? 'Lỗi hệ thống' : 'System Error') : (language === 'vi' ? 'Đang gửi giao dịch...' : 'Processing Transaction...'))}</h3>
+              <h3>
+                {txMessage.type === 'success' 
+                  ? copy.managePortal.tx.success 
+                  : txMessage.type === 'error' 
+                    ? copy.managePortal.tx.error 
+                    : copy.managePortal.tx.processing}
+              </h3>
               <p>{txMessage.text}</p>
               {txMessage.type === 'success' && txMessage.txSig && (
-                <div style={{ marginTop: '8px' }}>
+                <div className="tx-feedback-link-wrap">
                   <a
                     href={`https://explorer.solana.com/tx/${txMessage.txSig}?cluster=devnet`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="explorer-link"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      color: 'var(--color-green-mid)',
-                      fontSize: '0.8rem',
-                      fontWeight: '500',
-                      textDecoration: 'underline'
-                    }}
                   >
-                    {language === 'vi' ? 'Xem giao dịch trên Solana Explorer' : 'View transaction on Solana Explorer'}
+                    {copy.managePortal.tx.viewExplorer}
                   </a>
                 </div>
               )}
@@ -538,15 +526,13 @@ function ManagementPortalContent() {
         )}
 
         {/* Educational Callout */}
-        <div className="dashboard-card visual-callout-card mt-6" style={{ marginTop: '24px' }}>
+        <div className="dashboard-card visual-callout-card mt-6">
           <div className="card-header-with-icon">
             <ShieldCheck className="card-icon" size={20} />
-            <h2>{language === 'vi' ? 'Cơ Chế Bảo Mật Blockchain' : 'Blockchain Ledger Security Architecture'}</h2>
+            <h2>{copy.managePortal.security.title}</h2>
           </div>
           <p className="callout-text">
-            {language === 'vi' 
-              ? 'Tất cả các giao dịch gửi từ Cổng quản trị này được ký trực tiếp bằng Khóa bí mật (Private Key) của ví kiểm định viên. Dữ liệu khi đã nạp vào chuỗi khối Hardhat sẽ sinh ra một địa chỉ TxHash bất biến duy nhất. Người tiêu dùng sử dụng Trình quét mã QR có thể hoàn toàn yên tâm thông tin kiểm định hóa chất Cadmium này đã được xác thực mã hóa 100%, không bị sửa đổi bởi các bên trung gian.'
-              : 'Every log submitted via this Operator console is cryptographically signed by the Inspector\'s private key. Once accepted into the EVM blockchain, it generates an immutable, timestamped transaction proof. Consumers scanning the package QR code can rest assured that this Cadmium assay and quality safety rating was certified directly at the source, preventing any tampering by distributors.'}
+            {copy.managePortal.security.desc}
           </p>
         </div>
 

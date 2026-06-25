@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  SOLANA_VERSION: "2.1.21"
+  ANCHOR_VERSION: "0.31.1"
+  NODE_VERSION:   "20"
+
+jobs:
+  # ── Anchor: build, IDL drift check, tests ─────────────────────────────────
+  anchor:
+    name: Anchor build & test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: durian-web3/program
+
+      - name: Install Solana CLI v${{ env.SOLANA_VERSION }}
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v${{ env.SOLANA_VERSION }}/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+
+      - name: Install AVM and Anchor CLI v${{ env.ANCHOR_VERSION }}
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+          avm install ${{ env.ANCHOR_VERSION }}
+          avm use ${{ env.ANCHOR_VERSION }}
+
+      - name: Generate throw-away keypair for CI
+        working-directory: durian-web3/program
+        run: |
+          mkdir -p target/deploy
+          solana-keygen new --no-bip39-passphrase \
+            -o target/deploy/durian_trust-keypair.json --force
+
+      # Gate: fail fast with a clear message if the program ID is still the
+      # System Program placeholder.  anchor build / anchor test will produce
+      # confusing errors otherwise.
+      - name: Verify program ID is not the System Program placeholder
+        working-directory: durian-web3/program
+        run: |
+          DECLARED=$(grep -oP '(?<=declare_id!\(")[^"]+' \
+            programs/durian_trust/src/lib.rs)
+          if [ "$DECLARED" = "11111111111111111111111111111111" ]; then
+            echo ""
+            echo "::error::Program ID is still the System Program placeholder."
+            echo "::error::  1. solana-keygen new -o program/target/deploy/durian_trust-keypair.json"
+            echo "::error::  2. Update declare_id!(...) in programs/durian_trust/src/lib.rs"
+            echo "::error::  3. Update [programs.localnet/devnet] in Anchor.toml to the same address"
+            echo "::error::  4. Run anchor build and commit the updated public/solana/idl.json"
+            exit 1
+          fi
+          echo "Program ID: $DECLARED"
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }} (for anchor test runner)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install program test dependencies
+        working-directory: durian-web3/program
+        run: npm install
+
+      - name: anchor build
+        working-directory: durian-web3/program
+        run: anchor build
+
+      # IDL drift check — the root cause of the fake-discriminator incident.
+      # Re-generates the IDL from source and diffs it against the committed copy.
+      # Any mismatch (discriminator change, added/removed field) fails the pipeline.
+      - name: IDL drift check
+        working-directory: durian-web3
+        run: |
+          GENERATED="program/target/idl/durian_trust.json"
+          COMMITTED="public/solana/idl.json"
+
+          if [ ! -f "$GENERATED" ]; then
+            echo "::error::Generated IDL not found at $GENERATED (did anchor build succeed?)"
+            exit 1
+          fi
+
+          # Normalise both files with jq so whitespace/ordering doesn't matter
+          diff <(jq --sort-keys . "$GENERATED") <(jq --sort-keys . "$COMMITTED") \
+            && echo "IDL is in sync." \
+            || {
+              echo ""
+              echo "::error::IDL has drifted from the committed copy."
+              echo "::error::Run: cp program/target/idl/durian_trust.json public/solana/idl.json"
+              echo "::error::Then commit public/solana/idl.json and push again."
+              exit 1
+            }
+
+      - name: anchor test (bankrun — no validator required)
+        working-directory: durian-web3/program
+        run: anchor test --skip-build
+
+  # ── Frontend: lint, build, unit tests, translation parity ─────────────────
+  frontend:
+    name: Frontend lint, build & test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: durian-web3/package-lock.json
+
+      - name: Install dependencies
+        working-directory: durian-web3
+        run: npm ci
+
+      - name: Lint
+        working-directory: durian-web3
+        run: npm run lint
+
+      - name: Build
+        working-directory: durian-web3
+        run: npm run build
+
+      - name: Unit tests (Vitest + translation parity)
+        working-directory: durian-web3
+        run: npm test

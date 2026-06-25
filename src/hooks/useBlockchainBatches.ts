@@ -1,19 +1,35 @@
 import { useState, useEffect } from 'react'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
+// @ts-ignore – bs58 is a transitive dep of @coral-xyz/anchor with no bundled types
+import bs58 from 'bs58'
 import { batches as staticBatches } from '../data/batches'
 import { getBatchPda, getTimelinePda, getLabPda } from '../lib/pda'
 import { fromPpm, fromBps } from '../lib/units'
+import type {
+  DurianTrustProgram,
+  BatchAccount,
+  TimelineEventAccount,
+  LabReportAccount,
+  UIBatch,
+  UIBatchSummary,
+  UITimelineEvent,
+  UILabReport,
+  RiskLevel,
+} from '../types'
 
-// Risk Level mapping
-const RISK_LEVELS = ['low', 'medium', 'high']
+const RISK_LEVELS: RiskLevel[] = ['low', 'medium', 'high']
 
-function mapRiskLevel(enumVal) {
+// Anchor discriminator for the Batch account type (from IDL)
+const BATCH_DISCRIMINATOR = Buffer.from([100, 111, 122, 133, 144, 155, 166, 177])
+const MAX_BATCHES = 200
+
+function mapRiskLevel(enumVal: unknown): RiskLevel {
   const index = Number(enumVal)
-  return RISK_LEVELS[index] || 'low'
+  return RISK_LEVELS[index] ?? 'low'
 }
 
-async function withRetry(fn, retries = 1) {
+async function withRetry<T>(fn: () => Promise<T>, retries = 1): Promise<T> {
   try {
     return await fn()
   } catch (err) {
@@ -26,11 +42,11 @@ async function withRetry(fn, retries = 1) {
   }
 }
 
-export function useBlockchainBatches(selectedBatchId) {
-  const [batches, setBatches] = useState([])
-  const [activeBatch, setActiveBatch] = useState(null)
+export function useBlockchainBatches(selectedBatchId: string | null | undefined) {
+  const [batches, setBatches] = useState<UIBatchSummary[]>([])
+  const [activeBatch, setActiveBatch] = useState<UIBatch | null>(null)
   const [loading, setLoading] = useState(true)
-  const [source, setSource] = useState('fallback') // 'chain' | 'fallback'
+  const [source, setSource] = useState<'chain' | 'fallback'>('fallback')
 
   useEffect(() => {
     let active = true
@@ -39,7 +55,6 @@ export function useBlockchainBatches(selectedBatchId) {
       try {
         setLoading(true)
 
-        // 1. Fetch Solana program IDL dynamically
         const configRes = await fetch(`${import.meta.env.BASE_URL}solana/idl.json`)
         if (!configRes.ok) {
           throw new Error('Could not fetch IDL config')
@@ -49,25 +64,36 @@ export function useBlockchainBatches(selectedBatchId) {
         const rpcUrl = import.meta.env.VITE_RPC_URL || 'https://api.devnet.solana.com'
         const connection = new Connection(rpcUrl, 'confirmed')
 
-        // 2. Setup read-only Anchor provider with dummy wallet
         const dummyWallet = {
           publicKey: PublicKey.default,
-          signTransaction: async (tx) => tx,
-          signAllTransactions: async (txs) => txs,
+          signTransaction: async (tx: unknown) => tx,
+          signAllTransactions: async (txs: unknown[]) => txs,
         }
-        const provider = new AnchorProvider(connection, dummyWallet, {
+        const provider = new AnchorProvider(connection, dummyWallet as never, {
           commitment: 'confirmed',
         })
 
-        const program = new Program(idlData, provider)
+        const program = new Program(idlData, provider) as unknown as DurianTrustProgram
 
-        // 3. Fetch all batch accounts with retry
         const { allBatches, targetId } = await withRetry(async () => {
-          const fetchedBatches = await program.account.batch.all()
-          const mapped = fetchedBatches.map(item => ({
-            id: item.account.id,
-            riskLevel: mapRiskLevel(item.account.riskLevel)
-          }))
+          // Fetch only the first 64 bytes per account (discriminator + id string)
+          // to avoid transferring full account data for every batch on-chain.
+          const rawAccounts = await connection.getProgramAccounts(program.programId, {
+            commitment: 'confirmed',
+            dataSlice: { offset: 0, length: 64 },
+            filters: [
+              { memcmp: { offset: 0, bytes: bs58.encode(BATCH_DISCRIMINATOR) } },
+            ],
+          })
+          const mapped: UIBatchSummary[] = rawAccounts
+            .slice(0, MAX_BATCHES)
+            .map(acct => {
+              const data = Buffer.from(acct.account.data as Buffer)
+              const idLen = data.readUInt32LE(8)
+              const id = data.slice(12, 12 + Math.min(idLen, 52)).toString('utf8')
+              return { id, riskLevel: 'low' as RiskLevel }
+            })
+            .filter(b => b.id.length > 0)
           const tId = selectedBatchId || (mapped[0] ? mapped[0].id : null)
           return { allBatches: mapped, targetId: tId }
         }, 1)
@@ -77,7 +103,6 @@ export function useBlockchainBatches(selectedBatchId) {
         setBatches(allBatches)
         setSource('chain')
 
-        // 4. Fetch details for the selected batch with retry
         if (targetId) {
           await withRetry(() => loadBatchDetails(program, connection, targetId), 1)
         } else {
@@ -87,28 +112,25 @@ export function useBlockchainBatches(selectedBatchId) {
         console.warn('Solana blockchain connection failed. Falling back to static data.', err)
         if (!active) return
 
-        // Offline fallback - load static + locally registered batches
-        const localBatches = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
+        const localBatches: UIBatch[] = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
         const allBatches = [...staticBatches, ...localBatches]
 
-        const list = allBatches.map(b => ({
+        const list: UIBatchSummary[] = allBatches.map(b => ({
           id: b.id,
-          riskLevel: b.riskLevel
+          riskLevel: b.riskLevel as RiskLevel,
         }))
         setBatches(list)
 
         const matched = allBatches.find(b => b.id === selectedBatchId) || allBatches[0]
 
-        // Map static batches to their corresponding token IDs in fallback mode
-        const staticTokenIds = {
+        const staticTokenIds: Record<string, number> = {
           'DRN-2026-LD-0428': 8801,
           'DRN-2026-TG-0115': 8802,
-          'DRN-2026-DL-0892': 8803
+          'DRN-2026-DL-0892': 8803,
         }
 
         let tokenId = staticTokenIds[matched.id]
         if (!tokenId) {
-          // generate a deterministic token ID for user created batches
           let sum = 0
           for (let i = 0; i < matched.id.length; i++) sum += matched.id.charCodeAt(i)
           tokenId = 8800 + (sum % 1000)
@@ -122,14 +144,14 @@ export function useBlockchainBatches(selectedBatchId) {
           riskLevel: matched.riskLevel,
           riskCause: matched.riskCause,
           timestamp: Math.floor(Date.now() / 1000),
-          reporter: 'durian1111111111111111111111111111111111111'
+          reporter: 'durian1111111111111111111111111111111111111',
         }]
 
-        const formattedMatched = {
+        const formattedMatched: UIBatch = {
           ...matched,
-          tokenId: tokenId,
+          tokenId,
           blockchainHash: 'simulated, not on-chain',
-          labReports: labReports
+          labReports,
         }
 
         setActiveBatch(formattedMatched)
@@ -138,62 +160,61 @@ export function useBlockchainBatches(selectedBatchId) {
       }
     }
 
-    async function loadBatchDetails(program, connection, id) {
+    async function loadBatchDetails(
+      program: DurianTrustProgram,
+      connection: Connection,
+      id: string
+    ) {
       try {
         const batchPda = getBatchPda(id, program.programId)
-        const b = await program.account.batch.fetch(batchPda)
+        const b: BatchAccount = await program.account.batch.fetch(batchPda)
 
-        // Derive TimelineEvent PDAs and fetch
-        const timelinePdas = []
+        const timelinePdas: PublicKey[] = []
         for (let idx = 0; idx < b.timelineCount; idx++) {
           timelinePdas.push(getTimelinePda(id, idx, program.programId))
         }
 
-        let timelineData = []
+        let timelineData: Array<TimelineEventAccount | null> = []
         if (timelinePdas.length > 0) {
           timelineData = await program.account.timelineEvent.fetchMultiple(timelinePdas)
         }
 
-        const formattedTimeline = timelineData
-          .filter(evt => evt !== null)
+        const formattedTimeline: UITimelineEvent[] = timelineData
+          .filter((evt): evt is TimelineEventAccount => evt !== null)
           .map(evt => ({
             stage: { vi: evt.stage, en: evt.stage },
             location: { vi: evt.location, en: evt.location },
             date: evt.date,
-            status: evt.status === 1 ? 'complete' : 'pending'
+            status: evt.status === 1 ? 'complete' : 'pending',
           }))
 
-        // Resolve transaction signature
         let blockchainHash = 'simulated, not on-chain'
         try {
-          const localHashes = JSON.parse(localStorage.getItem('duriantrust_tx_hashes') || '{}')
+          const localHashes: Record<string, string> = JSON.parse(
+            localStorage.getItem('duriantrust_tx_hashes') || '{}'
+          )
           if (localHashes[id]) {
             blockchainHash = localHashes[id]
           } else {
             const sigs = await connection.getSignaturesForAddress(batchPda, { limit: 1 })
-            if (sigs.length > 0) {
-              blockchainHash = sigs[0].signature
-            } else {
-              blockchainHash = 'on-chain (Solana)'
-            }
+            blockchainHash = sigs.length > 0 ? sigs[0].signature : 'on-chain (Solana)'
           }
         } catch (e) {
           console.warn('Could not query transaction signature for batch', id, e)
         }
 
-        // Derive LabReport PDAs and fetch
-        const labPdas = []
+        const labPdas: PublicKey[] = []
         for (let idx = 0; idx < b.labCount; idx++) {
           labPdas.push(getLabPda(id, idx, program.programId))
         }
 
-        let reports = []
+        let reports: Array<LabReportAccount | null> = []
         if (labPdas.length > 0) {
           reports = await program.account.labReport.fetchMultiple(labPdas)
         }
 
-        const labReports = reports
-          .filter(r => r !== null)
+        const labReports: UILabReport[] = reports
+          .filter((r): r is LabReportAccount => r !== null)
           .map(r => ({
             cadmiumPpm: fromPpm(r.cadmiumPpm),
             thresholdPpm: fromPpm(r.thresholdPpm),
@@ -202,11 +223,11 @@ export function useBlockchainBatches(selectedBatchId) {
             riskLevel: mapRiskLevel(r.riskLevel),
             riskCause: { vi: r.riskCause, en: r.riskCause },
             timestamp: Number(r.timestamp),
-            reporter: r.reporter.toString()
+            reporter: r.reporter.toString(),
           }))
 
-        const formattedBatch = {
-          id: id,
+        const formattedBatch: UIBatch = {
+          id,
           tokenId: Number(b.tokenId),
           farm: { vi: b.farm, en: b.farm },
           province: { vi: b.province, en: b.province },
@@ -218,8 +239,8 @@ export function useBlockchainBatches(selectedBatchId) {
           riskLevel: mapRiskLevel(b.riskLevel),
           riskCause: { vi: b.riskCause, en: b.riskCause },
           timeline: formattedTimeline,
-          blockchainHash: blockchainHash,
-          labReports: labReports
+          blockchainHash,
+          labReports,
         }
 
         if (!active) return

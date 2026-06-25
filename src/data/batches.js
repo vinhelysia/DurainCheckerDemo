@@ -72,7 +72,7 @@ export const batches = [
         status: 'pending',
       },
     ],
-    blockchainHash: '0x8f3a1c...e21c9b',
+    blockchainHash: '5Nj3xGvD8T1h9X5pQ2yB7c...9pQ2',
   },
   {
     id: 'DRN-2026-TG-0115',
@@ -147,7 +147,7 @@ export const batches = [
         status: 'pending',
       },
     ],
-    blockchainHash: '0x2b77ad...f04e31',
+    blockchainHash: '3yB7cBkheTqA83TZRuJosg...AsUy',
   },
   {
     id: 'DRN-2026-DL-0892',
@@ -222,7 +222,7 @@ export const batches = [
         date: '-',
       },
     ],
-    blockchainHash: '0x91fa02...c4d8a7',
+    blockchainHash: '4xKXtg2CW87d97TXJSDpbD...3TZR',
   },
 ]
 

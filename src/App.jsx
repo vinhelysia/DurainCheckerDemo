@@ -9,7 +9,6 @@ import SolutionPillars from './components/SolutionPillars'
 import { useLanguage } from './components/LanguageContext'
 import Preloader from './components/Preloader'
 import 'lenis/dist/lenis.css'
-import './App.css'
 
 const DemoSection = lazy(() => import('./components/DemoSection'))
 const UnitDetails = lazy(() => import('./components/UnitDetails'))

@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 
-export function getConfigPda(programId) {
+export function getConfigPda(programId: PublicKey): PublicKey {
   const [pda] = PublicKey.findProgramAddressSync(
     [Buffer.from('config')],
     programId
@@ -8,7 +8,7 @@ export function getConfigPda(programId) {
   return pda
 }
 
-export function getBatchPda(batchId, programId) {
+export function getBatchPda(batchId: string, programId: PublicKey): PublicKey {
   const [pda] = PublicKey.findProgramAddressSync(
     [Buffer.from('batch'), Buffer.from(batchId)],
     programId
@@ -16,7 +16,7 @@ export function getBatchPda(batchId, programId) {
   return pda
 }
 
-export function getTimelinePda(batchId, index, programId) {
+export function getTimelinePda(batchId: string, index: number, programId: PublicKey): PublicKey {
   const indexBuf = Buffer.alloc(4)
   indexBuf.writeUInt32LE(index)
   const [pda] = PublicKey.findProgramAddressSync(
@@ -26,7 +26,7 @@ export function getTimelinePda(batchId, index, programId) {
   return pda
 }
 
-export function getLabPda(batchId, index, programId) {
+export function getLabPda(batchId: string, index: number, programId: PublicKey): PublicKey {
   const indexBuf = Buffer.alloc(4)
   indexBuf.writeUInt32LE(index)
   const [pda] = PublicKey.findProgramAddressSync(
@@ -36,7 +36,7 @@ export function getLabPda(batchId, index, programId) {
   return pda
 }
 
-export function getFarmerPda(walletPublicKey, programId) {
+export function getFarmerPda(walletPublicKey: PublicKey, programId: PublicKey): PublicKey {
   const [pda] = PublicKey.findProgramAddressSync(
     [Buffer.from('farmer'), walletPublicKey.toBuffer()],
     programId
@@ -44,7 +44,7 @@ export function getFarmerPda(walletPublicKey, programId) {
   return pda
 }
 
-export function getLabRolePda(walletPublicKey, programId) {
+export function getLabRolePda(walletPublicKey: PublicKey, programId: PublicKey): PublicKey {
   const [pda] = PublicKey.findProgramAddressSync(
     [Buffer.from('lab_role'), walletPublicKey.toBuffer()],
     programId
@@ -52,7 +52,7 @@ export function getLabRolePda(walletPublicKey, programId) {
   return pda
 }
 
-export function getLogisticsPda(walletPublicKey, programId) {
+export function getLogisticsPda(walletPublicKey: PublicKey, programId: PublicKey): PublicKey {
   const [pda] = PublicKey.findProgramAddressSync(
     [Buffer.from('logistics'), walletPublicKey.toBuffer()],
     programId

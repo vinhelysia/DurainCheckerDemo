@@ -1,43 +1,51 @@
 :root {
-  --color-bg: #f7f2e8;
-  --color-surface: #fffdf7;
-  --color-surface-alt: #f0e9da;
-  --color-line: #e2d9c6;
-  --color-ink: #1e2a22;
-  --color-ink-soft: #57645b;
-  --color-green-deep: #1f4734;
-  --color-green-mid: #3c6e54;
-  --color-gold: #d9a441;
-  --color-gold-soft: #f3dfb3;
-  --color-ledger: #5e8e86;
-  --color-ledger-soft: #e2edea;
-  --color-risk-low: #3c6e54;
-  --color-risk-medium: #9f6427;
-  --color-risk-high: #b23b2e;
-  --color-risk-low-bg: #e7f0ea;
-  --color-risk-medium-bg: #fbeddb;
-  --color-risk-high-bg: #fbe6e2;
-  --font-display: 'Be Vietnam Pro', sans-serif;
-  --font-body: 'Be Vietnam Pro', sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas,
-    monospace;
+  /* Canvas & surfaces */
+  --color-bg: #0E1411;
+  --color-bg-alt: #121A16;
+  --color-surface: #161F1A;
+  --color-surface-glass: rgba(255,255,255,0.045);
+  --color-surface-raised: #1B2620;
+  --color-line: rgba(255,255,255,0.09);
+  --color-line-strong: rgba(255,255,255,0.16);
+  /* Text */
+  --color-ink: #ECF2EE;
+  --color-ink-soft: #9FB2A8;
+  --color-ink-faint: #6C7E74;
+  /* Brand accents */
+  --color-gold: #F0B43C;
+  --color-gold-soft: rgba(240,180,60,0.14);
+  --color-emerald: #36D399;
+  --color-emerald-soft: rgba(54,211,153,0.14);
+  --color-green-deep: #1F4734;
+  /* Risk (tuned for dark) */
+  --color-risk-low: #36D399;     --color-risk-low-bg: rgba(54,211,153,0.12);
+  --color-risk-medium: #F0B43C;  --color-risk-medium-bg: rgba(240,180,60,0.12);
+  --color-risk-high: #FF6B5E;    --color-risk-high-bg: rgba(255,107,94,0.12);
+  /* Effects */
+  --glass-blur: blur(16px);
+  --glow-emerald: 0 0 24px rgba(54,211,153,0.35);
+  --glow-gold: 0 0 22px rgba(240,180,60,0.30);
+  --shadow-card: inset 0 1px 0 rgba(255,255,255,0.05), 0 14px 34px rgba(0,0,0,0.5);
+  --shadow-elevated: 0 26px 64px rgba(0,0,0,0.6);
+  --radius-card: 14px;   --radius-pill: 999px;
+  /* Fonts UNCHANGED */
+  --font-display:'Be Vietnam Pro',sans-serif; --font-body:'Be Vietnam Pro',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  /* Font scale */
   --fs-h1: 3.25rem;
   --fs-h2: 2.25rem;
   --fs-h3: 1.25rem;
   --fs-body: 1rem;
   --fs-small: 0.875rem;
-  --radius-card: 8px;
-  --radius-pill: 999px;
-  --shadow-card:
-    0 1px 2px rgba(31, 71, 52, 0.06),
-    0 8px 24px rgba(31, 71, 52, 0.06);
-  --shadow-elevated:
-    0 16px 44px rgba(31, 71, 52, 0.14),
-    0 4px 12px rgba(31, 71, 52, 0.08);
+  /* Compat aliases — legacy var references in App.css resolve to dark equivalents */
+  --color-surface-alt: var(--color-surface-raised);
+  --color-green-mid: var(--color-emerald);
+  --color-ledger: var(--color-emerald);
+  --color-ledger-soft: var(--color-emerald-soft);
 
   color: var(--color-ink);
   background: var(--color-bg);
-  color-scheme: light;
+  color-scheme: dark;
   font-family: var(--font-body);
   font-size: 16px;
   font-synthesis: none;
@@ -157,6 +165,12 @@ code {
   color: var(--color-ink);
   background: var(--color-gold-soft);
 }
+
+/* Global scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-surface-raised); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-line-strong); }
 
 #root {
   min-height: 100dvh;

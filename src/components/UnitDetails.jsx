@@ -2,7 +2,7 @@ import { useLanguage } from './LanguageContext'
 import { Sprout, Truck, FlaskConical, Award, ShieldCheck, ArrowLeft, Cpu, Activity, Database, HeartPulse } from 'lucide-react'
 
 export default function UnitDetails({ unitType }) {
-  const { language, copy } = useLanguage()
+  const { copy } = useLanguage()
 
   // Dynamic back to home helper
   const handleBackToHome = (e) => {
@@ -19,15 +19,15 @@ export default function UnitDetails({ unitType }) {
       colorClass: 'farm-theme',
       status: 'approved',
       telemetry: [
-        { label: language === 'vi' ? 'Độ ẩm đất' : 'Soil Moisture', value: '42.8 %', status: 'optimal' },
-        { label: language === 'vi' ? 'Độ pH của đất' : 'Soil pH', value: '6.45', status: 'optimal' },
-        { label: language === 'vi' ? 'Nhiệt độ môi trường' : 'Ambient Temp', value: '28.3 °C', status: 'normal' },
-        { label: language === 'vi' ? 'Hàm lượng hữu cơ' : 'Soil Organic Matter', value: '3.42 %', status: 'optimal' },
+        { label: copy.unitDetails.farm.soilMoisture, value: '42.8 %', status: 'optimal' },
+        { label: copy.unitDetails.farm.soilPh, value: '6.45', status: 'optimal' },
+        { label: copy.unitDetails.farm.ambientTemp, value: '28.3 °C', status: 'normal' },
+        { label: copy.unitDetails.farm.soilOrganicMatter, value: '3.42 %', status: 'optimal' },
       ],
       blockchainLogs: [
-        { height: '190458', hash: '0x3bf9...f192', event: language === 'vi' ? 'Đăng ký Lô đất trồng sầu riêng' : 'Orchard Plot Registered', time: '10:14 - 12/06/2026' },
-        { height: '190492', hash: '0x82ec...110e', event: language === 'vi' ? 'Kiểm nghiệm Dư lượng Đất & Nước' : 'Soil & Water Runoff Cleared', time: '14:23 - 13/06/2026' },
-        { height: '190530', hash: '0xefc4...7a29', event: language === 'vi' ? 'Khai báo Thu hoạch Lô hàng #B882' : 'Batch #B882 Harvest Declared', time: '07:30 - 15/06/2026' }
+        { height: '190458', hash: '3bF9...f192', event: copy.unitDetails.farm.plotRegistered, time: '10:14 - 12/06/2026' },
+        { height: '190492', hash: '82eC...11ye', event: copy.unitDetails.farm.runoffCleared, time: '14:23 - 13/06/2026' },
+        { height: '190530', hash: 'eFc4...7a29', event: copy.unitDetails.farm.harvestDeclared, time: '07:30 - 15/06/2026' }
       ]
     },
     transport: {
@@ -37,15 +37,15 @@ export default function UnitDetails({ unitType }) {
       colorClass: 'transport-theme',
       status: 'approved',
       telemetry: [
-        { label: language === 'vi' ? 'Nhiệt độ thùng lạnh' : 'Container Temperature', value: '2.8 °C', status: 'optimal' },
-        { label: language === 'vi' ? 'Độ ẩm thùng lạnh' : 'Container Humidity', value: '82.5 %', status: 'normal' },
-        { label: language === 'vi' ? 'Vận tốc trung bình' : 'Average GPS Speed', value: '62 km/h', status: 'normal' },
-        { label: language === 'vi' ? 'Độ rung chấn cơ học' : 'Mechanical Vibration', value: '0.04 g', status: 'optimal' },
+        { label: copy.unitDetails.transport.containerTemp, value: '2.8 °C', status: 'optimal' },
+        { label: copy.unitDetails.transport.containerHumidity, value: '82.5 %', status: 'normal' },
+        { label: copy.unitDetails.transport.gpsSpeed, value: '62 km/h', status: 'normal' },
+        { label: copy.unitDetails.transport.vibration, value: '0.04 g', status: 'optimal' },
       ],
       blockchainLogs: [
-        { height: '190544', hash: '0xfa8d...301a', event: language === 'vi' ? 'Khởi tạo Hành trình Vận chuyển' : 'Transit Journey Initiated', time: '08:45 - 15/06/2026' },
-        { height: '190561', hash: '0x48e1...76c2', event: language === 'vi' ? 'Ghi nhận Định vị GPS & Nhiệt độ IoT' : 'GPS & Cold Chain Ping Logged', time: '10:00 - 15/06/2026' },
-        { height: '190592', hash: '0x221b...804f', event: language === 'vi' ? 'Cập cảng Trung chuyển Cát Lái' : 'Arrived at Cat Lai Export Hub', time: '11:15 - 15/06/2026' }
+        { height: '190544', hash: 'fa8d...391a', event: copy.unitDetails.transport.journeyInitiated, time: '08:45 - 15/06/2026' },
+        { height: '190561', hash: '48e1...76c2', event: copy.unitDetails.transport.pingLogged, time: '10:00 - 15/06/2026' },
+        { height: '190592', hash: '221b...894f', event: copy.unitDetails.transport.arrivedHub, time: '11:15 - 15/06/2026' }
       ]
     },
     testing: {
@@ -55,15 +55,15 @@ export default function UnitDetails({ unitType }) {
       colorClass: 'testing-theme',
       status: 'approved',
       telemetry: [
-        { label: language === 'vi' ? 'Hàm lượng Cadimi' : 'Cadmium Level', value: '0.024 ppm', status: 'optimal', limit: '< 0.05 ppm' },
-        { label: language === 'vi' ? 'Chất Vàng O' : 'Auramine O Dye', value: language === 'vi' ? 'Không phát hiện' : 'Not Detected', status: 'optimal' },
-        { label: language === 'vi' ? 'Độ tin cậy quét' : 'Quality Gate Conf', value: '98.7 %', status: 'optimal' },
-        { label: language === 'vi' ? 'Chứng nhận Phòng Lab' : 'Lab Accreditation', value: 'ISO/IEC 17025', status: 'normal' },
+        { label: copy.unitDetails.testing.cadmiumLevel, value: '0.024 ppm', status: 'optimal', limit: '< 0.05 ppm' },
+        { label: copy.unitDetails.testing.yellowODye, value: copy.unitDetails.testing.notDetected, status: 'optimal' },
+        { label: copy.unitDetails.testing.qualityConf, value: '98.7 %', status: 'optimal' },
+        { label: copy.unitDetails.testing.labAccreditation, value: 'ISO/IEC 17025', status: 'normal' },
       ],
       blockchainLogs: [
-        { height: '190605', hash: '0x99e2...0bda', event: language === 'vi' ? 'Tiếp nhận Mẫu thử Phòng Thí nghiệm' : 'Laboratory Sample Checked In', time: '11:30 - 15/06/2026' },
-        { height: '190623', hash: '0xdac4...998f', event: language === 'vi' ? 'Ghi nhận Kết quả Kiểm nghiệm Cadimi' : 'Cadmium Assay Results Logged', time: '12:45 - 15/06/2026' },
-        { height: '190638', hash: '0x88f2...ee7c', event: language === 'vi' ? 'Ký mã hóa Xác nhận kiểm nghiệm' : 'Rule-Based Audit Sign-Off Broadcasted', time: '13:00 - 15/06/2026' }
+        { height: '190605', hash: '99e2...Tbda', event: copy.unitDetails.testing.sampleCheckedIn, time: '11:30 - 15/06/2026' },
+        { height: '190623', hash: 'daC4...998f', event: copy.unitDetails.testing.assayResultsLogged, time: '12:45 - 15/06/2026' },
+        { height: '190638', hash: '88f2...ee7c', event: copy.unitDetails.testing.auditSignOff, time: '13:00 - 15/06/2026' }
       ]
     },
     export: {
@@ -73,15 +73,15 @@ export default function UnitDetails({ unitType }) {
       colorClass: 'export-theme',
       status: 'approved',
       telemetry: [
-        { label: language === 'vi' ? 'Mã số Tờ khai Hải quan' : 'Customs Declaration ID', value: 'VN-1903882-C', status: 'normal' },
-        { label: language === 'vi' ? 'Mã chì Niêm phong' : 'Container Seal ID', value: 'CO-998242A', status: 'optimal' },
-        { label: language === 'vi' ? 'Chứng thư thông quan số' : 'Phytosanitary E-Cert', value: 'CLEARED-2026', status: 'optimal' },
-        { label: language === 'vi' ? 'Trạng thái Hợp đồng Thông minh' : 'Smart Contract Status', value: 'Ready/Released', status: 'optimal' },
+        { label: copy.unitDetails.export.declarationId, value: 'VN-1903882-C', status: 'normal' },
+        { label: copy.unitDetails.export.sealId, value: 'CO-998242A', status: 'optimal' },
+        { label: copy.unitDetails.export.eCert, value: 'CLEARED-2026', status: 'optimal' },
+        { label: copy.unitDetails.export.smartContractStatus, value: 'Ready/Released', status: 'optimal' },
       ],
       blockchainLogs: [
-        { height: '190650', hash: '0x3ac4...7a78', event: language === 'vi' ? 'Nộp hồ sơ Hải quan lên Blockchain' : 'Customs Files Deposited to Web3', time: '13:30 - 15/06/2026' },
-        { height: '190669', hash: '0x8b22...192f', event: language === 'vi' ? 'Thông quan Cảng xuất khẩu thành công' : 'Port Clearance Verified', time: '14:00 - 15/06/2026' },
-        { height: '190700', hash: '0x00f2...ad8c', event: language === 'vi' ? 'Đúc (Mint) Chứng thư số NFT Traceability' : 'NFT Traceability Certificate Minted', time: '14:30 - 15/06/2026' }
+        { height: '190650', hash: '3aC4...7a78', event: copy.unitDetails.export.filesDeposited, time: '13:30 - 15/06/2026' },
+        { height: '190669', hash: '8b22...192f', event: copy.unitDetails.export.clearanceVerified, time: '14:00 - 15/06/2026' },
+        { height: '190700', hash: 'Gof2...ad8c', event: copy.unitDetails.export.recordFinalized, time: '14:30 - 15/06/2026' }
       ]
     }
   }
@@ -113,11 +113,11 @@ export default function UnitDetails({ unitType }) {
           <div className="status-left">
             <ShieldCheck size={22} className="status-shield-icon" />
             <span>
-              <strong>{language === 'vi' ? 'Trạng thái hoạt động' : 'Operational Status'}: </strong>
+              <strong>{copy.unitDetails.operationalStatus}: </strong>
               <span className="status-text">{copy.units.statusApproved}</span>
             </span>
           </div>
-          <span className="status-badge-pill">{language === 'vi' ? 'Đã liên kết' : 'Connected'}</span>
+          <span className="status-badge-pill">{copy.unitDetails.connected}</span>
         </div>
 
         {/* Grid Dashboard */}
@@ -179,12 +179,10 @@ export default function UnitDetails({ unitType }) {
         <div className="dashboard-card visual-callout-card">
           <div className="card-header-with-icon">
             <HeartPulse className="card-icon animate-pulse" size={20} />
-            <h2>{language === 'vi' ? 'Quy chuẩn an toàn chuỗi cung ứng' : 'Supply Chain Safety Compliance'}</h2>
+            <h2>{copy.unitDetails.safetyTitle}</h2>
           </div>
           <p className="callout-text">
-            {language === 'vi' 
-              ? 'Dữ liệu được cập nhật tự động từ các bộ cảm biến thông minh (IoT Sensors) gắn tại hiện trường. Mọi tham số đo lường vượt ngưỡng sẽ kích hoạt trạng thái cảnh báo trên hợp đồng thông minh blockchain và khóa tự động lô hàng để thanh tra thêm.'
-              : 'Data is synchronized in real-time from on-field smart IoT sensors. Any parameter violating set thresholds automatically triggers a warning flag on the blockchain smart contract, locking the batch for inspector review.'}
+            {copy.unitDetails.safetyDesc}
           </p>
         </div>
 
