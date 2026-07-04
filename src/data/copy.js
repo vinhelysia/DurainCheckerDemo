@@ -1,6 +1,11 @@
 export const copyData = {
   vi: {
     skipLink: 'Bỏ qua điều hướng',
+    common: {
+      warmingUpModel: 'Đang khởi động mô hình AI, vui lòng đợi…',
+      retry: 'Thử lại',
+      aiUnavailable: 'Mô hình AI tạm thời không phản hồi. Vui lòng thử lại.',
+    },
     header: {
       nav: {
         home: 'Trang chủ',
@@ -24,30 +29,22 @@ export const copyData = {
       languageSwitchAria: 'Chọn ngôn ngữ',
     },
     hero: {
-      eyebrow: 'DurianTrust · Hệ thống Xác thực & Kiểm định Sầu riêng',
-      title: 'Minh bạch chuỗi cung ứng sầu riêng - từ vườn đến cảng xuất khẩu',
-      lead: 'Truy xuất nguồn gốc bằng sổ cái Blockchain và kiểm định chất lượng bằng Bộ quy tắc kiểm định chất lượng cho sầu riêng xuất khẩu.',
-      ctaDemo: 'Xem demo truy xuất lô hàng',
+      eyebrow: 'Xác thực & truy xuất sầu riêng trên Solana',
+      title: 'Sầu riêng xuất khẩu, xác thực trên Blockchain trong tích tắc',
+      lead: 'Mỗi lô hàng được ghi sổ bất biến từ vườn đến cảng; ngưỡng Cadimi 0.05 ppm theo quy định GACC được đối chiếu tự động ngay khi phòng lab nhập kết quả.',
+      ctaDemo: 'Quét thử một lô hàng demo',
       ctaProblem: 'Tìm hiểu vấn đề',
       batchProof: 'Chứng thư kiểm định',
       ledgerEvents: '4 sự kiện sổ cái / Sàng lọc Quy tắc đạt chuẩn / Cadimi trong ngưỡng',
       verified: 'Đã xác thực',
       ariaLabelLedger: 'Mẫu trạng thái lô hàng',
       ariaLabelActions: 'Hành động chính',
-    },
-    heroIllustration: {
-      title: 'Sơ đồ chuỗi cung ứng sầu riêng: vườn trồng, vận chuyển, kiểm nghiệm, xuất khẩu',
-      desc: 'Minh họa tuyến dữ liệu đi từ nông trại đến xe vận chuyển, phòng kiểm nghiệm và cảng xuất khẩu, với dấu xác thực blockchain.',
-      farm: 'Vườn trồng',
-      transport: 'Vận chuyển',
-      testing: 'Kiểm nghiệm',
-      export: 'Xuất khẩu',
-      ledgerVerified: 'Đã xác thực',
+      photoAlt: 'Lá sầu riêng khỏe mạnh chụp tại vườn trồng',
     },
     problem: {
       kicker: 'Bối cảnh',
       title: 'Vì sao truy xuất nguồn gốc quan trọng hơn bao giờ hết?',
-      body1: 'Hoạt động xuất khẩu sầu riêng Việt Nam đang đối mặt với thách thức lớn về tiêu chuẩn an toàn sinh học khi hàng loạt lô hàng liên tiếp bị cảnh báo hoặc dừng thông quan tại cửa khẩu. Nguyên nhân chủ yếu xuất phát từ việc từ năm 2025, Hải quan Trung Quốc thắt chặt kiểm soát hàm lượng Cadmium và chất cấm Vàng O (Auramine O). Tuy nhiên, nhiều lô hàng bị giữ lại không phải do chất lượng sầu riêng kém, mà do hồ sơ kiểm nghiệm và nguồn gốc vùng trồng bị rời rạc, thiếu minh bạch và không thể đối soát tức thời.',
+      body1: 'Hoạt động xuất khẩu sầu riêng Việt Nam đang đối mặt với thách thức lớn về tiêu chuẩn an toàn sinh học khi hàng loạt lô hàng liên tiếp bị cảnh báo hoặc dừng thông quan tại cửa khẩu. Nguyên nhân chủ yếu xuất phát từ việc từ năm 2025, Tổng cục Hải quan Trung Quốc (GACC) thắt chặt kiểm soát theo Nghị định 248/249: giới hạn Cadimi 0.05 ppm và không khoan nhượng với chất cấm Vàng O (Auramine O). Tuy nhiên, nhiều lô hàng bị giữ lại không phải do chất lượng sầu riêng kém, mà do hồ sơ kiểm nghiệm và nguồn gốc vùng trồng bị rời rạc, thiếu minh bạch và không thể đối soát tức thời.',
       disclaimer: 'Đây là demo minh họa quy trình truy xuất - không thay thế kết quả kiểm nghiệm chính thức.',
       pointsAriaLabel: 'Các thách thức xuất khẩu chính',
       points: [
@@ -85,7 +82,7 @@ export const copyData = {
         {
           title: 'Truy xuất nguồn & rủi ro',
           subtitle: 'Khoanh vùng rủi ro',
-          body: 'Khi một lô hàng bị cảnh báo, hệ thống giúp khoanh vùng nhanh nông trại, vùng trồng và bước có khả năng phát sinh rủi ro.',
+          body: 'Khi một lô hàng bị cảnh báo, hệ thống khoanh vùng nhanh nông trại và vùng trồng - Đắk Lắk, Tiền Giang, Đồng Nai - cùng bước phát sinh rủi ro trong chuỗi.',
         },
         {
           title: 'Phân loại chất lượng bằng Quy tắc kiểm định',
@@ -103,7 +100,7 @@ export const copyData = {
       scanQr: 'Quét mã QR',
       scanning: 'Đang quét...',
       scanBlockchain: 'Truy vấn sổ cái...',
-      scanConfirmed: 'Xác nhận Block ✓',
+      scanConfirmed: 'Đã xác nhận block',
       scanStatusProgress: 'Đang quét mã QR mô phỏng...',
       skeletonLabel: 'Đang tải dữ liệu blockchain...',
       scanStatusComplete: 'Đã tải hồ sơ lô {id}',
@@ -124,19 +121,26 @@ export const copyData = {
         medium: 'Cần kiểm tra',
         high: 'Giữ lô',
       },
+      provenance: {
+        live: '● Trực tiếp trên Solana Devnet',
+        demo: '○ Dữ liệu minh họa, Devnet không khả dụng',
+        viewExplorer: 'Xem trên Solana Explorer',
+      },
     },
     leafScanner: {
       kicker: 'Chẩn đoán hình ảnh',
       title: 'Nhận diện bệnh lá bằng AI',
       desc: 'Chụp hoặc tải ảnh lá sầu riêng để phân tích bệnh nhanh chóng qua mô hình học máy trên máy chủ.',
+      sampleHeading: 'Hoặc thử nhanh với ảnh mẫu',
+      sampleHint: 'Nhấn vào một ảnh mẫu để phân tích ngay, không cần tải ảnh lên',
       button: 'Chụp/Tải ảnh lá sầu riêng',
       analyzing: 'Đang gửi dữ liệu và phân tích...',
       resultHeader: 'Kết quả phân tích từ máy chủ',
       diseaseLabel: 'Bệnh chẩn đoán',
       probabilityLabel: 'Độ tin cậy',
       treatmentHeader: 'Thông tin tham khảo xử lý',
-      sourceAi: '🧠 Mô hình AI',
-      sourceOffline: '⚠️ Lỗi/Offline',
+      sourceAi: 'Mô hình AI',
+      sourceOffline: 'Lỗi / Offline',
       diseases: {
         healthy: 'Lá khỏe mạnh',
         algal_leaf_spot: 'Bệnh đốm rong (tảo)',
@@ -153,7 +157,6 @@ export const copyData = {
       }
     },
     timeline: {
-      kicker: 'Blockchain ledger',
       title: 'Nhật ký truy xuất lô hàng',
       ariaLabel: 'Các mốc truy xuất lô hàng',
       statusRecorded: 'Đã ghi sổ',
@@ -161,16 +164,16 @@ export const copyData = {
       pendingDate: 'Chưa có lịch',
     },
     aiResult: {
-      kicker: 'Quality Gate classification',
       title: 'Kết quả kiểm định chất lượng',
-      sourceChain: '🔗 Đã xác thực Blockchain',
-      sourceFallback: '⚠️ Ngoại tuyến · dữ liệu tĩnh',
+      sourceChain: 'Đã xác thực Blockchain',
+      sourceFallback: 'Ngoại tuyến · dữ liệu tĩnh',
       riskLabels: {
         low: 'Rủi ro thấp',
         medium: 'Cần kiểm tra',
         high: 'Giữ lô',
       },
       confidence: 'Độ tin cậy kiểm định',
+      history: 'Lịch sử kiểm định',
       cadmium: 'Cadimi',
       threshold: 'Ngưỡng minh họa',
       yellowO: 'Vàng O',
@@ -252,8 +255,8 @@ export const copyData = {
       title: 'Cổng Quản Trị Chuỗi Cung Ứng',
       subtitle: 'Ghi nhật ký kiểm nghiệm theo Bộ quy tắc và phân quyền, cập nhật các chặng sổ cái bất biến lên Blockchain',
       walletLabel: 'Ví kết nối: ',
-      devnet: '🔗 Solana Devnet',
-      fallbackMode: '⚠️ Giả Lập LocalLedger',
+      devnet: 'Solana Devnet',
+      fallbackMode: 'Giả lập LocalLedger',
       simulatedRoles: {
         owner: 'Quản trị viên (Owner)',
         farmer: 'Nông Dân (Farmer)',
@@ -275,7 +278,14 @@ export const copyData = {
         success: 'Thực thi giao dịch thành công',
         error: 'Lỗi hệ thống',
         processing: 'Đang gửi giao dịch...',
+        confirming: 'Đang xác nhận trên Blockchain...',
         viewExplorer: 'Xem giao dịch trên Solana Explorer'
+      },
+      walletGuidance: {
+        noPhantom: 'Không tìm thấy ví Phantom trên trình duyệt này. Cài đặt để ký giao dịch trên Devnet.',
+        getPhantom: 'Tải ví Phantom',
+        noBalance: 'Ví Devnet của bạn có 0 SOL. Lấy SOL miễn phí để ký giao dịch.',
+        getFaucet: 'Nhận SOL từ Faucet',
       },
       security: {
         title: 'Cơ Chế Bảo Mật Blockchain',
@@ -450,6 +460,11 @@ export const copyData = {
   },
   en: {
     skipLink: 'Skip to content',
+    common: {
+      warmingUpModel: 'Warming up the model…',
+      retry: 'Retry',
+      aiUnavailable: 'The AI model is temporarily unavailable. Please try again.',
+    },
     header: {
       nav: {
         home: 'Home',
@@ -473,25 +488,17 @@ export const copyData = {
       languageSwitchAria: 'Select language',
     },
     hero: {
-      eyebrow: 'DurianTrust · Secured Durian Verification & Traceability',
-      title: 'Transparent durian supply chain - from farm to export port',
-      lead: 'Secure blockchain traceability ledger and Rule-Based Quality Gate screening for durian export compliance.',
-      ctaDemo: 'View live demo',
+      eyebrow: 'Durian verification & traceability on Solana',
+      title: 'Durian exports, verified on-chain in seconds',
+      lead: 'Every batch is recorded immutably from farm to port, with automatic Cadmium screening - lowering the risk of customs holds.',
+      ctaDemo: 'Scan a demo batch',
       ctaProblem: 'Learn about the problem',
       batchProof: 'Inspection Certificate',
       ledgerEvents: '4 ledger events / Quality check pass / Cadmium within limit',
       verified: 'Verified',
       ariaLabelLedger: 'Sample batch status',
       ariaLabelActions: 'Primary actions',
-    },
-    heroIllustration: {
-      title: 'Durian supply chain diagram: farm, transport, testing, export',
-      desc: 'Illustration of data flow from farm to transport vehicle, laboratory, and export port, with blockchain verification.',
-      farm: 'Farm',
-      transport: 'Transport',
-      testing: 'Testing',
-      export: 'Export',
-      ledgerVerified: 'Ledger verified',
+      photoAlt: 'Healthy durian leaves photographed at the orchard',
     },
     problem: {
       kicker: 'Context',
@@ -552,7 +559,7 @@ export const copyData = {
       scanQr: 'Scan QR Code',
       scanning: 'Scanning...',
       scanBlockchain: 'Querying blockchain...',
-      scanConfirmed: 'Block confirmed ✓',
+      scanConfirmed: 'Block confirmed',
       scanStatusProgress: 'Simulated QR scan in progress...',
       skeletonLabel: 'Loading blockchain data...',
       scanStatusComplete: 'Refreshed batch record {id}',
@@ -573,19 +580,26 @@ export const copyData = {
         medium: 'Needs review',
         high: 'Hold batch',
       },
+      provenance: {
+        live: '● Live on Solana Devnet',
+        demo: '○ Demo data, devnet unreachable',
+        viewExplorer: 'View on Solana Explorer',
+      },
     },
     leafScanner: {
       kicker: 'Computer Vision',
       title: 'AI Leaf Disease Diagnostics',
       desc: 'Take a photo or upload an image of a durian leaf to instantly detect common diseases via serverless machine learning.',
+      sampleHeading: 'Or try a sample instantly',
+      sampleHint: 'Click a sample photo to analyze it, no upload needed',
       button: 'Capture/Upload Leaf Photo',
       analyzing: 'Uploading pixels and analyzing...',
       resultHeader: 'Server Analysis Result',
       diseaseLabel: 'Detected Condition',
       probabilityLabel: 'Confidence Level',
       treatmentHeader: 'Informational General Remedy',
-      sourceAi: '🧠 AI Model',
-      sourceOffline: '⚠️ Error/Offline',
+      sourceAi: 'AI model',
+      sourceOffline: 'Error / Offline',
       diseases: {
         healthy: 'Healthy Leaf',
         algal_leaf_spot: 'Algal Leaf Spot',
@@ -602,7 +616,6 @@ export const copyData = {
       }
     },
     timeline: {
-      kicker: 'Blockchain ledger',
       title: 'Batch traceability timeline',
       ariaLabel: 'Batch traceability timeline events',
       statusRecorded: 'Recorded',
@@ -610,16 +623,16 @@ export const copyData = {
       pendingDate: 'Pending',
     },
     aiResult: {
-      kicker: 'Quality Gate classification',
       title: 'Rule-Based Quality Gate result',
-      sourceChain: '🔗 Blockchain verified',
-      sourceFallback: '⚠️ Offline · static data',
+      sourceChain: 'Blockchain verified',
+      sourceFallback: 'Offline · static data',
       riskLabels: {
         low: 'Low risk',
         medium: 'Review',
         high: 'Hold batch',
       },
       confidence: 'Audit confidence',
+      history: 'Audit history',
       cadmium: 'Cadmium',
       threshold: 'Demo threshold',
       yellowO: 'Yellow O',
@@ -701,8 +714,8 @@ export const copyData = {
       title: 'Supply Chain Operator Console',
       subtitle: 'Log rule-based quality reports, manage roles, and record immutable timeline stages on-chain',
       walletLabel: 'Auditor Wallet: ',
-      devnet: '🔗 Solana Devnet',
-      fallbackMode: '⚠️ LocalLedger Simulator',
+      devnet: 'Solana Devnet',
+      fallbackMode: 'LocalLedger Simulator',
       simulatedRoles: {
         owner: 'Owner / Admin',
         farmer: 'Farmer',
@@ -724,7 +737,14 @@ export const copyData = {
         success: 'Transaction Success',
         error: 'System Error',
         processing: 'Processing Transaction...',
+        confirming: 'Confirming on-chain...',
         viewExplorer: 'View transaction on Solana Explorer'
+      },
+      walletGuidance: {
+        noPhantom: 'Phantom wallet not detected in this browser. Install it to sign transactions on devnet.',
+        getPhantom: 'Get Phantom',
+        noBalance: 'Your devnet wallet has 0 SOL. Get free devnet SOL to sign transactions.',
+        getFaucet: 'Get SOL from Faucet',
       },
       security: {
         title: 'Blockchain Ledger Security Architecture',

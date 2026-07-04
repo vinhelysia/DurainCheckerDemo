@@ -23,10 +23,10 @@ function HashProofChip({ hash, batchId, loading }) {
           <code style={{ display: 'block', marginTop: '4px', overflowWrap: 'anywhere', color: 'var(--color-green-deep)', fontSize: '0.85rem', fontWeight: 700 }}>{hash}</code>
         </div>
       </div>
-      <div style={{ display: 'flex', gap: '12px', marginTop: '4px', fontSize: '0.8rem', borderTop: '1px solid rgba(94, 142, 134, 0.15)', paddingTop: '8px' }}>
-        <a 
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '4px', fontSize: '0.8rem', borderTop: '1px solid rgba(94, 142, 134, 0.15)', paddingTop: '8px' }}>
+        <a
           href={certificateHref}
-          style={{ color: 'var(--color-green-deep)', fontWeight: 600, textDecoration: 'underline' }}
+          style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', color: 'var(--color-green-deep)', fontWeight: 600, textDecoration: 'underline' }}
         >
           {language === 'vi' ? 'Xem Chứng Thư' : 'View Certificate'}
         </a>
@@ -35,7 +35,7 @@ function HashProofChip({ hash, batchId, loading }) {
             href={explorerHref}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: 'var(--color-gold)', fontWeight: 600, textDecoration: 'underline' }}
+            style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', color: 'var(--color-gold)', fontWeight: 600, textDecoration: 'underline' }}
           >
             {language === 'vi' ? 'Xem giao dịch Solana' : 'View on Solana Explorer'}
           </a>

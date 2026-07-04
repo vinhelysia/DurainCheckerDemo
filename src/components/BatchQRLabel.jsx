@@ -89,7 +89,7 @@ export default function BatchQRLabel({ batchId, language, loading }) {
         style={{
           marginTop: '16px',
           width: '100%',
-          minHeight: '36px',
+          minHeight: '44px',
           padding: '8px 16px',
           fontSize: '0.8rem',
           display: 'flex',

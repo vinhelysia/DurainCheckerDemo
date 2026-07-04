@@ -7,6 +7,7 @@ import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 import AIResultCard from './AIResultCard'
 import BlockchainTimeline from './BlockchainTimeline'
 import HashProofChip from './HashProofChip'
+import ProvenanceBadge from './ProvenanceBadge'
 
 const QRScannerModal = lazy(() => import('./QRScannerModal'))
 const BatchQRLabel = lazy(() => import('./BatchQRLabel'))
@@ -124,6 +125,8 @@ function DemoSection() {
             {copy.demo.scanQr}
           </button>
         </div>
+
+        <ProvenanceBadge source={source} hash={currentBatch.blockchainHash} loading={loading} />
 
         <div
           className={`batch-summary ${loading ? 'skeleton' : ''}`}

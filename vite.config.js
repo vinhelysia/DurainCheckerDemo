@@ -25,5 +25,14 @@ export default defineConfig({
         }
       }
     }
-  }
+  },
+  test: {
+    globals: true,
+    environment: 'node',
+    include: [
+      'src/**/*.test.{js,jsx,ts,tsx}',
+      'test/test-translations.js',
+    ],
+    exclude: ['node_modules', 'program', 'dist', 'api', 'ml'],
+  },
 })

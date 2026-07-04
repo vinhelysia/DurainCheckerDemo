@@ -10,7 +10,8 @@ import {
   getLabRolePda,
   getLogisticsPda,
 } from '../lib/pda'
-import type { DurianTrustProgram } from '../types'
+import { readLocalBatches, writeLocalBatches, STATIC_BATCH_IDS } from '../lib/localLedger'
+import type { DurianTrustProgram } from '../types/durian_trust'
 
 type Language = 'vi' | 'en'
 type ProviderMode = 'chain' | 'fallback'
@@ -30,6 +31,51 @@ interface TxMessage {
   text: string
   type: 'success' | 'error' | 'info' | ''
   txSig?: string
+}
+
+type TxStage = 'idle' | 'sending' | 'confirming' | 'confirmed' | 'error'
+
+// Wraps a send/confirm call with a cosmetic staged status (sending -> confirming -> confirmed/error).
+// Does not alter what is sent, signed, or awaited - purely a UI-timing layer around the same call.
+async function trackStagedTx<T>(
+  setStage: (stage: TxStage) => void,
+  task: () => Promise<T>,
+  confirmingDelay = 600
+): Promise<T> {
+  setStage('sending')
+  const timer = setTimeout(() => setStage('confirming'), confirmingDelay)
+  try {
+    const result = await task()
+    setStage('confirmed')
+    return result
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+function humanizeTxError(rawMessage: string, language: Language): string {
+  const msg = rawMessage.toLowerCase()
+  if (msg.includes('user rejected') || msg.includes('rejected the request')) {
+    return language === 'vi'
+      ? 'Bạn đã từ chối ký giao dịch trong ví.'
+      : 'You rejected the signature request in your wallet.'
+  }
+  if (msg.includes('insufficient') || msg.includes('no record of a prior credit')) {
+    return language === 'vi'
+      ? 'Ví không đủ SOL trên Devnet. Lấy SOL miễn phí tại faucet.solana.com.'
+      : 'Wallet has insufficient devnet SOL. Get free SOL at faucet.solana.com.'
+  }
+  if (msg.includes('blockhash not found') || msg.includes('block height exceeded')) {
+    return language === 'vi'
+      ? 'Giao dịch hết hạn, vui lòng thử lại.'
+      : 'Transaction expired. Please try again.'
+  }
+  if (msg.includes('failed to fetch') || msg.includes('network')) {
+    return language === 'vi'
+      ? 'Không thể kết nối đến Solana Devnet. Kiểm tra kết nối mạng và thử lại.'
+      : 'Could not reach Solana devnet. Check your connection and try again.'
+  }
+  return rawMessage.slice(0, 120)
 }
 
 interface RuleAudit {
@@ -62,6 +108,7 @@ export function useBatchTransaction({
 }: UseBatchTransactionParams) {
   const [loading, setLoading] = useState(false)
   const [txMessage, setTxMessage] = useState<TxMessage>({ text: '', type: '' })
+  const [txStage, setTxStage] = useState<TxStage>('idle')
   const [newlyRegisteredBatchId, setNewlyRegisteredBatchId] = useState('')
 
   const registerBatch = async (
@@ -84,6 +131,7 @@ export function useBatchTransaction({
 
     setLoading(true)
     setTxMessage({ text: '', type: '' })
+    setTxStage('idle')
     setNewlyRegisteredBatchId('')
 
     const cadmiumValueScaled = Math.round(parseFloat(String(cadmiumPpm)) * 10000)
@@ -143,7 +191,7 @@ export function useBatchTransaction({
         }).instruction()
 
         const tx = new Transaction().add(registerIx, harvestTimelineIx)
-        const txSig = await program.provider.sendAndConfirm(tx)
+        const txSig = await trackStagedTx(setTxStage, () => program.provider.sendAndConfirm(tx))
 
         setTxMessage({
           text: language === 'vi'
@@ -158,9 +206,10 @@ export function useBatchTransaction({
         return true
       } catch (err: unknown) {
         console.error(err)
+        setTxStage('error')
         const msg = err instanceof Error ? err.message : String(err)
         setTxMessage({
-          text: language === 'vi' ? `Lỗi Blockchain: ${msg.slice(0, 120)}` : `Blockchain Error: ${msg.slice(0, 120)}`,
+          text: language === 'vi' ? `Lỗi Blockchain: ${humanizeTxError(msg, language)}` : `Blockchain Error: ${humanizeTxError(msg, language)}`,
           type: 'error',
         })
         return false
@@ -171,9 +220,9 @@ export function useBatchTransaction({
       try {
         await new Promise(r => setTimeout(r, 600))
 
-        const localBatches = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
+        const localBatches = readLocalBatches()
 
-        if (localBatches.some((b: { id: string }) => b.id === batchId) || ['DRN-2026-LD-0428', 'DRN-2026-TG-0115', 'DRN-2026-DL-0892'].includes(batchId)) {
+        if (localBatches.some((b: { id: string }) => b.id === batchId) || STATIC_BATCH_IDS.includes(batchId)) {
           throw new Error('Batch already exists')
         }
 
@@ -212,7 +261,7 @@ export function useBatchTransaction({
         }
 
         localBatches.push(newBatch)
-        localStorage.setItem('duriantrust_local_batches', JSON.stringify(localBatches))
+        writeLocalBatches(localBatches)
 
         setTxMessage({
           text: language === 'vi'
@@ -253,6 +302,7 @@ export function useBatchTransaction({
 
     setLoading(true)
     setTxMessage({ text: '', type: '' })
+    setTxStage('idle')
 
     const cadmiumValueScaled = Math.round(parseFloat(String(cadmiumPpmLab)) * 10000)
     const thresholdValueScaled = Math.round(parseFloat(String(thresholdPpmLab)) * 10000)
@@ -307,7 +357,7 @@ export function useBatchTransaction({
         }).instruction()
 
         const tx = new Transaction().add(updateIx, labTimelineIx)
-        const txSig = await program.provider.sendAndConfirm(tx)
+        const txSig = await trackStagedTx(setTxStage, () => program.provider.sendAndConfirm(tx))
 
         setTxMessage({
           text: language === 'vi'
@@ -321,9 +371,10 @@ export function useBatchTransaction({
         return true
       } catch (err: unknown) {
         console.error(err)
+        setTxStage('error')
         const msg = err instanceof Error ? err.message : String(err)
         setTxMessage({
-          text: language === 'vi' ? `Lỗi Blockchain: ${msg.slice(0, 120)}` : `Blockchain Error: ${msg.slice(0, 120)}`,
+          text: language === 'vi' ? `Lỗi Blockchain: ${humanizeTxError(msg, language)}` : `Blockchain Error: ${humanizeTxError(msg, language)}`,
           type: 'error',
         })
         return false
@@ -334,7 +385,7 @@ export function useBatchTransaction({
       try {
         await new Promise(r => setTimeout(r, 600))
 
-        const localBatches = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
+        const localBatches = readLocalBatches()
         const index = localBatches.findIndex((b: { id: string }) => b.id === selectedBatchId)
         if (index === -1) throw new Error('Batch not found')
 
@@ -366,7 +417,7 @@ export function useBatchTransaction({
           status: 'complete',
         })
 
-        localStorage.setItem('duriantrust_local_batches', JSON.stringify(localBatches))
+        writeLocalBatches(localBatches)
 
         setTxMessage({
           text: language === 'vi'
@@ -416,6 +467,7 @@ export function useBatchTransaction({
 
     setLoading(true)
     setTxMessage({ text: '', type: '' })
+    setTxStage('idle')
 
     if (providerMode === 'chain' && program && wallet.publicKey) {
       try {
@@ -431,7 +483,7 @@ export function useBatchTransaction({
           type: 'info',
         })
 
-        const txSig = await program.methods.addTimelineEvent(
+        const txSig = await trackStagedTx(setTxStage, () => program.methods.addTimelineEvent(
           selectedBatchId,
           stageVi,
           locationVi,
@@ -443,7 +495,7 @@ export function useBatchTransaction({
           signer: wallet.publicKey,
           systemProgram: SystemProgram.programId,
           logisticsRole: activeRoles.isOwner ? null : logisticsRolePda,
-        }).rpc()
+        }).rpc())
 
         setTxMessage({
           text: language === 'vi'
@@ -457,9 +509,10 @@ export function useBatchTransaction({
         return true
       } catch (err: unknown) {
         console.error(err)
+        setTxStage('error')
         const msg = err instanceof Error ? err.message : String(err)
         setTxMessage({
-          text: language === 'vi' ? `Lỗi Blockchain: ${msg.slice(0, 120)}` : `Blockchain Error: ${msg.slice(0, 120)}`,
+          text: language === 'vi' ? `Lỗi Blockchain: ${humanizeTxError(msg, language)}` : `Blockchain Error: ${humanizeTxError(msg, language)}`,
           type: 'error',
         })
         return false
@@ -468,7 +521,7 @@ export function useBatchTransaction({
       }
     } else {
       try {
-        const localBatches = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
+        const localBatches = readLocalBatches()
         const index = localBatches.findIndex((b: { id: string }) => b.id === selectedBatchId)
 
         if (index === -1) {
@@ -482,7 +535,7 @@ export function useBatchTransaction({
           status: Number(eventStatus) === 1 ? 'complete' : 'pending',
         })
 
-        localStorage.setItem('duriantrust_local_batches', JSON.stringify(localBatches))
+        writeLocalBatches(localBatches)
 
         setTxMessage({
           text: language === 'vi'
@@ -521,6 +574,7 @@ export function useBatchTransaction({
 
     setLoading(true)
     setTxMessage({ text: '', type: '' })
+    setTxStage('idle')
 
     if (providerMode === 'chain' && program && wallet.publicKey) {
       try {
@@ -536,51 +590,51 @@ export function useBatchTransaction({
         if (actionType === 'assign') {
           if (targetRole === 'farmer') {
             const farmerRolePda = getFarmerPda(targetPubkey, program.programId)
-            txSig = await program.methods.addFarmer(targetPubkey).accounts({
+            txSig = await trackStagedTx(setTxStage, () => program.methods.addFarmer(targetPubkey).accounts({
               config: configPda,
               farmerRole: farmerRolePda,
               authority: wallet.publicKey,
               systemProgram: SystemProgram.programId,
-            }).rpc()
+            }).rpc())
           } else if (targetRole === 'lab') {
             const labRolePda = getLabRolePda(targetPubkey, program.programId)
-            txSig = await program.methods.addLab(targetPubkey).accounts({
+            txSig = await trackStagedTx(setTxStage, () => program.methods.addLab(targetPubkey).accounts({
               config: configPda,
               labRole: labRolePda,
               authority: wallet.publicKey,
               systemProgram: SystemProgram.programId,
-            }).rpc()
+            }).rpc())
           } else if (targetRole === 'logistics') {
             const logisticsRolePda = getLogisticsPda(targetPubkey, program.programId)
-            txSig = await program.methods.addLogistics(targetPubkey).accounts({
+            txSig = await trackStagedTx(setTxStage, () => program.methods.addLogistics(targetPubkey).accounts({
               config: configPda,
               logisticsRole: logisticsRolePda,
               authority: wallet.publicKey,
               systemProgram: SystemProgram.programId,
-            }).rpc()
+            }).rpc())
           }
         } else {
           if (targetRole === 'farmer') {
             const farmerRolePda = getFarmerPda(targetPubkey, program.programId)
-            txSig = await program.methods.removeFarmer(targetPubkey).accounts({
+            txSig = await trackStagedTx(setTxStage, () => program.methods.removeFarmer(targetPubkey).accounts({
               config: configPda,
               farmerRole: farmerRolePda,
               authority: wallet.publicKey,
-            }).rpc()
+            }).rpc())
           } else if (targetRole === 'lab') {
             const labRolePda = getLabRolePda(targetPubkey, program.programId)
-            txSig = await program.methods.removeLab(targetPubkey).accounts({
+            txSig = await trackStagedTx(setTxStage, () => program.methods.removeLab(targetPubkey).accounts({
               config: configPda,
               labRole: labRolePda,
               authority: wallet.publicKey,
-            }).rpc()
+            }).rpc())
           } else if (targetRole === 'logistics') {
             const logisticsRolePda = getLogisticsPda(targetPubkey, program.programId)
-            txSig = await program.methods.removeLogistics(targetPubkey).accounts({
+            txSig = await trackStagedTx(setTxStage, () => program.methods.removeLogistics(targetPubkey).accounts({
               config: configPda,
               logisticsRole: logisticsRolePda,
               authority: wallet.publicKey,
-            }).rpc()
+            }).rpc())
           }
         }
 
@@ -596,9 +650,10 @@ export function useBatchTransaction({
         return true
       } catch (err: unknown) {
         console.error(err)
+        setTxStage('error')
         const msg = err instanceof Error ? err.message : String(err)
         setTxMessage({
-          text: language === 'vi' ? `Lỗi: ${msg.slice(0, 120)}` : `Error: ${msg.slice(0, 120)}`,
+          text: language === 'vi' ? `Lỗi: ${humanizeTxError(msg, language)}` : `Error: ${humanizeTxError(msg, language)}`,
           type: 'error',
         })
         return false
@@ -628,6 +683,7 @@ export function useBatchTransaction({
   const handleInitializeProgram = async (): Promise<boolean> => {
     setLoading(true)
     setTxMessage({ text: '', type: '' })
+    setTxStage('idle')
 
     if (providerMode === 'chain' && program && wallet.publicKey) {
       try {
@@ -638,11 +694,11 @@ export function useBatchTransaction({
           type: 'info',
         })
 
-        const txSig = await program.methods.initialize().accounts({
+        const txSig = await trackStagedTx(setTxStage, () => program.methods.initialize().accounts({
           config: configPda,
           authority: wallet.publicKey,
           systemProgram: SystemProgram.programId,
-        }).rpc()
+        }).rpc())
 
         setTxMessage({
           text: language === 'vi'
@@ -656,6 +712,7 @@ export function useBatchTransaction({
         return true
       } catch (err: unknown) {
         console.error(err)
+        setTxStage('error')
         const errMsg = err instanceof Error ? err.message : ''
         if (
           errMsg.toLowerCase().includes('already in use') ||
@@ -669,7 +726,7 @@ export function useBatchTransaction({
           })
         } else {
           setTxMessage({
-            text: language === 'vi' ? `Lỗi khởi tạo: ${errMsg.slice(0, 120)}` : `Initialization Error: ${errMsg.slice(0, 120)}`,
+            text: language === 'vi' ? `Lỗi khởi tạo: ${humanizeTxError(errMsg, language)}` : `Initialization Error: ${humanizeTxError(errMsg, language)}`,
             type: 'error',
           })
         }
@@ -702,6 +759,7 @@ export function useBatchTransaction({
     loading,
     txMessage,
     setTxMessage,
+    txStage,
     newlyRegisteredBatchId,
     setNewlyRegisteredBatchId,
     registerBatch,

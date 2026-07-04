@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Sprout, Compass, Cpu, AlertTriangle, CheckCircle2, RefreshCw, Send } from 'lucide-react'
+import { Compass, Cpu, AlertTriangle, CheckCircle2, RefreshCw, Send } from 'lucide-react'
 import { runRuleAuditor } from '../../lib/ruleAuditor'
+import { useSlowLoading } from '../../hooks/useSlowLoading'
 
 const PROVINCES = {
   'Lâm Đồng': 'Lam Dong',
@@ -125,6 +126,8 @@ export default function FarmerPanel({
   }
 
   const ruleAudit = runRuleAuditor(cadmiumPpm)
+  const isAiSlow = useSlowLoading(aiPredicting, 3000)
+  const isDiseaseSlow = useSlowLoading(diseasePredicting, 3000)
 
   // Debounced AI Disease Prediction (Extension feature)
   useEffect(() => {
@@ -283,16 +286,15 @@ export default function FarmerPanel({
   return (
     <div className="dashboard-card telemetry-card">
       <div className="card-header-with-icon">
-        <Sprout className="card-icon" size={20} />
         <h2>{copy.farmerPanel.title}</h2>
       </div>
       
       <form onSubmit={onSubmit} className="manage-form">
         <div className="form-row">
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={handlePreFill}
-            className="button button-secondary w-full text-xs py-2 mb-3 min-h-0"
+            className="button button-secondary w-full text-xs mb-3"
           >
             ✨ {copy.farmerPanel.preFill}
           </button>
@@ -513,7 +515,7 @@ export default function FarmerPanel({
               {aiPredicting ? (
                 <div className="text-xs py-2 opacity-80 flex items-center gap-2">
                   <RefreshCw size={12} className="animate-spin" />
-                  <span>{copy.farmerPanel.aiForecast.loading}</span>
+                  <span>{isAiSlow ? copy.common.warmingUpModel : copy.farmerPanel.aiForecast.loading}</span>
                 </div>
               ) : aiError ? (
                 <div className="text-xs text-red-500 py-1">{aiError}</div>
@@ -570,7 +572,7 @@ export default function FarmerPanel({
               {diseasePredicting ? (
                 <div className="text-xs py-2 opacity-80 flex items-center gap-2">
                   <RefreshCw size={12} className="animate-spin" />
-                  <span>{copy.farmerPanel.diseaseForecast.loading}</span>
+                  <span>{isDiseaseSlow ? copy.common.warmingUpModel : copy.farmerPanel.diseaseForecast.loading}</span>
                 </div>
               ) : diseaseError ? (
                 <div className="text-xs text-red-500 py-1">{diseaseError}</div>

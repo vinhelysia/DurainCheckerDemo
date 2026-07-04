@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react'
-import { Camera, Sparkles, AlertCircle } from 'lucide-react'
+import { Camera, Sparkles, AlertCircle, RotateCcw } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
+import { useSlowLoading } from '../hooks/useSlowLoading'
+
+const SAMPLE_IMAGES = [
+  { key: 'healthy', src: `${import.meta.env.BASE_URL}samples/healthy.jpg` },
+  { key: 'algal_leaf_spot', src: `${import.meta.env.BASE_URL}samples/algal_leaf_spot.jpg` },
+  { key: 'leaf_blight', src: `${import.meta.env.BASE_URL}samples/leaf_blight.jpg` },
+  { key: 'phomopsis_leaf_spot', src: `${import.meta.env.BASE_URL}samples/phomopsis_leaf_spot.jpg` },
+]
 
 export default function LeafDiseaseScanner() {
   const { language, copy } = useLanguage()
@@ -11,11 +19,14 @@ export default function LeafDiseaseScanner() {
   const [prediction, setPrediction] = useState(null)
   const [errorState, setErrorState] = useState(null)
   const [badgeSource, setBadgeSource] = useState(null) // 'ai' | 'error'
+  const [lastRequest, setLastRequest] = useState(null) // Blob/File to retry with
+
+  const isSlow = useSlowLoading(loading, 3000)
 
   // Clean up object URLs to avoid memory leaks
   useEffect(() => {
     return () => {
-      if (imagePreview) {
+      if (imagePreview && imagePreview.startsWith('blob:')) {
         URL.revokeObjectURL(imagePreview)
       }
     }
@@ -26,7 +37,7 @@ export default function LeafDiseaseScanner() {
     if (!file) return
 
     // Revoke previous URL if exists
-    if (imagePreview) {
+    if (imagePreview && imagePreview.startsWith('blob:')) {
       URL.revokeObjectURL(imagePreview)
     }
 
@@ -35,9 +46,36 @@ export default function LeafDiseaseScanner() {
     setPrediction(null)
     setErrorState(null)
     setBadgeSource(null)
+    setLastRequest(file)
     setLoading(true)
 
     sendInferenceRequest(file)
+  }
+
+  const handleSampleClick = async (sample) => {
+    if (loading) return
+
+    if (imagePreview && imagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreview)
+    }
+
+    setImagePreview(sample.src)
+    setPrediction(null)
+    setErrorState(null)
+    setBadgeSource(null)
+    setLoading(true)
+
+    try {
+      const response = await fetch(sample.src)
+      const blob = await response.blob()
+      setLastRequest(blob)
+      sendInferenceRequest(blob)
+    } catch (err) {
+      console.error('Failed to load sample image:', err)
+      setErrorState(err.message || 'Sample load failed')
+      setBadgeSource('error')
+      setLoading(false)
+    }
   }
 
   const sendInferenceRequest = async (file) => {
@@ -71,6 +109,15 @@ export default function LeafDiseaseScanner() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleRetry = () => {
+    if (!lastRequest) return
+    setPrediction(null)
+    setErrorState(null)
+    setBadgeSource(null)
+    setLoading(true)
+    sendInferenceRequest(lastRequest)
   }
 
   // Get translated disease class name
@@ -111,9 +158,28 @@ export default function LeafDiseaseScanner() {
         {loading && (
           <div className="scanner-loading-state" role="status" aria-live="polite">
             <div className="scanner-loading-spinner"></div>
-            <span>{scannerCopy.analyzing}</span>
+            <span>{isSlow ? copy.common.warmingUpModel : scannerCopy.analyzing}</span>
           </div>
         )}
+      </div>
+
+      <div className="leaf-scanner-samples">
+        <p className="leaf-scanner-samples-heading">{scannerCopy.sampleHeading}</p>
+        <p className="leaf-scanner-samples-hint">{scannerCopy.sampleHint}</p>
+        <div className="leaf-scanner-samples-grid">
+          {SAMPLE_IMAGES.map((sample) => (
+            <button
+              key={sample.key}
+              type="button"
+              className="leaf-sample-thumb"
+              onClick={() => handleSampleClick(sample)}
+              disabled={loading}
+            >
+              <img src={sample.src} alt={getDiseaseLabel(sample.key)} />
+              <span>{getDiseaseLabel(sample.key)}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Error state */}
@@ -122,14 +188,22 @@ export default function LeafDiseaseScanner() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
             <AlertCircle size={20} />
             <strong style={{ fontFamily: 'var(--font-mono)' }}>
-              {language === 'vi' ? 'LỖI HỆ THỐNG / OFFLINE' : 'SYSTEM ERROR / OFFLINE'}
+              {scannerCopy.sourceOffline}
             </strong>
           </div>
-          <p style={{ margin: 0, fontSize: '0.85rem' }}>{errorState}</p>
-          <div style={{ marginTop: '12px' }}>
+          <p style={{ margin: 0, fontSize: '0.85rem' }}>{copy.common.aiUnavailable}</p>
+          <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span className="scanner-badge scanner-badge-error">
               {scannerCopy.sourceOffline}
             </span>
+            <button
+              type="button"
+              className="button button-secondary scanner-retry-btn"
+              onClick={handleRetry}
+            >
+              <RotateCcw size={14} aria-hidden="true" />
+              <span>{copy.common.retry}</span>
+            </button>
           </div>
         </div>
       )}
@@ -158,7 +232,7 @@ export default function LeafDiseaseScanner() {
             <h3 className="scanner-result-title" style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-ledger)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-mono)' }}>
               {scannerCopy.resultHeader}
             </h3>
-            
+
             <div>
               <span style={{ fontSize: '0.8rem', color: 'var(--color-ink-soft)', display: 'block' }}>
                 {scannerCopy.diseaseLabel}

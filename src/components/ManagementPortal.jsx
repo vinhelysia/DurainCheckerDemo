@@ -1,15 +1,15 @@
 import { useState, useEffect, lazy, Suspense, useMemo } from 'react'
 import { useConnection, useWallet, ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { clusterApiUrl } from '@solana/web3.js'
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { useLanguage } from './LanguageContext'
-import { ArrowLeft, Wallet, Compass, ShieldCheck, CheckCircle2, AlertTriangle, RefreshCw, X } from 'lucide-react'
+import { ArrowLeft, Wallet, Compass, CheckCircle2, AlertTriangle, RefreshCw, X } from 'lucide-react'
 import '@solana/wallet-adapter-react-ui/styles.css'
 
 import { useBatchTransaction } from '../hooks/useBatchTransaction'
 import { getConfigPda, getFarmerPda, getLabRolePda, getLogisticsPda } from '../lib/pda'
+import { readLocalBatches, STATIC_BATCH_IDS } from '../lib/localLedger'
 
 import FarmerPanel from './management/FarmerPanel'
 import LabPanel from './management/LabPanel'
@@ -64,6 +64,32 @@ function ManagementPortalContent() {
   const [registeredIds, setRegisteredIds] = useState([])
   const [selectedBatchId, setSelectedBatchId] = useState('')
 
+  // Devnet SOL balance, used to guide users toward the faucet when empty
+  const [devnetBalance, setDevnetBalance] = useState(null) // lamports; null = unknown/loading
+
+  useEffect(() => {
+    let active = true
+    if (!wallet.publicKey) {
+      setTimeout(() => {
+        setDevnetBalance(null)
+      }, 0)
+      return
+    }
+    connection.getBalance(wallet.publicKey)
+      .then((lamports) => {
+        if (active) setDevnetBalance(lamports)
+      })
+      .catch((e) => {
+        console.warn('Could not fetch devnet balance', e)
+      })
+    return () => {
+      active = false
+    }
+  }, [wallet.publicKey, connection, reloadTrigger])
+
+  const phantomReadyState = wallet.wallets?.[0]?.readyState
+  const isPhantomMissing = !wallet.connected && phantomReadyState && phantomReadyState !== 'Installed'
+
   // Resolve roles based on current active providerMode
   const activeRoles = useMemo(() => {
     return providerMode === 'chain' ? {
@@ -86,6 +112,7 @@ function ManagementPortalContent() {
     loading,
     txMessage,
     setTxMessage,
+    txStage,
     newlyRegisteredBatchId,
     setNewlyRegisteredBatchId,
     registerBatch,
@@ -165,9 +192,8 @@ function ManagementPortalContent() {
       setProviderMode('fallback')
       setAccount('')
       
-      const localBatches = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
-      const staticIds = ['DRN-2026-LD-0428', 'DRN-2026-TG-0115', 'DRN-2026-DL-0892']
-      const allIds = [...staticIds, ...localBatches.map(b => b.id)]
+      const localBatches = readLocalBatches()
+      const allIds = [...STATIC_BATCH_IDS, ...localBatches.map(b => b.id)]
       setRegisteredIds(allIds)
       if (allIds.length > 0 && !selectedBatchId) {
         setSelectedBatchId(allIds[allIds.length - 1])
@@ -291,7 +317,6 @@ function ManagementPortalContent() {
             {wallet.publicKey && (
               <div className="dashboard-card telemetry-card">
                 <div className="card-header-with-icon">
-                  <ShieldCheck className="card-icon" size={20} />
                   <h2>{copy.managePortal.admin.initTitle}</h2>
                 </div>
                 <div className="manage-init-body">
@@ -393,6 +418,26 @@ function ManagementPortalContent() {
             </div>
           )}
         </div>
+
+        {isPhantomMissing && (
+          <div className="wallet-guidance-banner" role="status">
+            <AlertTriangle size={16} aria-hidden="true" />
+            <span>{copy.managePortal.walletGuidance.noPhantom}</span>
+            <a href="https://phantom.app/" target="_blank" rel="noopener noreferrer">
+              {copy.managePortal.walletGuidance.getPhantom}
+            </a>
+          </div>
+        )}
+
+        {wallet.connected && devnetBalance === 0 && (
+          <div className="wallet-guidance-banner" role="status">
+            <AlertTriangle size={16} aria-hidden="true" />
+            <span>{copy.managePortal.walletGuidance.noBalance}</span>
+            <a href="https://faucet.solana.com" target="_blank" rel="noopener noreferrer">
+              {copy.managePortal.walletGuidance.getFaucet}
+            </a>
+          </div>
+        )}
 
         {/* Console Operator Navigation Tabs */}
         <div className="portal-tabs" role="tablist" aria-label={copy.managePortal.tabsAriaLabel}>
@@ -502,11 +547,13 @@ function ManagementPortalContent() {
             {txMessage.type === 'info' && <RefreshCw className="tx-icon text-gold animate-spin" />}
             <div>
               <h3>
-                {txMessage.type === 'success' 
-                  ? copy.managePortal.tx.success 
-                  : txMessage.type === 'error' 
-                    ? copy.managePortal.tx.error 
-                    : copy.managePortal.tx.processing}
+                {txMessage.type === 'success'
+                  ? copy.managePortal.tx.success
+                  : txMessage.type === 'error'
+                    ? copy.managePortal.tx.error
+                    : txStage === 'confirming'
+                      ? copy.managePortal.tx.confirming
+                      : copy.managePortal.tx.processing}
               </h3>
               <p>{txMessage.text}</p>
               {txMessage.type === 'success' && txMessage.txSig && (
@@ -528,7 +575,6 @@ function ManagementPortalContent() {
         {/* Educational Callout */}
         <div className="dashboard-card visual-callout-card mt-6">
           <div className="card-header-with-icon">
-            <ShieldCheck className="card-icon" size={20} />
             <h2>{copy.managePortal.security.title}</h2>
           </div>
           <p className="callout-text">
@@ -544,10 +590,8 @@ function ManagementPortalContent() {
 export default function ManagementPortal() {
   const endpoint = useMemo(() => import.meta.env.VITE_RPC_URL || clusterApiUrl('devnet'), [])
   
-  const wallets = useMemo(
-    () => [new PhantomWalletAdapter()],
-    []
-  )
+  // Phantom (and other Wallet Standard wallets) auto-register; no adapters needed.
+  const wallets = useMemo(() => [], [])
 
   return (
     <ConnectionProvider endpoint={endpoint}>

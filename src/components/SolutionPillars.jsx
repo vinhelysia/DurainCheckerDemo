@@ -1,8 +1,5 @@
-import { MapPin, ScanLine, ShieldCheck } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
-
-const icons = [ShieldCheck, MapPin, ScanLine]
 
 function SolutionPillars() {
   const { copy } = useLanguage()
@@ -24,20 +21,13 @@ function SolutionPillars() {
         </div>
 
         <div className="pillar-grid">
-          {copy.solution.pillars.map((pillar, index) => {
-            const Icon = icons[index] || ShieldCheck
-
-            return (
-              <article className="pillar-card" key={pillar.title}>
-                <div className="pillar-icon" aria-hidden="true">
-                  <Icon size={28} strokeWidth={2.1} />
-                </div>
-                <h3>{pillar.title}</h3>
-                <p className="pillar-subtitle">{pillar.subtitle}</p>
-                <p>{pillar.body}</p>
-              </article>
-            )
-          })}
+          {copy.solution.pillars.map((pillar) => (
+            <article className="pillar-card" key={pillar.title}>
+              <h3>{pillar.title}</h3>
+              <p className="pillar-subtitle">{pillar.subtitle}</p>
+              <p>{pillar.body}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>

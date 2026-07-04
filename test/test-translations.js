@@ -1,5 +1,4 @@
-/* global describe, it */
-import { expect } from "chai";
+import { describe, it, expect } from "vitest";
 import { copyData } from "../src/data/copy.js";
 
 describe("Translation Completeness Tests", function () {
@@ -20,7 +19,6 @@ describe("Translation Completeness Tests", function () {
     const viKeys = getDeepKeys(copyData.vi);
     const enKeys = getDeepKeys(copyData.en);
 
-    expect(viKeys).to.have.members(enKeys, "English translations are missing some keys from Vietnamese");
-    expect(enKeys).to.have.members(viKeys, "Vietnamese translations are missing some keys from English");
+    expect([...viKeys].sort()).toEqual([...enKeys].sort());
   });
 });

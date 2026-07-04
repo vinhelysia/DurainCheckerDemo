@@ -1,5 +1,5 @@
 import { useLanguage } from './LanguageContext'
-import { Sprout, Truck, FlaskConical, Award, ShieldCheck, ArrowLeft, Cpu, Activity, Database, HeartPulse } from 'lucide-react'
+import { ShieldCheck, ArrowLeft, Activity } from 'lucide-react'
 
 export default function UnitDetails({ unitType }) {
   const { copy } = useLanguage()
@@ -13,7 +13,6 @@ export default function UnitDetails({ unitType }) {
   // Define details for each unit type
   const unitData = {
     farm: {
-      icon: <Sprout size={32} className="text-green-mid" />,
       title: copy.units.farmTitle,
       subtitle: copy.units.farmSubtitle,
       colorClass: 'farm-theme',
@@ -31,7 +30,6 @@ export default function UnitDetails({ unitType }) {
       ]
     },
     transport: {
-      icon: <Truck size={32} className="text-green-mid" />,
       title: copy.units.transportTitle,
       subtitle: copy.units.transportSubtitle,
       colorClass: 'transport-theme',
@@ -49,7 +47,6 @@ export default function UnitDetails({ unitType }) {
       ]
     },
     testing: {
-      icon: <FlaskConical size={32} className="text-green-mid" />,
       title: copy.units.testingTitle,
       subtitle: copy.units.testingSubtitle,
       colorClass: 'testing-theme',
@@ -67,7 +64,6 @@ export default function UnitDetails({ unitType }) {
       ]
     },
     export: {
-      icon: <Award size={32} className="text-green-mid" />,
       title: copy.units.exportTitle,
       subtitle: copy.units.exportSubtitle,
       colorClass: 'export-theme',
@@ -99,9 +95,6 @@ export default function UnitDetails({ unitType }) {
 
         {/* Page Header */}
         <div className="unit-header-block">
-          <div className="unit-icon-wrapper">
-            {activeData.icon}
-          </div>
           <div>
             <h1>{activeData.title}</h1>
             <p className="unit-subtitle">{activeData.subtitle}</p>
@@ -125,7 +118,6 @@ export default function UnitDetails({ unitType }) {
           {/* Column 1: Telemetry */}
           <div className="dashboard-card telemetry-card">
             <div className="card-header-with-icon">
-              <Cpu className="card-icon" size={20} />
               <h2>{copy.units.iotTelemetry}</h2>
             </div>
             
@@ -148,7 +140,6 @@ export default function UnitDetails({ unitType }) {
           {/* Column 2: Blockchain Logs */}
           <div className="dashboard-card blockchain-logs-card">
             <div className="card-header-with-icon">
-              <Database className="card-icon" size={20} />
               <h2>{copy.units.blockchainProof}</h2>
             </div>
 
@@ -178,7 +169,6 @@ export default function UnitDetails({ unitType }) {
         {/* Visual Callout */}
         <div className="dashboard-card visual-callout-card">
           <div className="card-header-with-icon">
-            <HeartPulse className="card-icon animate-pulse" size={20} />
             <h2>{copy.unitDetails.safetyTitle}</h2>
           </div>
           <p className="callout-text">

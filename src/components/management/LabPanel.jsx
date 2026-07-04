@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Award, FileText, RefreshCw, Cpu, Send } from 'lucide-react'
+import { RefreshCw, Cpu, Send } from 'lucide-react'
 import { getBatchPda, getLabPda } from '../../lib/pda'
+import { readLocalBatches } from '../../lib/localLedger'
 import { runRuleAuditor } from '../../lib/ruleAuditor'
 
 const RISK_LEVELS = ['low', 'medium', 'high']
@@ -82,7 +83,7 @@ export default function LabPanel({
         }
       } else {
         // Fallback simulated batches
-        const localBatches = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
+        const localBatches = readLocalBatches()
         const matched = localBatches.find(b => b.id === selectedBatchId)
         if (matched && matched.labReports) {
           setLabHistory(matched.labReports)
@@ -123,7 +124,6 @@ export default function LabPanel({
       {/* Lab Report Form */}
       <div className="dashboard-card telemetry-card">
         <div className="card-header-with-icon">
-          <Award className="card-icon" size={20} />
           <h2>{copy.labPanel.title}</h2>
         </div>
 
@@ -210,7 +210,6 @@ export default function LabPanel({
       {/* History Display Card */}
       <div className="dashboard-card blockchain-logs-card">
         <div className="card-header-with-icon">
-          <FileText className="card-icon" size={20} />
           <h2>{copy.labPanel.history.title}</h2>
         </div>
         

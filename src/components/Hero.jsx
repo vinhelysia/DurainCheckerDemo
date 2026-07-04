@@ -1,5 +1,4 @@
 import { ArrowRight, CheckCircle2, FileCheck2 } from 'lucide-react'
-import HeroIllustration from './HeroIllustration'
 import { useLanguage } from './LanguageContext'
 
 function Hero() {
@@ -24,7 +23,11 @@ function Hero() {
         </div>
 
         <div className="hero-visual">
-          <HeroIllustration />
+          <img
+            className="hero-photo"
+            src={`${import.meta.env.BASE_URL}samples/healthy.jpg`}
+            alt={copy.hero.photoAlt}
+          />
           <div className="hero-ledger-note" aria-label={copy.hero.ariaLabelLedger}>
             <div className="proof-icon" aria-hidden="true">
               <FileCheck2 size={22} />

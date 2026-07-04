@@ -40,11 +40,6 @@ export interface LabReportAccount {
   timestamp: BN
 }
 
-export interface ConfigAccount {
-  authority: PublicKey
-  nextTokenId: BN
-}
-
 // --- UI/presentation types (after mapping from chain) ---
 
 export type RiskLevel = 'low' | 'medium' | 'high'

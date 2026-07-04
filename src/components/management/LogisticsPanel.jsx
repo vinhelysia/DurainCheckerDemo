@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileText, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 
 export default function LogisticsPanel({
   language,
@@ -47,7 +47,6 @@ export default function LogisticsPanel({
   return (
     <div className="dashboard-card blockchain-logs-card">
       <div className="card-header-with-icon">
-        <FileText className="card-icon" size={20} />
         <h2>{language === 'vi' ? 'Cập Nhật Lịch Trình (Timeline)' : 'Log Supply Chain Timeline Stage'}</h2>
       </div>
 

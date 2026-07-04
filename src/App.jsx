@@ -7,7 +7,6 @@ import ImpactSection from './components/ImpactSection'
 import ProblemSection from './components/ProblemSection'
 import SolutionPillars from './components/SolutionPillars'
 import { useLanguage } from './components/LanguageContext'
-import Preloader from './components/Preloader'
 import 'lenis/dist/lenis.css'
 
 const DemoSection = lazy(() => import('./components/DemoSection'))
@@ -16,9 +15,6 @@ const ManagementPortal = lazy(() => import('./components/ManagementPortal'))
 
 function App() {
   const { language, copy } = useLanguage()
-  const [preloaderComplete, setPreloaderComplete] = useState(() => {
-    return sessionStorage.getItem('duriantrust-preloader-seen') === 'true'
-  })
 
   const [currentRoute, setCurrentRoute] = useState(() => {
     return window.location.hash || '#/'
@@ -121,12 +117,11 @@ function App() {
   }
 
   return (
-    <div className={`app ${preloaderComplete ? 'preloader-done' : 'preloader-active'}`}>
-      <Preloader onComplete={() => setPreloaderComplete(true)} />
+    <div className="app">
       <a className="skip-link" href="#main">
         {copy.skipLink}
       </a>
-      <div className="main-content-wrapper" aria-hidden={!preloaderComplete}>
+      <div className="main-content-wrapper">
         <Header />
         <main id="main">
           <Suspense fallback={

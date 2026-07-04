@@ -3,7 +3,7 @@
   --color-bg: #0E1411;
   --color-bg-alt: #121A16;
   --color-surface: #161F1A;
-  --color-surface-glass: rgba(255,255,255,0.045);
+  --color-surface-glass: #1B2620;
   --color-surface-raised: #1B2620;
   --color-line: rgba(255,255,255,0.09);
   --color-line-strong: rgba(255,255,255,0.16);
@@ -22,9 +22,6 @@
   --color-risk-medium: #F0B43C;  --color-risk-medium-bg: rgba(240,180,60,0.12);
   --color-risk-high: #FF6B5E;    --color-risk-high-bg: rgba(255,107,94,0.12);
   /* Effects */
-  --glass-blur: blur(16px);
-  --glow-emerald: 0 0 24px rgba(54,211,153,0.35);
-  --glow-gold: 0 0 22px rgba(240,180,60,0.30);
   --shadow-card: inset 0 1px 0 rgba(255,255,255,0.05), 0 14px 34px rgba(0,0,0,0.5);
   --shadow-elevated: 0 26px 64px rgba(0,0,0,0.6);
   --radius-card: 14px;   --radius-pill: 999px;

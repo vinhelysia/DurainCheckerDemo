@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { AnchorProvider, Program } from '@coral-xyz/anchor'
-// @ts-ignore – bs58 is a transitive dep of @coral-xyz/anchor with no bundled types
-import bs58 from 'bs58'
+import { AnchorProvider, Program, utils } from '@coral-xyz/anchor'
 import { batches as staticBatches } from '../data/batches'
 import { getBatchPda, getTimelinePda, getLabPda } from '../lib/pda'
-import { fromPpm, fromBps } from '../lib/units'
+import { readLocalBatches } from '../lib/localLedger'
+import { fromPpm } from '../lib/units'
 import type {
   DurianTrustProgram,
   BatchAccount,
@@ -16,7 +15,7 @@ import type {
   UITimelineEvent,
   UILabReport,
   RiskLevel,
-} from '../types'
+} from '../types/durian_trust'
 
 const RISK_LEVELS: RiskLevel[] = ['low', 'medium', 'high']
 
@@ -82,7 +81,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
             commitment: 'confirmed',
             dataSlice: { offset: 0, length: 64 },
             filters: [
-              { memcmp: { offset: 0, bytes: bs58.encode(BATCH_DISCRIMINATOR) } },
+              { memcmp: { offset: 0, bytes: utils.bytes.bs58.encode(BATCH_DISCRIMINATOR) } },
             ],
           })
           const mapped: UIBatchSummary[] = rawAccounts
@@ -112,7 +111,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
         console.warn('Solana blockchain connection failed. Falling back to static data.', err)
         if (!active) return
 
-        const localBatches: UIBatch[] = JSON.parse(localStorage.getItem('duriantrust_local_batches') || '[]')
+        const localBatches: UIBatch[] = readLocalBatches()
         const allBatches = [...staticBatches, ...localBatches]
 
         const list: UIBatchSummary[] = allBatches.map(b => ({
@@ -219,7 +218,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
             cadmiumPpm: fromPpm(r.cadmiumPpm),
             thresholdPpm: fromPpm(r.thresholdPpm),
             aiResult: { vi: r.aiResult, en: r.aiResult },
-            confidence: fromBps(r.confidence),
+            confidence: fromPpm(r.confidence),
             riskLevel: mapRiskLevel(r.riskLevel),
             riskCause: { vi: r.riskCause, en: r.riskCause },
             timestamp: Number(r.timestamp),
@@ -235,7 +234,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
           cadmiumPpm: fromPpm(b.cadmiumPpm),
           thresholdPpm: fromPpm(b.thresholdPpm),
           aiResult: { vi: b.aiResult, en: b.aiResult },
-          confidence: fromBps(b.confidence),
+          confidence: fromPpm(b.confidence),
           riskLevel: mapRiskLevel(b.riskLevel),
           riskCause: { vi: b.riskCause, en: b.riskCause },
           timeline: formattedTimeline,

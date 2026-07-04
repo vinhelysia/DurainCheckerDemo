@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { ShieldAlert } from 'lucide-react'
 
 export default function AdminPanel({
   language,
@@ -19,7 +18,6 @@ export default function AdminPanel({
   return (
     <div className="dashboard-card telemetry-card">
       <div className="card-header-with-icon">
-        <ShieldAlert className="card-icon" size={20} />
         <h2>{language === 'vi' ? 'Phân Quyền Vai Trò Sổ Cái (Owner Only)' : 'Ledger Role Management (Owner Only)'}</h2>
       </div>
       

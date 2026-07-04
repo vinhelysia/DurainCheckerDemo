@@ -13,7 +13,6 @@ function BlockchainTimeline({ timeline, loading, source }) {
     >
       <div className="panel-heading panel-heading-inline">
         <div>
-          <p className="section-kicker">{copy.timeline.kicker}</p>
           <h3 id="ledger-title">{copy.timeline.title}</h3>
         </div>
         <span className={`source-badge ${source === 'chain' ? 'source-badge--chain' : 'source-badge--fallback'}`}>
