@@ -1093,7 +1093,18 @@ fn verify_ed25519_ix(
         DurianTrustError::InvalidEd25519Instruction
     );
 
-    let data = &ed25519_ix.data;
+    parse_and_verify_ed25519_data(&ed25519_ix.data, expected_pubkey, expected_message, expected_sig)
+}
+
+/// Pure byte-parsing/comparison half of `verify_ed25519_ix` — everything that doesn't
+/// need the sysvar or the instruction's `program_id`. Split out so it can be unit
+/// tested with hand-built instruction data (see the `ed25519` tests below).
+fn parse_and_verify_ed25519_data(
+    data: &[u8],
+    expected_pubkey: &[u8; 32],
+    expected_message: &[u8; 32],
+    expected_sig: &[u8; 64],
+) -> Result<()> {
     // Minimum: 2-byte prefix + 14-byte entry header = 16 bytes
     require!(
         data.len() >= 16 && data[0] >= 1,
@@ -1131,4 +1142,209 @@ fn verify_ed25519_ix(
     );
 
     Ok(())
+}
+
+// ── unit tests ────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // -- validate_date --------------------------------------------------
+
+    #[test]
+    fn validate_date_accepts_valid_date() {
+        assert!(validate_date("2025-07-04").is_ok());
+    }
+
+    #[test]
+    fn validate_date_rejects_wrong_length() {
+        assert!(validate_date("2025-7-4").is_err());
+        assert!(validate_date("2025-07-004").is_err());
+        assert!(validate_date("").is_err());
+    }
+
+    #[test]
+    fn validate_date_rejects_wrong_separator_positions() {
+        assert!(validate_date("2025:07:04").is_err());
+        assert!(validate_date("2025/07/04").is_err());
+        assert!(validate_date("20-2507-04").is_err());
+    }
+
+    #[test]
+    fn validate_date_rejects_invalid_month() {
+        assert!(validate_date("2025-00-04").is_err());
+        assert!(validate_date("2025-13-04").is_err());
+    }
+
+    #[test]
+    fn validate_date_rejects_invalid_day() {
+        assert!(validate_date("2025-07-00").is_err());
+        assert!(validate_date("2025-07-32").is_err());
+    }
+
+    #[test]
+    fn validate_date_rejects_non_digit_chars() {
+        assert!(validate_date("202X-07-04").is_err());
+        assert!(validate_date("2025-0A-04").is_err());
+        assert!(validate_date("2025-07-0B").is_err());
+    }
+
+    // -- validate_string_len ---------------------------------------------
+
+    #[test]
+    fn validate_string_len_exactly_max_passes() {
+        let s = "a".repeat(10);
+        assert!(validate_string_len(&s, 10).is_ok());
+    }
+
+    #[test]
+    fn validate_string_len_max_plus_one_fails() {
+        let s = "a".repeat(11);
+        assert!(validate_string_len(&s, 10).is_err());
+    }
+
+    #[test]
+    fn validate_string_len_counts_bytes_not_chars() {
+        // "é" is 2 bytes in UTF-8. 4 chars = 8 bytes, which exceeds max_len 4
+        // even though the char count (4) would pass a chars-based check.
+        let s = "é".repeat(4);
+        assert_eq!(s.chars().count(), 4);
+        assert_eq!(s.as_bytes().len(), 8);
+        assert!(validate_string_len(&s, 4).is_err());
+        assert!(validate_string_len(&s, 8).is_ok());
+    }
+
+    // -- compute_payload_hash ---------------------------------------------
+
+    #[test]
+    fn compute_payload_hash_known_answer() {
+        let reporter = [7u8; 32];
+        let hash = compute_payload_hash(
+            "TEST-001", 42, 50, 88, 1, "ok", "none", &reporter,
+        );
+        assert_eq!(
+            hash,
+            [
+                71, 135, 165, 142, 189, 121, 43, 87, 17, 47, 177, 118, 35, 134, 125, 170, 8, 234,
+                245, 153, 126, 28, 239, 216, 173, 154, 152, 177, 5, 234, 145, 227
+            ]
+        );
+    }
+
+    #[test]
+    fn compute_payload_hash_sensitivity() {
+        let reporter = [7u8; 32];
+        let base = compute_payload_hash("TEST-001", 42, 50, 88, 1, "ok", "none", &reporter);
+
+        let mut other_reporter = reporter;
+        other_reporter[0] ^= 1;
+
+        assert_ne!(base, compute_payload_hash("TEST-002", 42, 50, 88, 1, "ok", "none", &reporter));
+        assert_ne!(base, compute_payload_hash("TEST-001", 43, 50, 88, 1, "ok", "none", &reporter));
+        assert_ne!(base, compute_payload_hash("TEST-001", 42, 51, 88, 1, "ok", "none", &reporter));
+        assert_ne!(base, compute_payload_hash("TEST-001", 42, 50, 89, 1, "ok", "none", &reporter));
+        assert_ne!(base, compute_payload_hash("TEST-001", 42, 50, 88, 2, "ok", "none", &reporter));
+        assert_ne!(base, compute_payload_hash("TEST-001", 42, 50, 88, 1, "no", "none", &reporter));
+        assert_ne!(base, compute_payload_hash("TEST-001", 42, 50, 88, 1, "ok", "some", &reporter));
+        assert_ne!(base, compute_payload_hash("TEST-001", 42, 50, 88, 1, "ok", "none", &other_reporter));
+    }
+
+    // -- parse_and_verify_ed25519_data ------------------------------------
+
+    /// Builds a single-entry Ed25519SigVerify instruction data buffer with the
+    /// signature, pubkey, and message packed back-to-back right after the
+    /// 16-byte header, matching the layout documented on `verify_ed25519_ix`.
+    fn build_ed25519_ix_data(pubkey: &[u8; 32], message: &[u8], sig: &[u8; 64]) -> Vec<u8> {
+        let sig_offset: u16 = 16;
+        let pubkey_offset: u16 = sig_offset + 64;
+        let msg_offset: u16 = pubkey_offset + 32;
+        let msg_size: u16 = message.len() as u16;
+
+        let mut data = vec![0u8; 16];
+        data[0] = 1; // count
+        data[1] = 0; // padding
+        data[2..4].copy_from_slice(&sig_offset.to_le_bytes());
+        data[4..6].copy_from_slice(&0xFFFFu16.to_le_bytes());
+        data[6..8].copy_from_slice(&pubkey_offset.to_le_bytes());
+        data[8..10].copy_from_slice(&0xFFFFu16.to_le_bytes());
+        data[10..12].copy_from_slice(&msg_offset.to_le_bytes());
+        data[12..14].copy_from_slice(&msg_size.to_le_bytes());
+        data[14..16].copy_from_slice(&0xFFFFu16.to_le_bytes());
+
+        data.extend_from_slice(sig);
+        data.extend_from_slice(pubkey);
+        data.extend_from_slice(message);
+        data
+    }
+
+    #[test]
+    fn ed25519_valid_data_passes() {
+        let pubkey = [1u8; 32];
+        let message = [2u8; 32];
+        let sig = [3u8; 64];
+        let data = build_ed25519_ix_data(&pubkey, &message, &sig);
+        assert!(parse_and_verify_ed25519_data(&data, &pubkey, &message, &sig).is_ok());
+    }
+
+    #[test]
+    fn ed25519_data_too_short_fails() {
+        let pubkey = [1u8; 32];
+        let message = [2u8; 32];
+        let sig = [3u8; 64];
+        let data = vec![1u8; 10]; // < 16 bytes
+        assert!(parse_and_verify_ed25519_data(&data, &pubkey, &message, &sig).is_err());
+    }
+
+    #[test]
+    fn ed25519_count_zero_fails() {
+        let pubkey = [1u8; 32];
+        let message = [2u8; 32];
+        let sig = [3u8; 64];
+        let mut data = build_ed25519_ix_data(&pubkey, &message, &sig);
+        data[0] = 0;
+        assert!(parse_and_verify_ed25519_data(&data, &pubkey, &message, &sig).is_err());
+    }
+
+    #[test]
+    fn ed25519_wrong_pubkey_fails() {
+        let pubkey = [1u8; 32];
+        let message = [2u8; 32];
+        let sig = [3u8; 64];
+        let data = build_ed25519_ix_data(&pubkey, &message, &sig);
+        let wrong_pubkey = [9u8; 32];
+        assert!(parse_and_verify_ed25519_data(&data, &wrong_pubkey, &message, &sig).is_err());
+    }
+
+    #[test]
+    fn ed25519_msg_size_mismatch_fails() {
+        let pubkey = [1u8; 32];
+        let message = [2u8; 32];
+        let sig = [3u8; 64];
+        let mut data = build_ed25519_ix_data(&pubkey, &message, &sig);
+        // Shrink msg_size in the header without changing the offsets/content,
+        // so the mismatch is caught by the `msg_size == 32` check.
+        data[12..14].copy_from_slice(&16u16.to_le_bytes());
+        assert!(parse_and_verify_ed25519_data(&data, &pubkey, &message, &sig).is_err());
+    }
+
+    #[test]
+    fn ed25519_wrong_message_fails() {
+        let pubkey = [1u8; 32];
+        let message = [2u8; 32];
+        let sig = [3u8; 64];
+        let data = build_ed25519_ix_data(&pubkey, &message, &sig);
+        let wrong_message = [8u8; 32];
+        assert!(parse_and_verify_ed25519_data(&data, &pubkey, &wrong_message, &sig).is_err());
+    }
+
+    #[test]
+    fn ed25519_wrong_sig_fails() {
+        let pubkey = [1u8; 32];
+        let message = [2u8; 32];
+        let sig = [3u8; 64];
+        let data = build_ed25519_ix_data(&pubkey, &message, &sig);
+        let wrong_sig = [9u8; 64];
+        assert!(parse_and_verify_ed25519_data(&data, &pubkey, &message, &wrong_sig).is_err());
+    }
 }
