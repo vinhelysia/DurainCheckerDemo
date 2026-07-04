@@ -375,7 +375,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
               </button>
             </div>
             {manualError && (
-              <p style={{ color: '#ef4444', fontSize: '0.75rem', margin: 0 }}>{manualError}</p>
+              <p style={{ color: 'var(--color-risk-high)', fontSize: '0.75rem', margin: 0 }}>{manualError}</p>
             )}
           </form>
         </div>

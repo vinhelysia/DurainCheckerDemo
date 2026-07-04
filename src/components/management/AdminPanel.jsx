@@ -61,7 +61,7 @@ export default function AdminPanel({
             onClick={() => onAction('revoke')}
             disabled={loading}
             className="button button-secondary"
-            style={{ flex: 1, borderColor: '#ef4444', color: '#ef4444' }}
+            style={{ flex: 1, borderColor: 'var(--color-risk-high)', color: 'var(--color-risk-high)' }}
             type="button"
           >
             <span>{language === 'vi' ? 'Thu hồi quyền' : 'Revoke Access'}</span>

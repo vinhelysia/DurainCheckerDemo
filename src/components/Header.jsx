@@ -171,7 +171,6 @@ function Header() {
             }}
             onMouseEnter={handleMouseEnter}
           >
-            {(isIntroActive || activeDrawer === 'intro') && <span className="nav-active-badge" aria-hidden="true" />}
             <span>{copy.header.nav.intro}</span>
             <ChevronDown className="nav-chevron" size={16} aria-hidden="true" />
           </button>
@@ -193,7 +192,6 @@ function Header() {
             }}
             onMouseEnter={handleMouseEnter}
           >
-            {(isUnitActive || activeDrawer === 'units') && <span className="nav-active-badge" aria-hidden="true" />}
             <span>{copy.header.nav.units}</span>
             <ChevronDown className="nav-chevron" size={16} aria-hidden="true" />
           </button>

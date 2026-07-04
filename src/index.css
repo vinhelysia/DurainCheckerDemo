@@ -1,48 +1,50 @@
 :root {
+  /* "Export dossier" theme: bone paper, forest ink, amber stamp */
   /* Canvas & surfaces */
-  --color-bg: #0E1411;
-  --color-bg-alt: #121A16;
-  --color-surface: #161F1A;
-  --color-surface-glass: #1B2620;
-  --color-surface-raised: #1B2620;
-  --color-line: rgba(255,255,255,0.09);
-  --color-line-strong: rgba(255,255,255,0.16);
+  --color-bg: #F2F0E7;
+  --color-bg-alt: #EAE8DC;
+  --color-surface: #F9F8F2;
+  --color-surface-glass: #FDFCF7;
+  --color-surface-raised: #FDFCF7;
+  --color-line: rgba(26,36,30,0.14);
+  --color-line-strong: rgba(26,36,30,0.32);
   /* Text */
-  --color-ink: #ECF2EE;
-  --color-ink-soft: #9FB2A8;
-  --color-ink-faint: #6C7E74;
+  --color-ink: #1A241E;
+  --color-ink-soft: #49564E;
+  --color-ink-faint: #75827A;
   /* Brand accents */
-  --color-gold: #F0B43C;
-  --color-gold-soft: rgba(240,180,60,0.14);
-  --color-emerald: #36D399;
-  --color-emerald-soft: rgba(54,211,153,0.14);
+  --color-gold: #A87614;
+  --color-gold-soft: rgba(168,118,20,0.12);
+  --color-emerald: #14724F;
+  --color-emerald-soft: rgba(20,114,79,0.10);
   --color-green-deep: #1F4734;
-  /* Risk (tuned for dark) */
-  --color-risk-low: #36D399;     --color-risk-low-bg: rgba(54,211,153,0.12);
-  --color-risk-medium: #F0B43C;  --color-risk-medium-bg: rgba(240,180,60,0.12);
-  --color-risk-high: #FF6B5E;    --color-risk-high-bg: rgba(255,107,94,0.12);
+  /* Risk (tuned for paper) */
+  --color-risk-low: #14724F;     --color-risk-low-bg: rgba(20,114,79,0.10);
+  --color-risk-medium: #8A6116;  --color-risk-medium-bg: rgba(168,118,20,0.14);
+  --color-risk-high: #B3362A;    --color-risk-high-bg: rgba(179,54,42,0.10);
   /* Effects */
-  --shadow-card: inset 0 1px 0 rgba(255,255,255,0.05), 0 14px 34px rgba(0,0,0,0.5);
-  --shadow-elevated: 0 26px 64px rgba(0,0,0,0.6);
-  --radius-card: 14px;   --radius-pill: 999px;
-  /* Fonts UNCHANGED */
-  --font-display:'Be Vietnam Pro',sans-serif; --font-body:'Be Vietnam Pro',sans-serif;
+  --shadow-card: 0 1px 2px rgba(26,36,30,0.05), 0 10px 28px rgba(26,36,30,0.07);
+  --shadow-elevated: 0 24px 56px rgba(26,36,30,0.18);
+  --radius-card: 10px;   --radius-pill: 999px;
+  /* Fonts */
+  --font-display:'Bricolage Grotesque','Be Vietnam Pro',sans-serif;
+  --font-body:'Be Vietnam Pro',sans-serif;
   --font-mono:'IBM Plex Mono',ui-monospace,monospace;
   /* Font scale */
-  --fs-h1: 3.25rem;
-  --fs-h2: 2.25rem;
-  --fs-h3: 1.25rem;
+  --fs-h1: 3.6rem;
+  --fs-h2: 2.4rem;
+  --fs-h3: 1.3rem;
   --fs-body: 1rem;
   --fs-small: 0.875rem;
-  /* Compat aliases — legacy var references in App.css resolve to dark equivalents */
-  --color-surface-alt: var(--color-surface-raised);
+  /* Compat aliases — legacy var references in App.css */
+  --color-surface-alt: var(--color-bg-alt);
   --color-green-mid: var(--color-emerald);
   --color-ledger: var(--color-emerald);
   --color-ledger-soft: var(--color-emerald-soft);
 
   color: var(--color-ink);
   background: var(--color-bg);
-  color-scheme: dark;
+  color-scheme: light;
   font-family: var(--font-body);
   font-size: 16px;
   font-synthesis: none;
@@ -55,15 +57,15 @@
 
 @media (max-width: 860px) {
   :root {
-    --fs-h1: 2.5rem;
-    --fs-h2: 1.9rem;
+    --fs-h1: 2.7rem;
+    --fs-h2: 2rem;
   }
 }
 
 @media (max-width: 480px) {
   :root {
-    --fs-h1: 2rem;
-    --fs-h2: 1.55rem;
+    --fs-h1: 2.1rem;
+    --fs-h2: 1.6rem;
     --fs-h3: 1.12rem;
   }
 }
@@ -128,13 +130,15 @@ h3,
 h4 {
   color: var(--color-ink);
   font-family: var(--font-display);
-  line-height: 1.25;
+  line-height: 1.15;
   letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
 h1 {
   font-size: var(--fs-h1);
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 h2 {
@@ -166,8 +170,8 @@ code {
 /* Global scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-surface-raised); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-line-strong); }
+::-webkit-scrollbar-thumb { background: var(--color-line-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-ink-faint); }
 
 #root {
   min-height: 100dvh;
