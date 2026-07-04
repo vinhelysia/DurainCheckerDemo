@@ -20,8 +20,8 @@ import type {
 
 const RISK_LEVELS: RiskLevel[] = ['low', 'medium', 'high']
 
-// Anchor discriminator for the Batch account type (from IDL)
-const BATCH_DISCRIMINATOR = Buffer.from([100, 111, 122, 133, 144, 155, 166, 177])
+// Anchor account discriminator: first 8 bytes of sha256("account:Batch")
+const BATCH_DISCRIMINATOR = Buffer.from([156, 194, 70, 44, 22, 88, 137, 44])
 const MAX_BATCHES = 200
 
 function mapRiskLevel(enumVal: unknown): RiskLevel {
