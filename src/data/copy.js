@@ -39,7 +39,40 @@ export const copyData = {
       verified: 'Đã xác thực',
       ariaLabelLedger: 'Mẫu trạng thái lô hàng',
       ariaLabelActions: 'Hành động chính',
-      photoAlt: 'Lá sầu riêng khỏe mạnh chụp tại vườn trồng',
+      photoAlt: 'Trái sầu riêng nguyên quả trên bàn gỗ',
+    },
+    landing: {
+      journeyTitle: 'Từ vườn đến cảng, mỗi mắt xích đều được ghi sổ',
+      journeyLead: 'Ba mắt xích quyết định chất lượng lô sầu riêng xuất khẩu. Mỗi mắt xích ghi một sự kiện không thể sửa lên Solana.',
+      journeyAria: 'Hành trình lô hàng',
+      steps: [
+        {
+          title: 'Vùng trồng',
+          text: 'Nhật ký thu hoạch và mã số vùng trồng gắn với từng lô ngay từ đầu.',
+          href: '#/unit/farm',
+          alt: 'Vườn sầu riêng',
+        },
+        {
+          title: 'Kiểm nghiệm',
+          text: 'Phòng lab ký số kết quả Cadimi và Auramine O; báo cáo được băm SHA-256.',
+          href: '#/unit/testing',
+          alt: 'Kỹ thuật viên xử lý mẫu trong phòng kiểm nghiệm',
+        },
+        {
+          title: 'Xuất cảng',
+          text: 'Mốc vận chuyển lạnh và hồ sơ thông quan khớp với sổ cái theo từng sự kiện.',
+          href: '#/unit/export',
+          alt: 'Tàu container tại cảng Hải Phòng',
+        },
+      ],
+      recordTitle: 'Dữ liệu nào nằm trên chuỗi?',
+      recordLead: 'Bốn lệnh chính của chương trình Anchor ghi lại toàn bộ vòng đời lô hàng.',
+      records: [
+        { name: 'registerBatch', detail: 'Khởi tạo lô: mã lô, vùng trồng, ngày thu hoạch.' },
+        { name: 'addTimelineEvent', detail: 'Ghi mốc canh tác, đóng gói, vận chuyển lạnh.' },
+        { name: 'attestLabReport', detail: 'Phòng lab ký Ed25519 lên hash SHA-256 của báo cáo kiểm nghiệm.' },
+        { name: 'verifyAttestation', detail: 'Bất kỳ ai cũng đối chiếu được chữ ký và hash ngay trên chuỗi.' },
+      ],
     },
     problem: {
       kicker: 'Bối cảnh',
@@ -204,6 +237,7 @@ export const copyData = {
     footer: {
       demoText: 'Sản phẩm demo phục vụ mục đích học thuật.',
       sourcesLabel: 'Nguồn tham khảo',
+      photosLabel: 'Ảnh tư liệu',
     },
     units: {
       farmTitle: 'Đơn vị Vườn trồng sầu riêng',
@@ -498,7 +532,40 @@ export const copyData = {
       verified: 'Verified',
       ariaLabelLedger: 'Sample batch status',
       ariaLabelActions: 'Primary actions',
-      photoAlt: 'Healthy durian leaves photographed at the orchard',
+      photoAlt: 'Whole durian fruit on a wooden table',
+    },
+    landing: {
+      journeyTitle: 'From orchard to port, every link is on the ledger',
+      journeyLead: 'Three links decide the quality of an export batch. Each one writes an immutable event to Solana.',
+      journeyAria: 'Batch journey',
+      steps: [
+        {
+          title: 'Orchard',
+          text: 'Harvest logs and growing-area codes are tied to each batch from day one.',
+          href: '#/unit/farm',
+          alt: 'Durian orchard',
+        },
+        {
+          title: 'Lab testing',
+          text: 'The lab signs Cadmium and Auramine O results; reports are hashed with SHA-256.',
+          href: '#/unit/testing',
+          alt: 'Technician processing samples in a testing laboratory',
+        },
+        {
+          title: 'Export',
+          text: 'Cold-chain milestones and customs records reconcile with the ledger, event by event.',
+          href: '#/unit/export',
+          alt: 'Container ship at Hai Phong port',
+        },
+      ],
+      recordTitle: 'What lives on-chain?',
+      recordLead: 'Four core instructions of the Anchor program capture the full batch lifecycle.',
+      records: [
+        { name: 'registerBatch', detail: 'Creates the batch: batch ID, growing area, harvest date.' },
+        { name: 'addTimelineEvent', detail: 'Records farming, packing and cold-chain milestones.' },
+        { name: 'attestLabReport', detail: 'The lab signs the SHA-256 hash of the test report with Ed25519.' },
+        { name: 'verifyAttestation', detail: 'Anyone can check the signature against the hash, directly on-chain.' },
+      ],
     },
     problem: {
       kicker: 'Context',
@@ -663,6 +730,7 @@ export const copyData = {
     footer: {
       demoText: 'Academic demo project.',
       sourcesLabel: 'Sources',
+      photosLabel: 'Photos',
     },
     units: {
       farmTitle: 'Orchard Farm Unit',

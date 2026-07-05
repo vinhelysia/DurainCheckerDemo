@@ -1,6 +1,14 @@
 import { ExternalLink } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 
+// CC BY / CC BY-SA licenses require author + license attribution
+const photoCredits = [
+  { label: 'Sodanie Chea (CC BY 2.0)', href: 'https://commons.wikimedia.org/w/index.php?curid=40618459' },
+  { label: 'Mx. Granger (CC0)', href: 'https://commons.wikimedia.org/w/index.php?curid=87077521' },
+  { label: 'U.S. FDA (PD)', href: 'https://commons.wikimedia.org/w/index.php?curid=48273411' },
+  { label: 'Nathan.cima (CC BY-SA 4.0)', href: 'https://commons.wikimedia.org/w/index.php?curid=126373777' },
+]
+
 const sources = [
   {
     label: 'VietnamPlus',
@@ -43,6 +51,21 @@ function Footer() {
               rel="noreferrer"
             >
               {source.label}
+              <ExternalLink size={13} aria-hidden="true" />
+            </a>
+          ))}
+        </div>
+
+        <div className="source-links footer-credits" aria-label={copy.footer.photosLabel}>
+          <span>{copy.footer.photosLabel}</span>
+          {photoCredits.map((credit) => (
+            <a
+              key={credit.label}
+              href={credit.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {credit.label}
               <ExternalLink size={13} aria-hidden="true" />
             </a>
           ))}
