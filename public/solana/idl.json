@@ -9,299 +9,1150 @@
   "instructions": [
     {
       "name": "initialize",
-      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
       "accounts": [
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "systemProgram" }
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram"
+        }
       ],
       "args": []
     },
     {
       "name": "proposeAuthorityTransfer",
-      "discriminator": [180, 10, 20, 30, 40, 50, 60, 70],
+      "discriminator": [
+        180,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70
+      ],
       "accounts": [
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "signer": true }
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
       ],
       "args": [
-        { "name": "newAuthority", "type": "pubkey" }
+        {
+          "name": "newAuthority",
+          "type": "pubkey"
+        }
       ]
     },
     {
       "name": "acceptAuthorityTransfer",
-      "discriminator": [181, 11, 21, 31, 41, 51, 61, 71],
+      "discriminator": [
+        181,
+        11,
+        21,
+        31,
+        41,
+        51,
+        61,
+        71
+      ],
       "accounts": [
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "newAuthority", "signer": true }
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "newAuthority",
+          "signer": true
+        }
       ],
       "args": []
     },
     {
       "name": "pause",
-      "discriminator": [182, 12, 22, 32, 42, 52, 62, 72],
+      "discriminator": [
+        182,
+        12,
+        22,
+        32,
+        42,
+        52,
+        62,
+        72
+      ],
       "accounts": [
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "signer": true }
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
       ],
       "args": []
     },
     {
       "name": "unpause",
-      "discriminator": [183, 13, 23, 33, 43, 53, 63, 73],
+      "discriminator": [
+        183,
+        13,
+        23,
+        33,
+        43,
+        53,
+        63,
+        73
+      ],
       "accounts": [
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "signer": true }
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
       ],
       "args": []
     },
     {
       "name": "addFarmer",
-      "discriminator": [223, 234, 56, 12, 99, 12, 15, 34],
+      "discriminator": [
+        223,
+        234,
+        56,
+        12,
+        99,
+        12,
+        15,
+        34
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "farmerRole", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [102, 97, 114, 109, 101, 114] }, { "kind": "arg", "path": "user" }] } },
-        { "name": "systemProgram" }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "farmerRole",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  114,
+                  109,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram"
+        }
       ],
       "args": [
-        { "name": "user", "type": "pubkey" }
+        {
+          "name": "user",
+          "type": "pubkey"
+        }
       ]
     },
     {
       "name": "removeFarmer",
-      "discriminator": [11, 22, 33, 44, 55, 66, 77, 88],
+      "discriminator": [
+        11,
+        22,
+        33,
+        44,
+        55,
+        66,
+        77,
+        88
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "farmerRole", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [102, 97, 114, 109, 101, 114] }, { "kind": "arg", "path": "user" }] } }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "farmerRole",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  114,
+                  109,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "user"
+              }
+            ]
+          }
+        }
       ],
       "args": [
-        { "name": "user", "type": "pubkey" }
+        {
+          "name": "user",
+          "type": "pubkey"
+        }
       ]
     },
     {
       "name": "addLab",
-      "discriminator": [12, 23, 34, 45, 56, 67, 78, 89],
+      "discriminator": [
+        12,
+        23,
+        34,
+        45,
+        56,
+        67,
+        78,
+        89
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "labRole", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [108, 97, 98, 95, 114, 111, 108, 101] }, { "kind": "arg", "path": "user" }] } },
-        { "name": "systemProgram" }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "labRole",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  98,
+                  95,
+                  114,
+                  111,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram"
+        }
       ],
       "args": [
-        { "name": "user", "type": "pubkey" }
+        {
+          "name": "user",
+          "type": "pubkey"
+        }
       ]
     },
     {
       "name": "removeLab",
-      "discriminator": [23, 34, 45, 56, 67, 78, 89, 90],
+      "discriminator": [
+        23,
+        34,
+        45,
+        56,
+        67,
+        78,
+        89,
+        90
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "labRole", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [108, 97, 98, 95, 114, 111, 108, 101] }, { "kind": "arg", "path": "user" }] } }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "labRole",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  98,
+                  95,
+                  114,
+                  111,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "user"
+              }
+            ]
+          }
+        }
       ],
       "args": [
-        { "name": "user", "type": "pubkey" }
+        {
+          "name": "user",
+          "type": "pubkey"
+        }
       ]
     },
     {
       "name": "addLogistics",
-      "discriminator": [34, 45, 56, 67, 78, 89, 90, 101],
+      "discriminator": [
+        34,
+        45,
+        56,
+        67,
+        78,
+        89,
+        90,
+        101
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "logisticsRole", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [108, 111, 103, 105, 115, 116, 105, 99, 115] }, { "kind": "arg", "path": "user" }] } },
-        { "name": "systemProgram" }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "logisticsRole",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  111,
+                  103,
+                  105,
+                  115,
+                  116,
+                  105,
+                  99,
+                  115
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram"
+        }
       ],
       "args": [
-        { "name": "user", "type": "pubkey" }
+        {
+          "name": "user",
+          "type": "pubkey"
+        }
       ]
     },
     {
       "name": "removeLogistics",
-      "discriminator": [45, 56, 67, 78, 89, 90, 101, 112],
+      "discriminator": [
+        45,
+        56,
+        67,
+        78,
+        89,
+        90,
+        101,
+        112
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "logisticsRole", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [108, 111, 103, 105, 115, 116, 105, 99, 115] }, { "kind": "arg", "path": "user" }] } }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "logisticsRole",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  111,
+                  103,
+                  105,
+                  115,
+                  116,
+                  105,
+                  99,
+                  115
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "user"
+              }
+            ]
+          }
+        }
       ],
       "args": [
-        { "name": "user", "type": "pubkey" }
+        {
+          "name": "user",
+          "type": "pubkey"
+        }
       ]
     },
     {
       "name": "registerBatch",
-      "discriminator": [1, 2, 3, 4, 5, 6, 7, 8],
+      "discriminator": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
       "accounts": [
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "batch", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [98, 97, 116, 99, 104] }, { "kind": "arg", "path": "id" }] } },
-        { "name": "labReport", "writable": true },
-        { "name": "farmerRole", "optional": true },
-        { "name": "signer", "writable": true, "signer": true },
-        { "name": "systemProgram" }
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "labReport",
+          "writable": true
+        },
+        {
+          "name": "farmerRole",
+          "optional": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram"
+        }
       ],
       "args": [
-        { "name": "id", "type": "string" },
-        { "name": "farm", "type": "string" },
-        { "name": "province", "type": "string" },
-        { "name": "harvestDate", "type": "string" },
-        { "name": "cadmiumPpm", "type": "u64" },
-        { "name": "thresholdPpm", "type": "u64" },
-        { "name": "confidence", "type": "u64" },
-        { "name": "riskLevel", "type": { "defined": { "name": "RiskLevel" } } },
-        { "name": "aiResult", "type": "string" },
-        { "name": "riskCause", "type": "string" }
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "farm",
+          "type": "string"
+        },
+        {
+          "name": "province",
+          "type": "string"
+        },
+        {
+          "name": "harvestDate",
+          "type": "string"
+        },
+        {
+          "name": "cadmiumPpm",
+          "type": "u64"
+        },
+        {
+          "name": "thresholdPpm",
+          "type": "u64"
+        },
+        {
+          "name": "confidence",
+          "type": "u64"
+        },
+        {
+          "name": "riskLevel",
+          "type": {
+            "defined": {
+              "name": "RiskLevel"
+            }
+          }
+        },
+        {
+          "name": "aiResult",
+          "type": "string"
+        },
+        {
+          "name": "riskCause",
+          "type": "string"
+        }
       ]
     },
     {
       "name": "addTimelineEvent",
-      "discriminator": [9, 10, 11, 12, 13, 14, 15, 16],
+      "discriminator": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "batch", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [98, 97, 116, 99, 104] }, { "kind": "arg", "path": "id" }] } },
-        { "name": "timelineEvent", "writable": true },
-        { "name": "logisticsRole", "optional": true },
-        { "name": "signer", "writable": true, "signer": true },
-        { "name": "systemProgram" }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "timelineEvent",
+          "writable": true
+        },
+        {
+          "name": "logisticsRole",
+          "optional": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram"
+        }
       ],
       "args": [
-        { "name": "id", "type": "string" },
-        { "name": "stage", "type": "string" },
-        { "name": "location", "type": "string" },
-        { "name": "date", "type": "string" },
-        { "name": "status", "type": { "defined": { "name": "TimelineStatus" } } }
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "stage",
+          "type": "string"
+        },
+        {
+          "name": "location",
+          "type": "string"
+        },
+        {
+          "name": "date",
+          "type": "string"
+        },
+        {
+          "name": "status",
+          "type": {
+            "defined": {
+              "name": "TimelineStatus"
+            }
+          }
+        }
       ]
     },
     {
       "name": "attestLabReport",
-      "discriminator": [200, 30, 40, 50, 60, 70, 80, 90],
+      "discriminator": [
+        200,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "batch", "pda": { "seeds": [{ "kind": "const", "value": [98, 97, 116, 99, 104] }, { "kind": "arg", "path": "id" }] } },
-        { "name": "labReport" },
-        { "name": "attestation", "writable": true },
-        { "name": "labRole", "optional": true },
-        { "name": "signer", "writable": true, "signer": true },
-        { "name": "ixSysvar" },
-        { "name": "systemProgram" }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "batch",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "labReport"
+        },
+        {
+          "name": "attestation",
+          "writable": true
+        },
+        {
+          "name": "labRole",
+          "optional": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ixSysvar"
+        },
+        {
+          "name": "systemProgram"
+        }
       ],
       "args": [
-        { "name": "id", "type": "string" },
-        { "name": "labReportIndex", "type": "u32" },
-        { "name": "sig", "type": { "array": ["u8", 64] } },
-        { "name": "payloadHash", "type": { "array": ["u8", 32] } }
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "labReportIndex",
+          "type": "u32"
+        },
+        {
+          "name": "sig",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
+        },
+        {
+          "name": "payloadHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
       ]
     },
     {
       "name": "verifyAttestation",
-      "discriminator": [201, 31, 41, 51, 61, 71, 81, 91],
+      "discriminator": [
+        201,
+        31,
+        41,
+        51,
+        61,
+        71,
+        81,
+        91
+      ],
       "accounts": [
-        { "name": "labReport" },
-        { "name": "attestation" }
+        {
+          "name": "labReport"
+        },
+        {
+          "name": "attestation"
+        }
       ],
       "args": [
-        { "name": "id", "type": "string" },
-        { "name": "labReportIndex", "type": "u32" }
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "labReportIndex",
+          "type": "u32"
+        }
       ]
     },
     {
       "name": "updateLabReport",
-      "discriminator": [17, 18, 19, 20, 21, 22, 23, 24],
+      "discriminator": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
       "accounts": [
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }] } },
-        { "name": "batch", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [98, 97, 116, 99, 104] }, { "kind": "arg", "path": "id" }] } },
-        { "name": "labReport", "writable": true },
-        { "name": "labRole", "optional": true },
-        { "name": "signer", "writable": true, "signer": true },
-        { "name": "systemProgram" }
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "labReport",
+          "writable": true
+        },
+        {
+          "name": "labRole",
+          "optional": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram"
+        }
       ],
       "args": [
-        { "name": "id", "type": "string" },
-        { "name": "cadmiumPpm", "type": "u64" },
-        { "name": "thresholdPpm", "type": "u64" },
-        { "name": "confidence", "type": "u64" },
-        { "name": "riskLevel", "type": { "defined": { "name": "RiskLevel" } } },
-        { "name": "aiResult", "type": "string" },
-        { "name": "riskCause", "type": "string" }
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "cadmiumPpm",
+          "type": "u64"
+        },
+        {
+          "name": "thresholdPpm",
+          "type": "u64"
+        },
+        {
+          "name": "confidence",
+          "type": "u64"
+        },
+        {
+          "name": "riskLevel",
+          "type": {
+            "defined": {
+              "name": "RiskLevel"
+            }
+          }
+        },
+        {
+          "name": "aiResult",
+          "type": "string"
+        },
+        {
+          "name": "riskCause",
+          "type": "string"
+        }
       ]
     }
   ],
   "accounts": [
     {
       "name": "Config",
-      "discriminator": [155, 12, 33, 44, 55, 66, 77, 88],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "authority", "type": "pubkey" },
-          { "name": "nextTokenId", "type": "u64" },
-          { "name": "pendingAuthority", "type": { "option": "pubkey" } },
-          { "name": "paused", "type": "bool" }
-        ]
-      }
+      "discriminator": [
+        155,
+        12,
+        33,
+        44,
+        55,
+        66,
+        77,
+        88
+      ]
     },
     {
       "name": "Batch",
-      "discriminator": [100, 111, 122, 133, 144, 155, 166, 177],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "id", "type": "string" },
-          { "name": "farm", "type": "string" },
-          { "name": "province", "type": "string" },
-          { "name": "harvestDate", "type": "string" },
-          { "name": "registrant", "type": "pubkey" },
-          { "name": "tokenId", "type": "u64" },
-          { "name": "timelineCount", "type": "u32" },
-          { "name": "labCount", "type": "u32" },
-          { "name": "createdAt", "type": "i64" }
-        ]
-      }
+      "discriminator": [
+        100,
+        111,
+        122,
+        133,
+        144,
+        155,
+        166,
+        177
+      ]
     },
     {
       "name": "TimelineEvent",
-      "discriminator": [200, 210, 220, 230, 240, 250, 4, 14],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "stage", "type": "string" },
-          { "name": "location", "type": "string" },
-          { "name": "date", "type": "string" },
-          { "name": "status", "type": { "defined": { "name": "TimelineStatus" } } }
-        ]
-      }
+      "discriminator": [
+        200,
+        210,
+        220,
+        230,
+        240,
+        250,
+        4,
+        14
+      ]
     },
     {
       "name": "LabAttestation",
-      "discriminator": [202, 32, 42, 52, 62, 72, 82, 92],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "labReportIndex", "type": "u32" },
-          { "name": "payloadHash", "type": { "array": ["u8", 32] } },
-          { "name": "sig", "type": { "array": ["u8", 64] } },
-          { "name": "labPubkey", "type": "pubkey" },
-          { "name": "timestamp", "type": "i64" }
-        ]
-      }
+      "discriminator": [
+        202,
+        32,
+        42,
+        52,
+        62,
+        72,
+        82,
+        92
+      ]
     },
     {
       "name": "LabReport",
-      "discriminator": [11, 22, 33, 44, 55, 66, 77, 88],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "cadmiumPpm", "type": "u64" },
-          { "name": "thresholdPpm", "type": "u64" },
-          { "name": "confidence", "type": "u64" },
-          { "name": "riskLevel", "type": { "defined": { "name": "RiskLevel" } } },
-          { "name": "aiResult", "type": "string" },
-          { "name": "riskCause", "type": "string" },
-          { "name": "reporter", "type": "pubkey" },
-          { "name": "timestamp", "type": "i64" }
-        ]
-      }
+      "discriminator": [
+        11,
+        22,
+        33,
+        44,
+        55,
+        66,
+        77,
+        88
+      ]
     }
   ],
   "types": [
@@ -310,11 +1161,21 @@
       "type": {
         "kind": "enum",
         "variants": [
-          { "name": "Safe" },
-          { "name": "Low" },
-          { "name": "Medium" },
-          { "name": "High" },
-          { "name": "Critical" }
+          {
+            "name": "Safe"
+          },
+          {
+            "name": "Low"
+          },
+          {
+            "name": "Medium"
+          },
+          {
+            "name": "High"
+          },
+          {
+            "name": "Critical"
+          }
         ]
       }
     },
@@ -323,10 +1184,18 @@
       "type": {
         "kind": "enum",
         "variants": [
-          { "name": "Pending" },
-          { "name": "InTransit" },
-          { "name": "Delivered" },
-          { "name": "Rejected" }
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "InTransit"
+          },
+          {
+            "name": "Delivered"
+          },
+          {
+            "name": "Rejected"
+          }
         ]
       }
     },
@@ -335,9 +1204,425 @@
       "type": {
         "kind": "enum",
         "variants": [
-          { "name": "Farmer" },
-          { "name": "Lab" },
-          { "name": "Logistics" }
+          {
+            "name": "Farmer"
+          },
+          {
+            "name": "Lab"
+          },
+          {
+            "name": "Logistics"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "nextTokenId",
+            "type": "u64"
+          },
+          {
+            "name": "pendingAuthority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Batch",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "farm",
+            "type": "string"
+          },
+          {
+            "name": "province",
+            "type": "string"
+          },
+          {
+            "name": "harvestDate",
+            "type": "string"
+          },
+          {
+            "name": "registrant",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenId",
+            "type": "u64"
+          },
+          {
+            "name": "timelineCount",
+            "type": "u32"
+          },
+          {
+            "name": "labCount",
+            "type": "u32"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimelineEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stage",
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "TimelineStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "LabAttestation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "labReportIndex",
+            "type": "u32"
+          },
+          {
+            "name": "payloadHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "sig",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "labPubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LabReport",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "cadmiumPpm",
+            "type": "u64"
+          },
+          {
+            "name": "thresholdPpm",
+            "type": "u64"
+          },
+          {
+            "name": "confidence",
+            "type": "u64"
+          },
+          {
+            "name": "riskLevel",
+            "type": {
+              "defined": {
+                "name": "RiskLevel"
+              }
+            }
+          },
+          {
+            "name": "aiResult",
+            "type": "string"
+          },
+          {
+            "name": "riskCause",
+            "type": "string"
+          },
+          {
+            "name": "reporter",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuthorityTransferProposed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proposed",
+            "type": "pubkey"
+          },
+          {
+            "name": "by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuthorityTransferAccepted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "oldAuthority",
+            "type": "pubkey"
+          },
+          {
+            "name": "newAuthority",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProgramPaused",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProgramUnpaused",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoleGranted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "role",
+            "type": {
+              "defined": {
+                "name": "RoleType"
+              }
+            }
+          },
+          {
+            "name": "grantedBy",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoleRevoked",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "role",
+            "type": {
+              "defined": {
+                "name": "RoleType"
+              }
+            }
+          },
+          {
+            "name": "revokedBy",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BatchRegistered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "batch",
+            "type": "pubkey"
+          },
+          {
+            "name": "registrant",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenId",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimelineEventAdded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "batch",
+            "type": "pubkey"
+          },
+          {
+            "name": "index",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LabReportUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "batch",
+            "type": "pubkey"
+          },
+          {
+            "name": "index",
+            "type": "u32"
+          },
+          {
+            "name": "reporter",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LabReportAttested",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "labReportIndex",
+            "type": "u32"
+          },
+          {
+            "name": "labPubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "payloadHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttestationVerified",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "labReportIndex",
+            "type": "u32"
+          },
+          {
+            "name": "labPubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "payloadHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
         ]
       }
     }
@@ -345,114 +1630,208 @@
   "events": [
     {
       "name": "AuthorityTransferProposed",
-      "discriminator": [190, 20, 30, 40, 50, 60, 70, 80],
-      "fields": [
-        { "name": "proposed", "type": "pubkey", "index": false },
-        { "name": "by", "type": "pubkey", "index": false }
+      "discriminator": [
+        190,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80
       ]
     },
     {
       "name": "AuthorityTransferAccepted",
-      "discriminator": [191, 21, 31, 41, 51, 61, 71, 81],
-      "fields": [
-        { "name": "oldAuthority", "type": "pubkey", "index": false },
-        { "name": "newAuthority", "type": "pubkey", "index": false }
+      "discriminator": [
+        191,
+        21,
+        31,
+        41,
+        51,
+        61,
+        71,
+        81
       ]
     },
     {
       "name": "ProgramPaused",
-      "discriminator": [192, 22, 32, 42, 52, 62, 72, 82],
-      "fields": [
-        { "name": "by", "type": "pubkey", "index": false }
+      "discriminator": [
+        192,
+        22,
+        32,
+        42,
+        52,
+        62,
+        72,
+        82
       ]
     },
     {
       "name": "ProgramUnpaused",
-      "discriminator": [193, 23, 33, 43, 53, 63, 73, 83],
-      "fields": [
-        { "name": "by", "type": "pubkey", "index": false }
+      "discriminator": [
+        193,
+        23,
+        33,
+        43,
+        53,
+        63,
+        73,
+        83
       ]
     },
     {
       "name": "RoleGranted",
-      "discriminator": [194, 24, 34, 44, 54, 64, 74, 84],
-      "fields": [
-        { "name": "user", "type": "pubkey", "index": false },
-        { "name": "role", "type": { "defined": { "name": "RoleType" } }, "index": false },
-        { "name": "grantedBy", "type": "pubkey", "index": false }
+      "discriminator": [
+        194,
+        24,
+        34,
+        44,
+        54,
+        64,
+        74,
+        84
       ]
     },
     {
       "name": "RoleRevoked",
-      "discriminator": [195, 25, 35, 45, 55, 65, 75, 85],
-      "fields": [
-        { "name": "user", "type": "pubkey", "index": false },
-        { "name": "role", "type": { "defined": { "name": "RoleType" } }, "index": false },
-        { "name": "revokedBy", "type": "pubkey", "index": false }
+      "discriminator": [
+        195,
+        25,
+        35,
+        45,
+        55,
+        65,
+        75,
+        85
       ]
     },
     {
       "name": "BatchRegistered",
-      "discriminator": [196, 26, 36, 46, 56, 66, 76, 86],
-      "fields": [
-        { "name": "id", "type": "string", "index": false },
-        { "name": "batch", "type": "pubkey", "index": false },
-        { "name": "registrant", "type": "pubkey", "index": false },
-        { "name": "tokenId", "type": "u64", "index": false }
+      "discriminator": [
+        196,
+        26,
+        36,
+        46,
+        56,
+        66,
+        76,
+        86
       ]
     },
     {
       "name": "TimelineEventAdded",
-      "discriminator": [197, 27, 37, 47, 57, 67, 77, 87],
-      "fields": [
-        { "name": "id", "type": "string", "index": false },
-        { "name": "batch", "type": "pubkey", "index": false },
-        { "name": "index", "type": "u32", "index": false }
+      "discriminator": [
+        197,
+        27,
+        37,
+        47,
+        57,
+        67,
+        77,
+        87
       ]
     },
     {
       "name": "LabReportUpdated",
-      "discriminator": [198, 28, 38, 48, 58, 68, 78, 88],
-      "fields": [
-        { "name": "id", "type": "string", "index": false },
-        { "name": "batch", "type": "pubkey", "index": false },
-        { "name": "index", "type": "u32", "index": false },
-        { "name": "reporter", "type": "pubkey", "index": false }
+      "discriminator": [
+        198,
+        28,
+        38,
+        48,
+        58,
+        68,
+        78,
+        88
       ]
     },
     {
       "name": "LabReportAttested",
-      "discriminator": [199, 29, 39, 49, 59, 69, 79, 89],
-      "fields": [
-        { "name": "id", "type": "string", "index": false },
-        { "name": "labReportIndex", "type": "u32", "index": false },
-        { "name": "labPubkey", "type": "pubkey", "index": false },
-        { "name": "payloadHash", "type": { "array": ["u8", 32] }, "index": false }
+      "discriminator": [
+        199,
+        29,
+        39,
+        49,
+        59,
+        69,
+        79,
+        89
       ]
     },
     {
       "name": "AttestationVerified",
-      "discriminator": [203, 33, 43, 53, 63, 73, 83, 93],
-      "fields": [
-        { "name": "id", "type": "string", "index": false },
-        { "name": "labReportIndex", "type": "u32", "index": false },
-        { "name": "labPubkey", "type": "pubkey", "index": false },
-        { "name": "payloadHash", "type": { "array": ["u8", 32] }, "index": false }
+      "discriminator": [
+        203,
+        33,
+        43,
+        53,
+        63,
+        73,
+        83,
+        93
       ]
     }
   ],
   "errors": [
-    { "code": 6000, "name": "Unauthorized", "msg": "Signer is not authorized for this action." },
-    { "code": 6001, "name": "StringTooLong", "msg": "A provided string exceeds its configured byte length." },
-    { "code": 6002, "name": "CounterOverflow", "msg": "A counter overflowed." },
-    { "code": 6003, "name": "InvalidIndex", "msg": "The append index is invalid." },
-    { "code": 6004, "name": "Paused", "msg": "The program is currently paused." },
-    { "code": 6005, "name": "NoPendingTransfer", "msg": "No pending authority transfer exists." },
-    { "code": 6006, "name": "InvalidDateFormat", "msg": "Date must be formatted as YYYY-MM-DD with a valid month (01-12) and day (01-31)." },
-    { "code": 6007, "name": "MissingEd25519Instruction", "msg": "Transaction must include an Ed25519SigVerify instruction at index 0." },
-    { "code": 6008, "name": "InvalidEd25519Instruction", "msg": "Instruction 0 is not a valid Ed25519SigVerify call or its data is malformed." },
-    { "code": 6009, "name": "AttestationKeyMismatch", "msg": "Ed25519 public key in ix 0 does not match the transaction signer." },
-    { "code": 6010, "name": "SignatureMismatch", "msg": "Ed25519 signature in ix 0 does not match the submitted signature." },
-    { "code": 6011, "name": "PayloadHashMismatch", "msg": "Recomputed payload hash does not match the submitted hash." }
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Signer is not authorized for this action."
+    },
+    {
+      "code": 6001,
+      "name": "StringTooLong",
+      "msg": "A provided string exceeds its configured byte length."
+    },
+    {
+      "code": 6002,
+      "name": "CounterOverflow",
+      "msg": "A counter overflowed."
+    },
+    {
+      "code": 6003,
+      "name": "InvalidIndex",
+      "msg": "The append index is invalid."
+    },
+    {
+      "code": 6004,
+      "name": "Paused",
+      "msg": "The program is currently paused."
+    },
+    {
+      "code": 6005,
+      "name": "NoPendingTransfer",
+      "msg": "No pending authority transfer exists."
+    },
+    {
+      "code": 6006,
+      "name": "InvalidDateFormat",
+      "msg": "Date must be formatted as YYYY-MM-DD with a valid month (01-12) and day (01-31)."
+    },
+    {
+      "code": 6007,
+      "name": "MissingEd25519Instruction",
+      "msg": "Transaction must include an Ed25519SigVerify instruction at index 0."
+    },
+    {
+      "code": 6008,
+      "name": "InvalidEd25519Instruction",
+      "msg": "Instruction 0 is not a valid Ed25519SigVerify call or its data is malformed."
+    },
+    {
+      "code": 6009,
+      "name": "AttestationKeyMismatch",
+      "msg": "Ed25519 public key in ix 0 does not match the transaction signer."
+    },
+    {
+      "code": 6010,
+      "name": "SignatureMismatch",
+      "msg": "Ed25519 signature in ix 0 does not match the submitted signature."
+    },
+    {
+      "code": 6011,
+      "name": "PayloadHashMismatch",
+      "msg": "Recomputed payload hash does not match the submitted hash."
+    }
   ]
 }

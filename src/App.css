@@ -3633,3 +3633,15 @@ button.nav-link:focus-visible {
   margin-bottom: 16px;
   color: var(--color-ink-soft);
 }
+
+/* Wallet adapter button: dossier palette instead of default purple */
+.wallet-adapter-button-trigger {
+  background-color: var(--color-green-deep);
+  border-radius: 8px;
+  font-family: var(--font-body);
+}
+
+.wallet-adapter-button-trigger:not([disabled]):hover {
+  background-color: var(--color-green-deep);
+  filter: brightness(1.12);
+}

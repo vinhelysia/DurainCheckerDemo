@@ -39,15 +39,21 @@ function ManagementPortalContent() {
   // Derive program from wallet + connection + IDL info
   const program = useMemo(() => {
     if (!wallet.publicKey || !contractInfo) return null
-    const anchorWallet = {
-      publicKey: wallet.publicKey,
-      signTransaction: wallet.signTransaction,
-      signAllTransactions: wallet.signAllTransactions,
+    try {
+      const anchorWallet = {
+        publicKey: wallet.publicKey,
+        signTransaction: wallet.signTransaction,
+        signAllTransactions: wallet.signAllTransactions,
+      }
+      const provider = new AnchorProvider(connection, anchorWallet, {
+        commitment: 'confirmed',
+      })
+      return new Program(contractInfo, provider)
+    } catch (e) {
+      // Malformed/placeholder IDL must degrade to the simulated ledger, never blank the page
+      console.warn('Anchor Program init failed, staying in fallback mode:', e)
+      return null
     }
-    const provider = new AnchorProvider(connection, anchorWallet, {
-      commitment: 'confirmed',
-    })
-    return new Program(contractInfo, provider)
   }, [connection, wallet.publicKey, wallet.signTransaction, wallet.signAllTransactions, contractInfo])
 
   // Gating & Roles
