@@ -3,10 +3,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-durian_trust = "11111111111111111111111111111111"
+durian_trust = "4EZcqRn9LYK5VMuhLC2bNDaUqVBHxc6KCZ6zhFet3Par"
 
 [programs.devnet]
-durian_trust = "11111111111111111111111111111111"
+durian_trust = "4EZcqRn9LYK5VMuhLC2bNDaUqVBHxc6KCZ6zhFet3Par"
 
 [registry]
 url = "https://api.apr.dev"

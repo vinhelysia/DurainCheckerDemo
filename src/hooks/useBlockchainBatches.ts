@@ -17,15 +17,34 @@ import type {
   RiskLevel,
 } from '../types/durian_trust'
 
-const RISK_LEVELS: RiskLevel[] = ['low', 'medium', 'high']
-
-// Anchor discriminator for the Batch account type (from IDL)
-const BATCH_DISCRIMINATOR = Buffer.from([100, 111, 122, 133, 144, 155, 166, 177])
+// Anchor discriminator for the Batch account type: sha256("account:Batch")[0..8]
+const BATCH_DISCRIMINATOR = Buffer.from([156, 194, 70, 44, 22, 88, 137, 44])
 const MAX_BATCHES = 200
 
+// Program enum RiskLevel { Safe, Low, Medium, High, Critical } → UI 3-level scale.
+// Anchor decodes enums as single-key objects ({ low: {} }); numbers cover legacy data.
+const CHAIN_RISK: Record<string, RiskLevel> = {
+  safe: 'low',
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  critical: 'high',
+}
+const CHAIN_RISK_BY_INDEX = ['safe', 'low', 'medium', 'high', 'critical']
+
 function mapRiskLevel(enumVal: unknown): RiskLevel {
-  const index = Number(enumVal)
-  return RISK_LEVELS[index] ?? 'low'
+  if (enumVal && typeof enumVal === 'object') {
+    return CHAIN_RISK[Object.keys(enumVal)[0]] ?? 'low'
+  }
+  return CHAIN_RISK[CHAIN_RISK_BY_INDEX[Number(enumVal)]] ?? 'low'
+}
+
+// Program enum TimelineStatus { Pending, InTransit, Delivered, Rejected } → UI complete/pending
+function mapTimelineStatus(enumVal: unknown): 'complete' | 'pending' {
+  if (enumVal && typeof enumVal === 'object') {
+    return 'delivered' in enumVal ? 'complete' : 'pending'
+  }
+  return Number(enumVal) === 2 ? 'complete' : 'pending'
 }
 
 async function withRetry<T>(fn: () => Promise<T>, retries = 1): Promise<T> {
@@ -184,7 +203,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
             stage: { vi: evt.stage, en: evt.stage },
             location: { vi: evt.location, en: evt.location },
             date: evt.date,
-            status: evt.status === 1 ? 'complete' : 'pending',
+            status: mapTimelineStatus(evt.status),
           }))
 
         let blockchainHash = 'simulated, not on-chain'
@@ -225,18 +244,21 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
             reporter: r.reporter.toString(),
           }))
 
+        // Quality fields live in the lab reports, not the Batch account;
+        // index 0 is the registration-time report written by register_batch.
+        const primary = labReports[0]
         const formattedBatch: UIBatch = {
           id,
           tokenId: Number(b.tokenId),
           farm: { vi: b.farm, en: b.farm },
           province: { vi: b.province, en: b.province },
           harvestDate: b.harvestDate,
-          cadmiumPpm: fromPpm(b.cadmiumPpm),
-          thresholdPpm: fromPpm(b.thresholdPpm),
-          aiResult: { vi: b.aiResult, en: b.aiResult },
-          confidence: fromPpm(b.confidence),
-          riskLevel: mapRiskLevel(b.riskLevel),
-          riskCause: { vi: b.riskCause, en: b.riskCause },
+          cadmiumPpm: primary?.cadmiumPpm ?? 0,
+          thresholdPpm: primary?.thresholdPpm ?? 0,
+          aiResult: primary?.aiResult ?? { vi: '', en: '' },
+          confidence: primary?.confidence ?? 0,
+          riskLevel: primary?.riskLevel ?? 'low',
+          riskCause: primary?.riskCause ?? { vi: '', en: '' },
           timeline: formattedTimeline,
           blockchainHash,
           labReports,

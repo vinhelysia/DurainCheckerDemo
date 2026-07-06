@@ -5,7 +5,7 @@ use anchor_lang::solana_program::{
     sysvar::instructions::{load_current_index_checked, load_instruction_at_checked},
 };
 
-declare_id!("11111111111111111111111111111111");
+declare_id!("4EZcqRn9LYK5VMuhLC2bNDaUqVBHxc6KCZ6zhFet3Par");
 
 const MAX_ID_LEN: usize = 32;
 const MAX_FARM_LEN: usize = 96;

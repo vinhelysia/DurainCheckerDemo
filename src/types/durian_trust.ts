@@ -4,17 +4,14 @@ import type { PublicKey } from '@solana/web3.js'
 // --- On-chain account types (Anchor deserialization of the IDL) ---
 // u64/i64 → BN, u32/u8 → number, pubkey → PublicKey, string → string
 
+// Anchor deserializes Rust enums as single-key objects, e.g. { low: {} }
+export type ChainEnum = Record<string, Record<string, never>> | number
+
 export interface BatchAccount {
   id: string
   farm: string
   province: string
   harvestDate: string
-  cadmiumPpm: BN
-  thresholdPpm: BN
-  confidence: BN
-  riskLevel: number
-  aiResult: string
-  riskCause: string
   registrant: PublicKey
   tokenId: BN
   timelineCount: number
@@ -26,14 +23,14 @@ export interface TimelineEventAccount {
   stage: string
   location: string
   date: string
-  status: number
+  status: ChainEnum
 }
 
 export interface LabReportAccount {
   cadmiumPpm: BN
   thresholdPpm: BN
   confidence: BN
-  riskLevel: number
+  riskLevel: ChainEnum
   aiResult: string
   riskCause: string
   reporter: PublicKey
