@@ -1,30 +1,30 @@
 :root {
-  /* "Export dossier" theme: bone paper, forest ink, amber stamp */
+  /* "Cool ledger" theme: neutral cool canvas, sharp ink, emerald ledger accents */
   /* Canvas & surfaces */
-  --color-bg: #F2F0E7;
-  --color-bg-alt: #EAE8DC;
-  --color-surface: #F9F8F2;
-  --color-surface-glass: #FDFCF7;
-  --color-surface-raised: #FDFCF7;
-  --color-line: rgba(26,36,30,0.14);
-  --color-line-strong: rgba(26,36,30,0.32);
+  --color-bg: #F7F8F7;
+  --color-bg-alt: #EDF0EE;
+  --color-surface: #FBFCFB;
+  --color-surface-glass: #FDFEFD;
+  --color-surface-raised: #FDFEFD;
+  --color-line: rgba(18,28,23,0.12);
+  --color-line-strong: rgba(18,28,23,0.30);
   /* Text */
-  --color-ink: #1A241E;
-  --color-ink-soft: #49564E;
-  --color-ink-faint: #75827A;
+  --color-ink: #16201B;
+  --color-ink-soft: #46504A;
+  --color-ink-faint: #6E7973;
   /* Brand accents */
-  --color-gold: #A87614;
-  --color-gold-soft: rgba(168,118,20,0.12);
-  --color-emerald: #14724F;
-  --color-emerald-soft: rgba(20,114,79,0.10);
-  --color-green-deep: #1F4734;
-  /* Risk (tuned for paper) */
-  --color-risk-low: #14724F;     --color-risk-low-bg: rgba(20,114,79,0.10);
-  --color-risk-medium: #8A6116;  --color-risk-medium-bg: rgba(168,118,20,0.14);
-  --color-risk-high: #B3362A;    --color-risk-high-bg: rgba(179,54,42,0.10);
+  --color-gold: #9A6A10;
+  --color-gold-soft: rgba(154,106,16,0.10);
+  --color-emerald: #0E7A52;
+  --color-emerald-soft: rgba(14,122,82,0.09);
+  --color-green-deep: #123B2C;
+  /* Risk (tuned for cool canvas) */
+  --color-risk-low: #0E7A52;     --color-risk-low-bg: rgba(14,122,82,0.09);
+  --color-risk-medium: #8F6410;  --color-risk-medium-bg: rgba(154,106,16,0.12);
+  --color-risk-high: #B3362A;    --color-risk-high-bg: rgba(179,54,42,0.09);
   /* Effects */
-  --shadow-card: 0 1px 2px rgba(26,36,30,0.05), 0 10px 28px rgba(26,36,30,0.07);
-  --shadow-elevated: 0 24px 56px rgba(26,36,30,0.18);
+  --shadow-card: 0 1px 2px rgba(18,28,23,0.05), 0 10px 28px rgba(18,28,23,0.06);
+  --shadow-elevated: 0 24px 56px rgba(18,28,23,0.16);
   --radius-card: 10px;   --radius-pill: 999px;
   /* Fonts */
   --font-display:'Bricolage Grotesque','Be Vietnam Pro',sans-serif;

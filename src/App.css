@@ -1,8 +1,8 @@
 .app {
   min-height: 100dvh;
   background:
-    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(20,114,79,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 35% at 100% 100%, rgba(168,118,20,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(14,122,82,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 100% 100%, rgba(18,28,23,0.03) 0%, transparent 60%),
     var(--color-bg);
 }
 
@@ -301,7 +301,7 @@
 }
 
 .button-primary {
-  color: #F6F5EE;
+  color: #F3F6F4;
   background: var(--color-green-deep);
   font-weight: 700;
   box-shadow: none;
@@ -646,7 +646,7 @@
 .lookup-bar input:focus {
   outline: none;
   border-color: var(--color-gold);
-  box-shadow: 0 0 0 3px rgba(168,118,20,0.15);
+  box-shadow: 0 0 0 3px rgba(154,106,16,0.15);
 }
 
 .scan-button {
@@ -677,18 +677,18 @@
 .provenance-badge--live {
   color: var(--color-emerald);
   background: var(--color-emerald-soft);
-  border-color: rgba(20,114,79, 0.28);
+  border-color: rgba(14,122,82, 0.28);
 }
 
 .provenance-badge--demo {
   color: var(--color-gold);
   background: var(--color-gold-soft);
-  border-color: rgba(168,118,20, 0.25);
+  border-color: rgba(154,106,16, 0.25);
 }
 
 a.provenance-badge--live:hover,
 a.provenance-badge--live:focus-visible {
-  box-shadow: 0 0 0 2px rgba(20,114,79, 0.35);
+  box-shadow: 0 0 0 2px rgba(14,122,82, 0.35);
 }
 
 .provenance-badge-status {
@@ -795,19 +795,19 @@ a.provenance-badge--live:focus-visible {
 .source-badge--chain {
   color: var(--color-emerald);
   background: var(--color-emerald-soft);
-  border-color: rgba(20,114,79,0.28);
+  border-color: rgba(14,122,82,0.28);
 }
 
 .source-badge--fallback {
   color: var(--color-risk-medium);
   background: var(--color-risk-medium-bg);
-  border-color: rgba(168,118,20,0.25);
+  border-color: rgba(154,106,16,0.25);
 }
 
 .source-badge--token {
   color: var(--color-gold);
   background: var(--color-gold-soft);
-  border-color: rgba(168,118,20,0.25);
+  border-color: rgba(154,106,16,0.25);
 }
 
 .skeleton {
@@ -949,14 +949,14 @@ a.provenance-badge--live:focus-visible {
 .risk-pill.risk-low {
   color: var(--color-risk-low);
   background: var(--color-risk-low-bg);
-  border-color: rgba(20,114,79,0.25);
+  border-color: rgba(14,122,82,0.25);
   font-family: var(--font-mono);
 }
 
 .risk-pill.risk-medium {
   color: var(--color-risk-medium);
   background: var(--color-risk-medium-bg);
-  border-color: rgba(168,118,20,0.25);
+  border-color: rgba(154,106,16,0.25);
   font-family: var(--font-mono);
 }
 
@@ -986,7 +986,7 @@ a.provenance-badge--live:focus-visible {
   padding: 16px;
   border-radius: var(--radius-card);
   background: var(--color-emerald-soft);
-  border: 1px solid rgba(20,114,79,0.15);
+  border: 1px solid rgba(14,122,82,0.15);
 }
 
 .ai-result-main svg {
@@ -1109,7 +1109,7 @@ a.provenance-badge--live:focus-visible {
   min-height: 78px;
   gap: 12px;
   padding: 14px 16px;
-  border: 1px dashed rgba(20,114,79,0.35);
+  border: 1px dashed rgba(14,122,82,0.35);
   border-radius: var(--radius-card);
   background: var(--color-surface-glass);
   text-decoration: none;
@@ -2401,7 +2401,7 @@ button.nav-link:focus-visible {
 .form-group select:focus {
   border-color: var(--color-gold);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(168,118,20,0.15);
+  box-shadow: 0 0 0 3px rgba(154,106,16,0.15);
 }
 
 .form-grid-2 {
@@ -3035,7 +3035,7 @@ button.nav-link:focus-visible {
     transform: translate(-50%, -50%) !important;
     width: 280px !important;
     box-shadow: none !important;
-    border: 1px solid #1f4734 !important;
+    border: 1px solid #123B2C !important;
     background: #ffffff !important;
     padding: 24px !important;
     display: flex !important;
@@ -3176,7 +3176,7 @@ button.nav-link:focus-visible {
   align-items: center;
   gap: 10px;
   background: var(--color-green-deep);
-  color: #F6F5EE;
+  color: #F3F6F4;
   font-weight: 700;
   padding: 12px 24px;
   border-radius: 8px;

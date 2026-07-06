@@ -23,7 +23,7 @@ export default function BatchQRLabel({ batchId, language, loading }) {
         margin: 2,
         errorCorrectionLevel: 'H',
         color: {
-          dark: '#1f4734', // Brand deep green
+          dark: '#123B2C', // Brand deep green
           light: '#ffffff',
         },
       },
