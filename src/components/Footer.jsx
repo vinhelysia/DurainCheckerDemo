@@ -7,6 +7,7 @@ const photoCredits = [
   { label: 'Mx. Granger (CC0)', href: 'https://commons.wikimedia.org/w/index.php?curid=87077521' },
   { label: 'U.S. FDA (PD)', href: 'https://commons.wikimedia.org/w/index.php?curid=48273411' },
   { label: 'Nathan.cima (CC BY-SA 4.0)', href: 'https://commons.wikimedia.org/w/index.php?curid=126373777' },
+  { label: 'Andrea Puggioni (CC BY 2.0)', href: 'https://commons.wikimedia.org/wiki/File:Reefer_container_stacked.jpeg' },
 ]
 
 const sources = [

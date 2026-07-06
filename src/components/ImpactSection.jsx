@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 
@@ -25,6 +26,26 @@ function ImpactSection() {
               <p>{metric.label}</p>
             </article>
           ))}
+        </div>
+
+        <div className="impact-outcomes">
+          <h3>{copy.impact.outcomesTitle}</h3>
+          <div className="impact-rows">
+            {copy.impact.outcomes.map((outcome) => (
+              <div className="impact-row" key={outcome.who}>
+                <strong>{outcome.who}</strong>
+                <p>{outcome.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="impact-cta">
+          <h3>{copy.impact.cta.title}</h3>
+          <a className="button button-primary" href="#/unit/demo">
+            <span>{copy.impact.cta.button}</span>
+            <ArrowRight size={18} aria-hidden="true" />
+          </a>
         </div>
       </div>
     </section>

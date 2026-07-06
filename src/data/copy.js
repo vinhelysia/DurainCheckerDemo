@@ -77,7 +77,13 @@ export const copyData = {
     problem: {
       kicker: 'Bối cảnh',
       title: 'Vì sao truy xuất nguồn gốc quan trọng hơn bao giờ hết?',
-      body1: 'Hoạt động xuất khẩu sầu riêng Việt Nam đang đối mặt với thách thức lớn về tiêu chuẩn an toàn sinh học khi hàng loạt lô hàng liên tiếp bị cảnh báo hoặc dừng thông quan tại cửa khẩu. Nguyên nhân chủ yếu xuất phát từ việc từ năm 2025, Tổng cục Hải quan Trung Quốc (GACC) thắt chặt kiểm soát theo Nghị định 248/249: giới hạn Cadimi 0.05 ppm và không khoan nhượng với chất cấm Vàng O (Auramine O). Tuy nhiên, nhiều lô hàng bị giữ lại không phải do chất lượng sầu riêng kém, mà do hồ sơ kiểm nghiệm và nguồn gốc vùng trồng bị rời rạc, thiếu minh bạch và không thể đối soát tức thời.',
+      body1: 'Hàng loạt lô sầu riêng Việt Nam liên tiếp bị cảnh báo hoặc dừng thông quan tại cửa khẩu vì tiêu chuẩn an toàn sinh học ngày càng nghiêm ngặt.',
+      body2: 'Điều đáng nói: nhiều lô bị giữ lại không phải do chất lượng kém, mà do hồ sơ kiểm nghiệm và nguồn gốc vùng trồng rời rạc, thiếu minh bạch và không thể đối soát tức thời.',
+      figures: [
+        { value: '0.05 ppm', label: 'Ngưỡng Cadimi tối đa theo quy định của Hải quan Trung Quốc (GACC)' },
+        { value: '248/249', label: 'Hai Nghị định siết kiểm soát nguồn gốc và an toàn thực phẩm' },
+        { value: '2025', label: 'Năm cửa khẩu bắt đầu kiểm tra gắt gao, không khoan nhượng với Vàng O' },
+      ],
       disclaimer: 'Đây là demo minh họa quy trình truy xuất - không thay thế kết quả kiểm nghiệm chính thức.',
       pointsAriaLabel: 'Các thách thức xuất khẩu chính',
       points: [
@@ -111,16 +117,19 @@ export const copyData = {
           title: 'Sổ cái blockchain',
           subtitle: 'Sổ cái chỉ thêm',
           body: 'Mỗi lô hàng được ghi lại theo từng mốc - thu hoạch, kiểm nghiệm, đóng gói, xuất khẩu - trên sổ cái không thể sửa đổi ngược.',
+          tags: ['registerBatch', 'addTimelineEvent'],
         },
         {
           title: 'Truy xuất nguồn & rủi ro',
           subtitle: 'Khoanh vùng rủi ro',
           body: 'Khi một lô hàng bị cảnh báo, hệ thống khoanh vùng nhanh nông trại và vùng trồng - Đắk Lắk, Tiền Giang, Đồng Nai - cùng bước phát sinh rủi ro trong chuỗi.',
+          tags: ['Batch PDA', 'TimelineEvent PDA'],
         },
         {
           title: 'Phân loại chất lượng bằng Quy tắc kiểm định',
           subtitle: 'Phân loại thông minh',
           body: 'Bộ quy tắc kiểm định hỗ trợ phân loại lô hàng theo mức độ sẵn sàng xuất khẩu, dựa trên dữ liệu kiểm nghiệm Cadimi và các chỉ tiêu khác.',
+          tags: ['attestLabReport', 'verifyAttestation'],
         },
       ],
     },
@@ -233,6 +242,17 @@ export const copyData = {
           label: 'Nhờ hồ sơ Cadimi & Vàng O đầy đủ, có thể tra soát',
         },
       ],
+      outcomesTitle: 'Ai được lợi gì?',
+      outcomes: [
+        { who: 'Nhà vườn', text: 'Mã số vùng trồng gắn với từng lô ngay từ đầu, chấm dứt tình trạng mạo danh PUC.' },
+        { who: 'Doanh nghiệp xuất khẩu', text: 'Hồ sơ Cadimi và Vàng O đầy đủ theo từng lô, sẵn sàng đối soát khi thông quan.' },
+        { who: 'Đối tác nhập khẩu', text: 'Xác minh chữ ký phòng lab và hash báo cáo trực tiếp trên chuỗi, không cần tin bên trung gian.' },
+        { who: 'Người tiêu dùng', text: 'Quét mã QR trên trái sầu riêng để xem toàn bộ hành trình từ vườn đến cảng.' },
+      ],
+      cta: {
+        title: 'Tự kiểm chứng với một lô hàng thật trên Solana devnet',
+        button: 'Mở demo tra cứu',
+      },
     },
     footer: {
       demoText: 'Sản phẩm demo phục vụ mục đích học thuật.',
@@ -242,6 +262,12 @@ export const copyData = {
     units: {
       farmTitle: 'Đơn vị Vườn trồng sầu riêng',
       farmSubtitle: 'Đăng ký nông trại & Nhật ký canh tác IoT',
+      photoAlts: {
+        farm: 'Vườn sầu riêng',
+        transport: 'Container lạnh xếp chồng tại bãi',
+        testing: 'Kỹ thuật viên xử lý mẫu trong phòng kiểm nghiệm',
+        export: 'Tàu container tại cảng Hải Phòng',
+      },
       transportTitle: 'Đơn vị Vận chuyển thông minh',
       transportSubtitle: 'Giám sát chuỗi cung ứng lạnh & Hành trình GPS',
       testingTitle: 'Đơn vị Kiểm nghiệm chất lượng',
@@ -570,7 +596,13 @@ export const copyData = {
     problem: {
       kicker: 'Context',
       title: 'Why traceability matters now',
-      body1: 'Vietnamese durian exports are facing unprecedented regulatory challenges at border checkpoints, with numerous shipments flagged or delayed due to strict biosecurity audits. The primary driver is China’s tightened import controls since 2025 on Cadmium limits and Yellow O (Auramine O) dye. Importantly, many of these customs bottlenecks stem not from poor fruit quality, but from fragmented packing house records and laboratory certificates that lack transparent, real-time traceability.',
+      body1: 'Vietnamese durian shipments keep getting flagged or held at border checkpoints as biosecurity audits grow stricter.',
+      body2: 'The telling part: many holds stem not from poor fruit quality, but from fragmented lab certificates and growing-area records that cannot be verified in real time.',
+      figures: [
+        { value: '0.05 ppm', label: 'Maximum Cadmium threshold under China customs (GACC) rules' },
+        { value: '248/249', label: 'The two decrees tightening origin and food-safety control' },
+        { value: '2025', label: 'The year border checks hardened, with zero tolerance for Yellow O' },
+      ],
       disclaimer: 'This demo illustrates a traceability workflow and does not represent an official lab result.',
       pointsAriaLabel: 'Key export challenges',
       points: [
@@ -604,16 +636,19 @@ export const copyData = {
           title: 'Blockchain ledger',
           subtitle: 'Append-only ledger',
           body: 'Every batch is recorded at each step - harvest, lab test, packing, export - on an append-only ledger.',
+          tags: ['registerBatch', 'addTimelineEvent'],
         },
         {
           title: 'Source & risk tracing',
           subtitle: 'Narrow down risks',
           body: 'When a batch is flagged, the system helps narrow down the farm, region, and likely point of risk.',
+          tags: ['Batch PDA', 'TimelineEvent PDA'],
         },
         {
           title: 'Rule-Based quality classification',
           subtitle: 'Smart classification',
           body: 'A rule-based quality gate assists in classifying batches by export-readiness, based on Cadmium test data and other indicators.',
+          tags: ['attestLabReport', 'verifyAttestation'],
         },
       ],
     },
@@ -726,6 +761,17 @@ export const copyData = {
           label: 'with complete, auditable Cadmium & Yellow O records',
         },
       ],
+      outcomesTitle: 'Who gains what?',
+      outcomes: [
+        { who: 'Growers', text: 'Growing-area codes are tied to each batch from day one, ending PUC misuse.' },
+        { who: 'Exporters', text: 'Complete per-batch Cadmium and Yellow O records, ready for customs review.' },
+        { who: 'Import partners', text: 'Verify lab signatures and report hashes directly on-chain, no middleman required.' },
+        { who: 'Consumers', text: 'Scan the QR on the fruit to see the full journey from orchard to port.' },
+      ],
+      cta: {
+        title: 'Check a real batch on Solana devnet yourself',
+        button: 'Open the lookup demo',
+      },
     },
     footer: {
       demoText: 'Academic demo project.',
@@ -735,6 +781,12 @@ export const copyData = {
     units: {
       farmTitle: 'Orchard Farm Unit',
       farmSubtitle: 'Farm registration & IoT ledger',
+      photoAlts: {
+        farm: 'Durian orchard',
+        transport: 'Stacked refrigerated containers at a depot',
+        testing: 'Technician processing samples in a testing laboratory',
+        export: 'Container ship at Hai Phong port',
+      },
       transportTitle: 'Smart Logistics Unit',
       transportSubtitle: 'Cold chain temperature tracking & GPS routes',
       testingTitle: 'Quality Lab Testing Unit',

@@ -26,6 +26,13 @@ function SolutionPillars() {
               <h3>{pillar.title}</h3>
               <p className="pillar-subtitle">{pillar.subtitle}</p>
               <p>{pillar.body}</p>
+              {pillar.tags && (
+                <p className="pillar-tags">
+                  {pillar.tags.map((tag) => (
+                    <code key={tag}>{tag}</code>
+                  ))}
+                </p>
+              )}
             </article>
           ))}
         </div>
