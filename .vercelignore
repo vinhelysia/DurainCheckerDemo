@@ -1,0 +1,7 @@
+# Not needed for the web app or the api/ functions
+program
+ml
+dist
+.vite
+__pycache__
+*.log
