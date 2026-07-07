@@ -1,4 +1,4 @@
-import { ShieldAlert, ThermometerSnowflake, FileWarning, Clock } from 'lucide-react'
+import { ShieldAlert, ThermometerSnowflake, FileWarning, Clock, ArrowUpRight, ArrowRight } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 
@@ -33,6 +33,15 @@ function ProblemSection() {
           <p>{copy.problem.body2}</p>
         </div>
 
+        <figure className="problem-photo">
+          <img
+            src={`${import.meta.env.BASE_URL}images/market.jpg`}
+            alt={copy.problem.photoCaption}
+            loading="lazy"
+          />
+          <figcaption>{copy.problem.photoCaption}</figcaption>
+        </figure>
+
         <div className="impact-grid problem-figures">
           {copy.problem.figures.map((figure) => (
             <article className="impact-tile" key={figure.value}>
@@ -40,6 +49,25 @@ function ProblemSection() {
               <p>{figure.label}</p>
             </article>
           ))}
+        </div>
+
+        <div className="problem-news">
+          <h3>{copy.problem.newsTitle}</h3>
+          <div className="news-grid" aria-label={copy.problem.newsAria}>
+            {copy.problem.news.map((item) => (
+              <a
+                className="news-card"
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="news-source">{item.source}</span>
+                <span className="news-title">{item.title}</span>
+                <ArrowUpRight className="news-arrow" size={16} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
         </div>
 
         <div className="problem-points" aria-label={copy.problem.pointsAriaLabel}>
@@ -57,6 +85,14 @@ function ProblemSection() {
               </div>
             )
           })}
+        </div>
+
+        <div className="problem-bridge">
+          <h3>{copy.problem.bridgeTitle}</h3>
+          <a className="button button-primary" href="#/intro/solution">
+            <span>{copy.problem.bridgeButton}</span>
+            <ArrowRight size={18} aria-hidden="true" />
+          </a>
         </div>
 
         <p className="disclaimer">
