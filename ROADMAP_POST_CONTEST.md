@@ -8,6 +8,7 @@ Tài liệu vận hành / sản phẩm. **Không** thay README judge quickstart.
 |-----|------------|
 | MVP demo UniHackfest | Đủ để thi (devnet, QR, custody, lab, dual mode, deck VI) |
 | GitHub `main` | Đã push protocol fix + pitch (2026-07-14) |
+| Vercel production | https://durian-web3.vercel.app — leaf/predict/disease **200** (smoke 2026-07-14) |
 | Pilot HTX / gasless | Chưa code — thiết kế bên dưới |
 | Indexer DB / mainnet / LIMS | Hoãn cho đến khi có đối tác |
 
@@ -15,11 +16,19 @@ Tài liệu vận hành / sản phẩm. **Không** thay README judge quickstart.
 
 ```
 0  Pre-demo: git + rehearsal + backup ảnh     ✅ / ops
-1  Vercel API smoke (leaf + predict)           optional
+1  Vercel API smoke (leaf + predict)           ✅ verified on durian-web3.vercel.app
 2  HTX ký thay nông hộ + (sau) fee-payer       1–3 tuần sau thi
 3  Indexer read-only khi RPC/search đau        khi cần
 4  Mainnet + pháp lý + LIMS/gov                theo MoU
 ```
+
+### Vercel notes
+
+- Project link local: `.vercel/project.json` → `durian-web3` (do not commit `.vercel/`)
+- `vercel.json`: `api/**/*.py` maxDuration 30s, memory 1024MB
+- Env on Vercel: `ALLOWED_ORIGIN=https://durian-web3.vercel.app` (already returning that header)
+- Models under `api/*.onnx` are deployed (not in `.vercelignore`)
+- After next `git push`, confirm Vercel auto-deploy still serves `/api/predict_leaf`
 
 ## Phase 2 — Nông dân không đụng ví
 
