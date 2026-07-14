@@ -50,6 +50,121 @@
       "args": []
     },
     {
+      "name": "accept_custody",
+      "docs": [
+        "Step 2: the nominated holder accepts, taking ownership and appending an",
+        "immutable CustodyRecord at the batch's next custody index."
+      ],
+      "discriminator": [
+        68,
+        164,
+        229,
+        103,
+        201,
+        130,
+        55,
+        168
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              },
+              {
+                "kind": "account",
+                "path": "batch.custody_count",
+                "account": "Batch"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "role",
+          "type": {
+            "defined": {
+              "name": "CustodyRole"
+            }
+          }
+        },
+        {
+          "name": "location",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "add_farmer",
       "discriminator": [
         80,
@@ -1097,6 +1212,80 @@
       ]
     },
     {
+      "name": "transfer_custody",
+      "docs": [
+        "Step 1: the current owner (or authority) nominates the next custody holder.",
+        "Re-calling this overwrites the previous nomination, which is how a mistaken",
+        "nomination is corrected."
+      ],
+      "discriminator": [
+        183,
+        149,
+        207,
+        218,
+        216,
+        15,
+        178,
+        48
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "new_owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "unpause",
       "discriminator": [
         169,
@@ -1396,6 +1585,19 @@
       ]
     },
     {
+      "name": "CustodyRecord",
+      "discriminator": [
+        141,
+        189,
+        91,
+        132,
+        111,
+        175,
+        26,
+        190
+      ]
+    },
+    {
       "name": "FarmerRole",
       "discriminator": [
         113,
@@ -1528,6 +1730,32 @@
       ]
     },
     {
+      "name": "CustodyProposed",
+      "discriminator": [
+        228,
+        191,
+        188,
+        196,
+        234,
+        182,
+        7,
+        189
+      ]
+    },
+    {
+      "name": "CustodyTransferred",
+      "discriminator": [
+        165,
+        204,
+        218,
+        131,
+        126,
+        81,
+        159,
+        23
+      ]
+    },
+    {
       "name": "LabReportAttested",
       "discriminator": [
         165,
@@ -1652,31 +1880,41 @@
     },
     {
       "code": 6006,
+      "name": "NoPendingCustody",
+      "msg": "No pending custody transfer exists for this batch."
+    },
+    {
+      "code": 6007,
+      "name": "SelfCustodyTransfer",
+      "msg": "Cannot transfer custody to the current owner."
+    },
+    {
+      "code": 6008,
       "name": "InvalidDateFormat",
       "msg": "Date must be formatted as YYYY-MM-DD with a valid month (01-12) and day (01-31)."
     },
     {
-      "code": 6007,
+      "code": 6009,
       "name": "MissingEd25519Instruction",
       "msg": "Transaction must include an Ed25519SigVerify instruction at index 0."
     },
     {
-      "code": 6008,
+      "code": 6010,
       "name": "InvalidEd25519Instruction",
       "msg": "Instruction 0 is not a valid Ed25519SigVerify call or its data is malformed."
     },
     {
-      "code": 6009,
+      "code": 6011,
       "name": "AttestationKeyMismatch",
       "msg": "Ed25519 public key in ix 0 does not match the transaction signer."
     },
     {
-      "code": 6010,
+      "code": 6012,
       "name": "SignatureMismatch",
       "msg": "Ed25519 signature in ix 0 does not match the submitted signature."
     },
     {
-      "code": 6011,
+      "code": 6013,
       "name": "PayloadHashMismatch",
       "msg": "Recomputed payload hash does not match the submitted hash."
     }
@@ -1745,6 +1983,14 @@
     },
     {
       "name": "Batch",
+      "docs": [
+        "MIGRATION NOTE (custody): three fields were appended — `owner` (+32 bytes),",
+        "`pending_owner` (+33) and `custody_count` (+4), so Batch grew by 69 bytes.",
+        "Batch PDAs created by the *previous* program version are now undersized and",
+        "will fail to deserialise. There is no realloc path for them (the PDA seed is",
+        "the batch id, so they cannot be re-inited under the same address): on devnet,",
+        "re-register the demo batches after deploying this version."
+      ],
       "type": {
         "kind": "struct",
         "fields": [
@@ -1788,6 +2034,30 @@
           {
             "name": "created_at",
             "type": "i64"
+          },
+          {
+            "name": "owner",
+            "docs": [
+              "Current custody holder. Starts as the registrant and moves through the",
+              "export chain via `transfer_custody` / `accept_custody`."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "pending_owner",
+            "docs": [
+              "Nominated next holder, set by `transfer_custody` and cleared on accept."
+            ],
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "custody_count",
+            "docs": [
+              "Append index for CustodyRecord PDAs — same pattern as `timeline_count`."
+            ],
+            "type": "u32"
           }
         ]
       }
@@ -1844,6 +2114,125 @@
           {
             "name": "paused",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustodyProposed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "batch",
+            "type": "pubkey"
+          },
+          {
+            "name": "from",
+            "type": "pubkey"
+          },
+          {
+            "name": "to",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustodyRecord",
+      "docs": [
+        "One completed custody handoff. Written only by the receiving party, at",
+        "`[b\"custody\", id, index]`, and never mutated afterwards."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "from",
+            "type": "pubkey"
+          },
+          {
+            "name": "to",
+            "type": "pubkey"
+          },
+          {
+            "name": "role",
+            "type": {
+              "defined": {
+                "name": "CustodyRole"
+              }
+            }
+          },
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustodyRole",
+      "docs": [
+        "The link in the export chain that the *receiving* party claims when accepting",
+        "custody. Same guarantees as `RiskLevel` — invalid bytes are rejected at",
+        "deserialisation."
+      ],
+      "repr": {
+        "kind": "rust"
+      },
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Farmer"
+          },
+          {
+            "name": "Packer"
+          },
+          {
+            "name": "Exporter"
+          },
+          {
+            "name": "Importer"
+          },
+          {
+            "name": "Customs"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustodyTransferred",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "batch",
+            "type": "pubkey"
+          },
+          {
+            "name": "from",
+            "type": "pubkey"
+          },
+          {
+            "name": "to",
+            "type": "pubkey"
+          },
+          {
+            "name": "index",
+            "type": "u32"
           }
         ]
       }

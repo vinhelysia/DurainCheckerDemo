@@ -1,4 +1,7 @@
-import { useEffect, useState, useRef, lazy, Suspense } from 'react'
+import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+import { clusterApiUrl } from '@solana/web3.js'
 import Lenis from 'lenis'
 import Footer from './components/Footer'
 import Header from './components/Header'
@@ -8,6 +11,7 @@ import ProblemSection from './components/ProblemSection'
 import SolutionPillars from './components/SolutionPillars'
 import { useLanguage } from './components/LanguageContext'
 import 'lenis/dist/lenis.css'
+import '@solana/wallet-adapter-react-ui/styles.css'
 
 const DemoSection = lazy(() => import('./components/DemoSection'))
 const UnitDetails = lazy(() => import('./components/UnitDetails'))
@@ -20,12 +24,26 @@ function App() {
     return window.location.hash || '#/'
   })
 
+  // Mount once for the whole app so #/manage remounts do not re-fire autoConnect.
+  const endpoint = useMemo(() => import.meta.env.VITE_RPC_URL || clusterApiUrl('devnet'), [])
+  // Phantom (and other Wallet Standard wallets) auto-register; no adapters needed.
+  const wallets = useMemo(() => [], [])
+
   const lenisRef = useRef(null)
 
   useEffect(() => {
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (prefersReduced) {
+      lenisRef.current = null
+      return
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth exponential easing
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
@@ -33,15 +51,18 @@ function App() {
 
     lenisRef.current = lenis
 
+    let rafId = 0
     function raf(time) {
       lenis.raf(time)
-      requestAnimationFrame(raf)
+      rafId = requestAnimationFrame(raf)
     }
 
-    requestAnimationFrame(raf)
+    rafId = requestAnimationFrame(raf)
 
     return () => {
+      cancelAnimationFrame(rafId)
       lenis.destroy()
+      lenisRef.current = null
     }
   }, [])
 
@@ -117,25 +138,31 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <a className="skip-link" href="#main">
-        {copy.skipLink}
-      </a>
-      <div className="main-content-wrapper">
-        <Header />
-        <main id="main">
-          <Suspense fallback={
-            <div className="route-loading" role="status" aria-live="polite">
-              <div className="spinner"></div>
-              <span>{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span>
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <div className="app">
+            <a className="skip-link" href="#main">
+              {copy.skipLink}
+            </a>
+            <div className="main-content-wrapper">
+              <Header />
+              <main id="main">
+                <Suspense fallback={
+                  <div className="route-loading" role="status" aria-live="polite">
+                    <div className="spinner"></div>
+                    <span>{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span>
+                  </div>
+                }>
+                  {renderRouteView()}
+                </Suspense>
+              </main>
+              <Footer />
             </div>
-          }>
-            {renderRouteView()}
-          </Suspense>
-        </main>
-        <Footer />
-      </div>
-    </div>
+          </div>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   )
 }
 

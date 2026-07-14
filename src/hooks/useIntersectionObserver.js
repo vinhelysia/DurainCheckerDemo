@@ -2,12 +2,18 @@ import { useEffect, useState, useRef } from 'react'
 
 export function useIntersectionObserver(options = {}) {
   const { threshold = 0.15, rootMargin = '0px', triggerOnce = true } = options
-  const [hasIntersected, setHasIntersected] = useState(false)
+  // Prefer reduced motion: show content immediately (no reveal choreography).
+  const [hasIntersected, setHasIntersected] = useState(() =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
   const elementRef = useRef(null)
 
   useEffect(() => {
+    if (hasIntersected) return
+
     const currentElement = elementRef.current
-    if (!currentElement || hasIntersected) return
+    if (!currentElement) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {

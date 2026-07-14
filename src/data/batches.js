@@ -1,6 +1,6 @@
 export const batches = [
   {
-    id: 'DRN-2026-LD-0428',
+    id: 'DRN-2026-LD-0429',
     farm: {
       vi: 'Nông trại Tân Phú',
       en: 'Tan Phu Farm',
@@ -13,7 +13,7 @@ export const batches = [
     cadmiumPpm: 0.03,
     thresholdPpm: 0.05,
     aiResult: {
-      vi: 'Đạt chuẩn xuất khẩu',
+      vi: 'Đạt xuất khẩu',
       en: 'Export-ready',
     },
     confidence: 0.94,
@@ -88,8 +88,8 @@ export const batches = [
     cadmiumPpm: 0.047,
     thresholdPpm: 0.05,
     aiResult: {
-      vi: 'Cần kiểm tra lại',
-      en: 'Needs re-check',
+      vi: 'Cần xem lại',
+      en: 'Needs review',
     },
     confidence: 0.71,
     riskLevel: 'medium',
@@ -163,8 +163,8 @@ export const batches = [
     cadmiumPpm: 0.062,
     thresholdPpm: 0.05,
     aiResult: {
-      vi: 'Không đạt - giữ lô',
-      en: 'Hold - does not pass',
+      vi: 'Giữ lô',
+      en: 'Hold',
     },
     confidence: 0.88,
     riskLevel: 'high',
@@ -226,7 +226,7 @@ export const batches = [
   },
 ]
 
-export const defaultBatchId = 'DRN-2026-LD-0428'
+export const defaultBatchId = 'DRN-2026-LD-0429'
 
 export function localized(value, language) {
   if (!value) return ''

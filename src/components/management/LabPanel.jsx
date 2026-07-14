@@ -2,13 +2,25 @@ import { useState, useEffect } from 'react'
 import { RefreshCw, Cpu, Send } from 'lucide-react'
 import { getBatchPda, getLabPda } from '../../lib/pda'
 import { readLocalBatches } from '../../lib/localLedger'
-import { runRuleAuditor } from '../../lib/ruleAuditor'
+import { runRuleAuditor, DEFAULT_CADMIUM_THRESHOLD_PPM } from '../../lib/ruleAuditor'
+import { batches as staticBatches } from '../../data/batches'
 
-const RISK_LEVELS = ['low', 'medium', 'high']
+// Program enum RiskLevel → UI 3-level scale (same mapping as useBlockchainBatches).
+// Anchor decodes enums as single-key objects ({ low: {} }); numbers cover legacy data.
+const CHAIN_RISK = {
+  safe: 'low',
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  critical: 'high',
+}
+const CHAIN_RISK_BY_INDEX = ['safe', 'low', 'medium', 'high', 'critical']
 
 function mapRiskLevel(enumVal) {
-  const index = Number(enumVal)
-  return RISK_LEVELS[index] || 'low'
+  if (enumVal && typeof enumVal === 'object') {
+    return CHAIN_RISK[Object.keys(enumVal)[0]] ?? 'low'
+  }
+  return CHAIN_RISK[CHAIN_RISK_BY_INDEX[Number(enumVal)]] ?? 'low'
 }
 
 export default function LabPanel({
@@ -28,7 +40,10 @@ export default function LabPanel({
   const [labHistory, setLabHistory] = useState([])
   const [loadingHistory, setLoadingHistory] = useState(false)
 
-  const ruleAuditLab = runRuleAuditor(cadmiumPpmLab)
+  const ruleAuditLab = runRuleAuditor(
+    cadmiumPpmLab,
+    parseFloat(thresholdPpmLab) || DEFAULT_CADMIUM_THRESHOLD_PPM
+  )
 
   // Fetch testing history for selected batch
   useEffect(() => {
@@ -45,7 +60,7 @@ export default function LabPanel({
       if (providerMode === 'chain' && contractInfo && program) {
         try {
           setLoadingHistory(true)
-          
+
           const batchPda = getBatchPda(selectedBatchId, program.programId)
           const b = await program.account.batch.fetch(batchPda)
 
@@ -82,22 +97,14 @@ export default function LabPanel({
           if (active) setLoadingHistory(false)
         }
       } else {
-        // Fallback simulated batches
+        // Fallback: local ledger first, then static seed data — never invent a report.
         const localBatches = readLocalBatches()
         const matched = localBatches.find(b => b.id === selectedBatchId)
-        if (matched && matched.labReports) {
+        if (matched?.labReports) {
           setLabHistory(matched.labReports)
         } else {
-          setLabHistory([{
-            cadmiumPpm: 0.030,
-            thresholdPpm: 0.05,
-            aiResult: { vi: 'Đạt chuẩn xuất khẩu', en: 'Export-ready' },
-            confidence: 0.95,
-            riskLevel: 'low',
-            riskCause: { vi: 'Hàm lượng trong ngưỡng cho phép', en: 'Within safe limits' },
-            timestamp: Math.floor(Date.now() / 1000) - 3600 * 24,
-            reporter: 'durian1111111111111111111111111111111111111'
-          }])
+          const staticMatched = staticBatches.find(b => b.id === selectedBatchId)
+          setLabHistory(staticMatched?.labReports ?? [])
         }
       }
     }

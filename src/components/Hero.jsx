@@ -2,11 +2,10 @@ import { ArrowRight, CheckCircle2, FileCheck2 } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 
 const base = import.meta.env.BASE_URL
-const journeyPhotos = [
-  `${base}images/orchard.jpg`,
-  `${base}images/lab.jpg`,
-  `${base}images/port.jpg`,
-]
+
+function asset(file) {
+  return `${base}images/${file}`
+}
 
 function Hero() {
   const { copy } = useLanguage()
@@ -32,19 +31,24 @@ function Hero() {
           </div>
 
           <div className="hero-visual">
-            <img
-              className="hero-photo"
-              src={`${base}images/hero-durian.jpg`}
-              alt={copy.hero.photoAlt}
-              fetchPriority="high"
-            />
+            <picture>
+              <source srcSet={asset('hero-durian.webp')} type="image/webp" />
+              <img
+                className="hero-photo"
+                src={asset('hero-durian.jpg')}
+                alt={copy.hero.photoAlt}
+                width={800}
+                height={1000}
+                fetchPriority="high"
+              />
+            </picture>
             <div className="hero-ledger-note" aria-label={copy.hero.ariaLabelLedger}>
               <div className="proof-icon" aria-hidden="true">
                 <FileCheck2 size={22} />
               </div>
               <div className="proof-copy">
                 <small>{copy.hero.batchProof}</small>
-                <strong>DRN-2026-LD-0428</strong>
+                <strong>DRN-2026-LD-0429</strong>
                 <span>{copy.hero.ledgerEvents}</span>
               </div>
               <div className="proof-status">
@@ -62,28 +66,37 @@ function Hero() {
             <h2 id="journey-title">{landing.journeyTitle}</h2>
             <p>{landing.journeyLead}</p>
           </div>
-          <div className="journey-grid" aria-label={landing.journeyAria}>
-            {landing.steps.map((step, index) => (
-              <a
-                key={step.href}
-                className={`journey-card ${index === 1 ? 'journey-card-tall' : ''}`}
-                href={step.href}
-              >
-                <img
-                  className="journey-photo"
-                  src={journeyPhotos[index]}
-                  alt={step.alt}
-                  loading="lazy"
-                />
-                <div className="journey-copy">
-                  <h3>
-                    {step.title}
-                    <ArrowRight size={16} aria-hidden="true" />
-                  </h3>
-                  <p>{step.text}</p>
-                </div>
-              </a>
-            ))}
+          <div className="journey-grid journey-grid-4" aria-label={landing.journeyAria}>
+            {landing.steps.map((step, index) => {
+              const webp = step.image || 'orchard.webp'
+              const jpg = webp.replace(/\.webp$/i, '.jpg')
+              return (
+                <a
+                  key={step.href}
+                  className={`journey-card ${index === 1 ? 'journey-card-tall' : ''}`}
+                  href={step.href}
+                >
+                  <picture>
+                    <source srcSet={asset(webp)} type="image/webp" />
+                    <img
+                      className="journey-photo"
+                      src={asset(jpg)}
+                      alt={step.alt}
+                      width={600}
+                      height={400}
+                      loading="lazy"
+                    />
+                  </picture>
+                  <div className="journey-copy">
+                    <h3>
+                      {step.title}
+                      <ArrowRight size={16} aria-hidden="true" />
+                    </h3>
+                    <p>{step.text}</p>
+                  </div>
+                </a>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -97,7 +110,7 @@ function Hero() {
           <div className="chain-records">
             {landing.records.map((record) => (
               <div key={record.name} className="chain-record">
-                <code>{record.name}</code>
+                <strong className="chain-record-label">{record.name}</strong>
                 <p>{record.detail}</p>
               </div>
             ))}

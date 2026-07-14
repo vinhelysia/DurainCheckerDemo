@@ -1,17 +1,19 @@
 import { useState } from 'react'
-import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { PublicKey, SystemProgram } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
 import {
   getConfigPda,
   getBatchPda,
   getTimelinePda,
   getLabPda,
+  getCustodyPda,
   getFarmerPda,
   getLabRolePda,
   getLogisticsPda,
 } from '../lib/pda'
 import { readLocalBatches, writeLocalBatches, STATIC_BATCH_IDS } from '../lib/localLedger'
-import type { DurianTrustProgram } from '../types/durian_trust'
+import { DEFAULT_CADMIUM_THRESHOLD_PPM } from '../lib/ruleAuditor'
+import type { AnchorRiskLevel, AnchorTimelineStatus, DurianTrustProgram } from '../types/durian_trust'
 
 type Language = 'vi' | 'en'
 type ProviderMode = 'chain' | 'fallback'
@@ -34,6 +36,26 @@ interface TxMessage {
 }
 
 type TxStage = 'idle' | 'sending' | 'confirming' | 'confirmed' | 'error'
+
+// Anchor encodes a Rust enum variant as a single-key object. Index matches the
+// program's CustodyRole discriminants.
+const CUSTODY_ROLE_VARIANTS = [
+  { farmer: {} },
+  { packer: {} },
+  { exporter: {} },
+  { importer: {} },
+  { customs: {} },
+]
+
+// Anchor Rust enums → `{ variantName: {} }`. Raw numbers fail instruction encoding.
+const riskEnum = (r: 'low' | 'medium' | 'high'): AnchorRiskLevel => ({ [r]: {} }) as AnchorRiskLevel
+
+// Completed harvest/lab milestones are Delivered; UI "pending" maps to Pending.
+// Shipping/export legs from logistics should pass inTransit via eventStatus when needed.
+const timelineStatusEnum = (s: number | string): AnchorTimelineStatus =>
+  Number(s) === 1 ? { delivered: {} } : { pending: {} }
+
+const TIMELINE_DELIVERED: AnchorTimelineStatus = { delivered: {} }
 
 // Wraps a send/confirm call with a cosmetic staged status (sending -> confirming -> confirmed/error).
 // Does not alter what is sent, signed, or awaited - purely a UI-timing layer around the same call.
@@ -135,9 +157,9 @@ export function useBatchTransaction({
     setNewlyRegisteredBatchId('')
 
     const cadmiumValueScaled = Math.round(parseFloat(String(cadmiumPpm)) * 10000)
-    const thresholdValueScaled = 500
+    const thresholdValueScaled = Math.round(DEFAULT_CADMIUM_THRESHOLD_PPM * 10000)
     const confidenceScaled = Math.round(ruleAudit.confidence * 100)
-    const riskLevelEnum = ruleAudit.riskLevel === 'low' ? 0 : ruleAudit.riskLevel === 'medium' ? 1 : 2
+    const riskLevel = riskEnum(ruleAudit.riskLevel)
 
     if (providerMode === 'chain' && program && wallet.publicKey) {
       try {
@@ -145,18 +167,15 @@ export function useBatchTransaction({
         const batchPda = getBatchPda(batchId, program.programId)
         const firstLabReportPda = getLabPda(batchId, 0, program.programId)
         const farmerRolePda = getFarmerPda(wallet.publicKey, program.programId)
+        const date = harvestDate || new Date().toISOString().split('T')[0]
 
         setTxMessage({
           text: language === 'vi' ? 'Đang gửi giao dịch lên Blockchain...' : 'Broadcasting transaction to blockchain...',
           type: 'info',
         })
 
-        // Timeline index is always 0 for a newly registered batch (no prior events exist)
-        const timelineEventPda = getTimelinePda(batchId, 0, program.programId)
-        const logisticsRolePda = getLogisticsPda(wallet.publicKey, program.programId)
-        const date = harvestDate || new Date().toISOString().split('T')[0]
-
-        const registerIx = await program.methods.registerBatch(
+        // Primary write alone — never bundle with add_timeline_event (logistics-gated).
+        const txSig = await trackStagedTx(setTxStage, () => program.methods.registerBatch(
           batchId,
           farmVi,
           provinceVi,
@@ -164,7 +183,7 @@ export function useBatchTransaction({
           new BN(cadmiumValueScaled),
           new BN(thresholdValueScaled),
           new BN(confidenceScaled),
-          riskLevelEnum,
+          riskLevel,
           ruleAudit.aiResultVi,
           ruleAudit.riskCauseVi
         ).accounts({
@@ -174,24 +193,30 @@ export function useBatchTransaction({
           signer: wallet.publicKey,
           systemProgram: SystemProgram.programId,
           farmerRole: activeRoles.isOwner ? null : farmerRolePda,
-        }).instruction()
+        }).rpc())
 
-        const harvestTimelineIx = await program.methods.addTimelineEvent(
-          batchId,
-          'Thu hoạch',
-          `${farmVi}, ${provinceVi}`,
-          date,
-          1
-        ).accounts({
-          batch: batchPda,
-          timelineEvent: timelineEventPda,
-          signer: wallet.publicKey,
-          systemProgram: SystemProgram.programId,
-          logisticsRole: activeRoles.isOwner ? null : logisticsRolePda,
-        }).instruction()
-
-        const tx = new Transaction().add(registerIx, harvestTimelineIx)
-        const txSig = await trackStagedTx(setTxStage, () => program.provider.sendAndConfirm(tx))
+        // Best-effort harvest timeline only when signer can pass the logistics gate.
+        if (activeRoles.isOwner || activeRoles.isLogistics) {
+          try {
+            const timelineEventPda = getTimelinePda(batchId, 0, program.programId)
+            const logisticsRolePda = getLogisticsPda(wallet.publicKey, program.programId)
+            await program.methods.addTimelineEvent(
+              batchId,
+              'Thu hoạch',
+              `${farmVi}, ${provinceVi}`,
+              date,
+              TIMELINE_DELIVERED
+            ).accounts({
+              batch: batchPda,
+              timelineEvent: timelineEventPda,
+              signer: wallet.publicKey,
+              systemProgram: SystemProgram.programId,
+              logisticsRole: activeRoles.isOwner ? null : logisticsRolePda,
+            }).rpc()
+          } catch (e) {
+            console.warn('Harvest timeline follow-up failed (batch still registered):', e)
+          }
+        }
 
         setTxMessage({
           text: language === 'vi'
@@ -232,7 +257,7 @@ export function useBatchTransaction({
           province: { vi: provinceVi, en: provinceEn },
           harvestDate: harvestDate || new Date().toISOString().split('T')[0],
           cadmiumPpm: parseFloat(String(cadmiumPpm)),
-          thresholdPpm: 0.05,
+          thresholdPpm: DEFAULT_CADMIUM_THRESHOLD_PPM,
           aiResult: { vi: ruleAudit.aiResultVi, en: ruleAudit.aiResultEn },
           confidence: ruleAudit.confidence / 100,
           riskLevel: ruleAudit.riskLevel,
@@ -249,7 +274,7 @@ export function useBatchTransaction({
           labReports: [
             {
               cadmiumPpm: parseFloat(String(cadmiumPpm)),
-              thresholdPpm: 0.05,
+              thresholdPpm: DEFAULT_CADMIUM_THRESHOLD_PPM,
               aiResult: { vi: ruleAudit.aiResultVi, en: ruleAudit.aiResultEn },
               confidence: ruleAudit.confidence / 100,
               riskLevel: ruleAudit.riskLevel,
@@ -307,31 +332,29 @@ export function useBatchTransaction({
     const cadmiumValueScaled = Math.round(parseFloat(String(cadmiumPpmLab)) * 10000)
     const thresholdValueScaled = Math.round(parseFloat(String(thresholdPpmLab)) * 10000)
     const confidenceScaled = Math.round(audit.confidence * 100)
-    const riskLevelEnum = audit.riskLevel === 'low' ? 0 : audit.riskLevel === 'medium' ? 1 : 2
+    const riskLevel = riskEnum(audit.riskLevel)
 
     if (providerMode === 'chain' && program && wallet.publicKey) {
       try {
         const batchPda = getBatchPda(selectedBatchId, program.programId)
         const batchAccount = await program.account.batch.fetch(batchPda)
         const currentLabCount = batchAccount.labCount
-        const currentTimelineCount = batchAccount.timelineCount
 
         const labReportPda = getLabPda(selectedBatchId, currentLabCount, program.programId)
-        const timelineEventPda = getTimelinePda(selectedBatchId, currentTimelineCount, program.programId)
         const labRolePda = getLabRolePda(wallet.publicKey, program.programId)
-        const logisticsRolePda = getLogisticsPda(wallet.publicKey, program.programId)
 
         setTxMessage({
           text: language === 'vi' ? 'Đang gửi báo cáo kiểm định chất lượng lên Blockchain...' : 'Sending lab report update transaction to blockchain...',
           type: 'info',
         })
 
-        const updateIx = await program.methods.updateLabReport(
+        // Primary write alone — never bundle with add_timeline_event (logistics-gated).
+        const txSig = await trackStagedTx(setTxStage, () => program.methods.updateLabReport(
           selectedBatchId,
           new BN(cadmiumValueScaled),
           new BN(thresholdValueScaled),
           new BN(confidenceScaled),
-          riskLevelEnum,
+          riskLevel,
           audit.aiResultVi,
           audit.riskCauseVi
         ).accounts({
@@ -340,24 +363,32 @@ export function useBatchTransaction({
           signer: wallet.publicKey,
           systemProgram: SystemProgram.programId,
           labRole: activeRoles.isOwner ? null : labRolePda,
-        }).instruction()
+        }).rpc())
 
-        const labTimelineIx = await program.methods.addTimelineEvent(
-          selectedBatchId,
-          'Kiểm nghiệm cập nhật',
-          'Phòng phân tích độc học',
-          new Date().toISOString().split('T')[0],
-          1
-        ).accounts({
-          batch: batchPda,
-          timelineEvent: timelineEventPda,
-          signer: wallet.publicKey,
-          systemProgram: SystemProgram.programId,
-          logisticsRole: activeRoles.isOwner ? null : logisticsRolePda,
-        }).instruction()
-
-        const tx = new Transaction().add(updateIx, labTimelineIx)
-        const txSig = await trackStagedTx(setTxStage, () => program.provider.sendAndConfirm(tx))
+        // Best-effort lab timeline only when signer can pass the logistics gate.
+        // Re-read timelineCount after the primary tx — it may have advanced on-chain.
+        if (activeRoles.isOwner || activeRoles.isLogistics) {
+          try {
+            const freshBatch = await program.account.batch.fetch(batchPda)
+            const timelineEventPda = getTimelinePda(selectedBatchId, freshBatch.timelineCount, program.programId)
+            const logisticsRolePda = getLogisticsPda(wallet.publicKey, program.programId)
+            await program.methods.addTimelineEvent(
+              selectedBatchId,
+              'Kiểm nghiệm cập nhật',
+              'Phòng phân tích độc học',
+              new Date().toISOString().split('T')[0],
+              TIMELINE_DELIVERED
+            ).accounts({
+              batch: batchPda,
+              timelineEvent: timelineEventPda,
+              signer: wallet.publicKey,
+              systemProgram: SystemProgram.programId,
+              logisticsRole: activeRoles.isOwner ? null : logisticsRolePda,
+            }).rpc()
+          } catch (e) {
+            console.warn('Lab timeline follow-up failed (lab report still saved):', e)
+          }
+        }
 
         setTxMessage({
           text: language === 'vi'
@@ -488,7 +519,7 @@ export function useBatchTransaction({
           stageVi,
           locationVi,
           eventDate || new Date().toISOString().split('T')[0],
-          Number(eventStatus)
+          timelineStatusEnum(eventStatus)
         ).accounts({
           batch: batchPda,
           timelineEvent: timelineEventPda,
@@ -564,9 +595,15 @@ export function useBatchTransaction({
     targetAddress: string,
     targetRole: RoleType
   ): Promise<boolean> => {
-    if (!targetAddress || !targetAddress.startsWith('0x') || targetAddress.length !== 42) {
+    // Solana addresses are base58 pubkeys (~32–44 chars), not Ethereum 0x hex.
+    let targetPubkey: PublicKey
+    try {
+      targetPubkey = new PublicKey(targetAddress.trim())
+    } catch {
       setTxMessage({
-        text: language === 'vi' ? 'Vui lòng điền đúng định dạng địa chỉ ví (0x...)' : 'Please enter a valid wallet address starting with 0x!',
+        text: language === 'vi'
+          ? 'Vui lòng nhập địa chỉ ví Solana hợp lệ (base58).'
+          : 'Please enter a valid Solana wallet address (base58).',
         type: 'error',
       })
       return false
@@ -579,7 +616,6 @@ export function useBatchTransaction({
     if (providerMode === 'chain' && program && wallet.publicKey) {
       try {
         const configPda = getConfigPda(program.programId)
-        const targetPubkey = new PublicKey(targetAddress)
 
         setTxMessage({
           text: language === 'vi' ? 'Đang gửi giao dịch phân quyền lên Blockchain...' : 'Sending role transaction to blockchain...',
@@ -755,6 +791,144 @@ export function useBatchTransaction({
     }
   }
 
+  // Custody is chain-only. The localStorage fallback ledger has no notion of an owner,
+  // and simulating a transfer of ownership there would fake the one guarantee this
+  // feature exists to prove — so in fallback mode we refuse instead of pretending.
+  const requireChain = (): boolean => {
+    if (providerMode === 'chain' && program && wallet.publicKey) return true
+    setTxMessage({
+      text: language === 'vi'
+        ? 'Chuyển quyền sở hữu cần kết nối Phantom trên Solana Devnet — sổ cái giả lập không thể xác thực chủ sở hữu.'
+        : 'Custody transfer requires Phantom on Solana Devnet — the simulated ledger cannot prove ownership.',
+      type: 'error',
+    })
+    return false
+  }
+
+  /// Step 1 of the handoff: the current owner nominates the next custody holder.
+  /// Ownership does not move until the recipient calls acceptCustody.
+  const transferCustody = async (
+    selectedBatchId: string,
+    newOwner: string
+  ): Promise<boolean> => {
+    if (!selectedBatchId || !newOwner) {
+      setTxMessage({
+        text: language === 'vi' ? 'Cần chọn lô và nhập ví người nhận!' : 'Select a batch and enter the recipient wallet!',
+        type: 'error',
+      })
+      return false
+    }
+    if (!requireChain()) return false
+
+    let recipient: PublicKey
+    try {
+      recipient = new PublicKey(newOwner)
+    } catch {
+      setTxMessage({
+        text: language === 'vi' ? 'Địa chỉ ví người nhận không hợp lệ.' : 'The recipient wallet address is not valid.',
+        type: 'error',
+      })
+      return false
+    }
+
+    setLoading(true)
+    setTxMessage({ text: '', type: '' })
+    setTxStage('idle')
+
+    try {
+      const txSig = await trackStagedTx(setTxStage, () => program!.methods.transferCustody(
+        selectedBatchId,
+        recipient
+      ).accounts({
+        config: getConfigPda(program!.programId),
+        batch: getBatchPda(selectedBatchId, program!.programId),
+        signer: wallet.publicKey!,
+      }).rpc())
+
+      setTxMessage({
+        text: language === 'vi'
+          ? `Đã đề nghị chuyển quyền sở hữu tới ${newOwner.slice(0, 8)}… Người nhận phải ký chấp nhận. Mã Tx: ${txSig.slice(0, 16)}...`
+          : `Custody handoff proposed to ${newOwner.slice(0, 8)}… The recipient must sign to accept. Tx: ${txSig.slice(0, 16)}...`,
+        type: 'success',
+        txSig,
+      })
+
+      setReloadTrigger(prev => prev + 1)
+      return true
+    } catch (err: unknown) {
+      console.error(err)
+      setTxStage('error')
+      const msg = err instanceof Error ? err.message : String(err)
+      setTxMessage({
+        text: language === 'vi' ? `Lỗi Blockchain: ${humanizeTxError(msg, language)}` : `Blockchain Error: ${humanizeTxError(msg, language)}`,
+        type: 'error',
+      })
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /// Step 2: the nominated recipient signs, taking ownership and appending a
+  /// CustodyRecord. Only the pending owner can do this.
+  const acceptCustody = async (
+    selectedBatchId: string,
+    role: number,
+    location: string
+  ): Promise<boolean> => {
+    if (!selectedBatchId || !location) {
+      setTxMessage({
+        text: language === 'vi' ? 'Cần chọn lô và nhập địa điểm nhận hàng!' : 'Select a batch and enter the handover location!',
+        type: 'error',
+      })
+      return false
+    }
+    if (!requireChain()) return false
+
+    setLoading(true)
+    setTxMessage({ text: '', type: '' })
+    setTxStage('idle')
+
+    try {
+      const batchPda = getBatchPda(selectedBatchId, program!.programId)
+      const batchAccount = await program!.account.batch.fetch(batchPda)
+
+      const txSig = await trackStagedTx(setTxStage, () => program!.methods.acceptCustody(
+        selectedBatchId,
+        CUSTODY_ROLE_VARIANTS[role] ?? CUSTODY_ROLE_VARIANTS[0],
+        location
+      ).accounts({
+        config: getConfigPda(program!.programId),
+        batch: batchPda,
+        custodyRecord: getCustodyPda(selectedBatchId, batchAccount.custodyCount, program!.programId),
+        signer: wallet.publicKey!,
+        systemProgram: SystemProgram.programId,
+      }).rpc())
+
+      setTxMessage({
+        text: language === 'vi'
+          ? `Đã nhận quyền sở hữu lô ${selectedBatchId}. Mã Tx: ${txSig.slice(0, 16)}...`
+          : `Custody of ${selectedBatchId} accepted. Tx: ${txSig.slice(0, 16)}...`,
+        type: 'success',
+        txSig,
+      })
+
+      setReloadTrigger(prev => prev + 1)
+      return true
+    } catch (err: unknown) {
+      console.error(err)
+      setTxStage('error')
+      const msg = err instanceof Error ? err.message : String(err)
+      setTxMessage({
+        text: language === 'vi' ? `Lỗi Blockchain: ${humanizeTxError(msg, language)}` : `Blockchain Error: ${humanizeTxError(msg, language)}`,
+        type: 'error',
+      })
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return {
     loading,
     txMessage,
@@ -765,6 +939,8 @@ export function useBatchTransaction({
     registerBatch,
     updateLabReport,
     addTimelineEvent,
+    transferCustody,
+    acceptCustody,
     handleRoleAction,
     handleInitializeProgram,
   }

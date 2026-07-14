@@ -26,6 +26,16 @@ export function getTimelinePda(batchId: string, index: number, programId: Public
   return pda
 }
 
+export function getCustodyPda(batchId: string, index: number, programId: PublicKey): PublicKey {
+  const indexBuf = Buffer.alloc(4)
+  indexBuf.writeUInt32LE(index)
+  const [pda] = PublicKey.findProgramAddressSync(
+    [Buffer.from('custody'), Buffer.from(batchId), indexBuf],
+    programId
+  )
+  return pda
+}
+
 export function getLabPda(batchId: string, index: number, programId: PublicKey): PublicKey {
   const indexBuf = Buffer.alloc(4)
   indexBuf.writeUInt32LE(index)

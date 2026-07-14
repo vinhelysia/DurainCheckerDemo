@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Camera, Sparkles, AlertCircle, RotateCcw } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import { useSlowLoading } from '../hooks/useSlowLoading'
@@ -21,6 +21,7 @@ export default function LeafDiseaseScanner() {
   const [badgeSource, setBadgeSource] = useState(null) // 'ai' | 'error'
   const [lastRequest, setLastRequest] = useState(null) // Blob/File to retry with
 
+  const abortControllerRef = useRef(null)
   const isSlow = useSlowLoading(loading, 3000)
 
   // Clean up object URLs to avoid memory leaks
@@ -31,6 +32,15 @@ export default function LeafDiseaseScanner() {
       }
     }
   }, [imagePreview])
+
+  // Abort in-flight inference on unmount so stale responses are ignored
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
 
   const handleImageChange = (e) => {
     const file = e.target.files[0]
@@ -79,15 +89,21 @@ export default function LeafDiseaseScanner() {
   }
 
   const sendInferenceRequest = async (file) => {
+    // Abort any previous in-flight request so stale responses are ignored
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     try {
       const formData = new FormData()
-      // TODO: Backend /api/predict_leaf endpoint must accept FormData containing the raw image file (key 'image'),
-      // resize it to 224x224, and perform model inference.
       formData.append('image', file)
 
       const response = await fetch('/api/predict_leaf', {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       })
 
       if (response.ok) {
@@ -103,11 +119,17 @@ export default function LeafDiseaseScanner() {
         throw new Error(serverError)
       }
     } catch (err) {
+      if (err.name === 'AbortError') {
+        // Stale / cancelled request — ignore
+        return
+      }
       console.error('Inference request failed:', err)
       setErrorState(err.message || 'Inference failed')
       setBadgeSource('error')
     } finally {
-      setLoading(false)
+      if (!controller.signal.aborted) {
+        setLoading(false)
+      }
     }
   }
 
@@ -257,6 +279,11 @@ export default function LeafDiseaseScanner() {
                 <p className="scanner-remedy-text">
                   {getTreatmentText(prediction.disease)}
                 </p>
+                {scannerCopy.treatmentDisclaimer ? (
+                  <p className="scanner-remedy-disclaimer">
+                    {scannerCopy.treatmentDisclaimer}
+                  </p>
+                ) : null}
               </div>
             )}
           </div>

@@ -3,10 +3,10 @@ import { ShieldCheck, ArrowLeft, Activity } from 'lucide-react'
 
 const base = import.meta.env.BASE_URL
 const unitPhotos = {
-  farm: `${base}images/orchard.jpg`,
-  transport: `${base}images/reefer.jpg`,
-  testing: `${base}images/lab.jpg`,
-  export: `${base}images/port.jpg`,
+  farm: { webp: `${base}images/orchard.webp`, jpg: `${base}images/orchard.jpg` },
+  transport: { webp: `${base}images/reefer.webp`, jpg: `${base}images/reefer.jpg` },
+  testing: { webp: `${base}images/lab.webp`, jpg: `${base}images/lab.jpg` },
+  export: { webp: `${base}images/port.webp`, jpg: `${base}images/port.jpg` },
 }
 
 export default function UnitDetails({ unitType }) {
@@ -109,12 +109,22 @@ export default function UnitDetails({ unitType }) {
           </div>
         </div>
 
-        <img
-          className="unit-photo"
-          src={unitPhotos[unitType] || unitPhotos.farm}
-          alt={copy.units.photoAlts[unitType] || copy.units.photoAlts.farm}
-          loading="lazy"
-        />
+        {(() => {
+          const photo = unitPhotos[unitType] || unitPhotos.farm
+          return (
+            <picture>
+              <source srcSet={photo.webp} type="image/webp" />
+              <img
+                className="unit-photo"
+                src={photo.jpg}
+                alt={copy.units.photoAlts[unitType] || copy.units.photoAlts.farm}
+                width={1200}
+                height={800}
+                loading="lazy"
+              />
+            </picture>
+          )
+        })()}
 
         {/* Status Banner */}
         <div className="status-banner">

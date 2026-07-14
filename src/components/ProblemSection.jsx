@@ -22,7 +22,9 @@ function ProblemSection() {
     >
       <div className="section-shell">
         <div className="section-heading">
-          <p className="section-kicker">{copy.problem.kicker}</p>
+          {copy.problem.kicker ? (
+            <p className="section-kicker">{copy.problem.kicker}</p>
+          ) : null}
           <h2 id="problem-title">
             {copy.problem.title}
           </h2>
@@ -34,11 +36,19 @@ function ProblemSection() {
         </div>
 
         <figure className="problem-photo">
-          <img
-            src={`${import.meta.env.BASE_URL}images/market.jpg`}
-            alt={copy.problem.photoCaption}
-            loading="lazy"
-          />
+          <picture>
+            <source
+              srcSet={`${import.meta.env.BASE_URL}images/${copy.problem.photo || 'market.webp'}`}
+              type="image/webp"
+            />
+            <img
+              src={`${import.meta.env.BASE_URL}images/market.jpg`}
+              alt={copy.problem.photoCaption}
+              width={1200}
+              height={900}
+              loading="lazy"
+            />
+          </picture>
           <figcaption>{copy.problem.photoCaption}</figcaption>
         </figure>
 
@@ -70,14 +80,31 @@ function ProblemSection() {
           </div>
         </div>
 
-        <div className="problem-points" aria-label={copy.problem.pointsAriaLabel}>
+        <div className="problem-points problem-points-media" aria-label={copy.problem.pointsAriaLabel}>
           {copy.problem.points.map((point, index) => {
             const IconComponent = iconMap[point.icon] || ShieldAlert
+            const webp = point.image
+            const jpg = webp ? webp.replace(/\.webp$/i, '.jpg') : null
             return (
               <div className="problem-point" key={index}>
-                <span className="point-icon" aria-hidden="true">
-                  <IconComponent size={22} />
-                </span>
+                {webp ? (
+                  <div className="point-thumb" aria-hidden="true">
+                    <picture>
+                      <source srcSet={`${import.meta.env.BASE_URL}images/${webp}`} type="image/webp" />
+                      <img
+                        src={`${import.meta.env.BASE_URL}images/${jpg}`}
+                        alt=""
+                        width={120}
+                        height={90}
+                        loading="lazy"
+                      />
+                    </picture>
+                  </div>
+                ) : (
+                  <span className="point-icon" aria-hidden="true">
+                    <IconComponent size={22} />
+                  </span>
+                )}
                 <span>
                   <strong>{point.title}</strong>
                   <small>{point.desc}</small>

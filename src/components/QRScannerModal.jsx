@@ -219,20 +219,20 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
 
   const handleManualVerify = (e) => {
     e.preventDefault()
-    const cleanInput = manualInput.trim().toUpperCase()
-    if (!cleanInput) {
+    const trimmed = manualInput.trim()
+    if (!trimmed) {
       setManualError(copy.qrScanner.error.empty)
       return
     }
 
-    // Match against known batch IDs or allow anyway for sandbox
-    const matched = batches.find(b => b.id.toUpperCase() === cleanInput)
+    // Match against known batch IDs case-insensitively; pass original casing through
+    const matched = batches.find(b => b.id.toUpperCase() === trimmed.toUpperCase())
     if (matched) {
       onScanSuccess(matched.id)
       handleClose()
     } else {
       // Allow any batch ID to be loaded to support dynamic/unregistered ones
-      onScanSuccess(cleanInput)
+      onScanSuccess(trimmed)
       handleClose()
     }
   }

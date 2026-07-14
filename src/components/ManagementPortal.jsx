@@ -1,25 +1,24 @@
 import { useState, useEffect, lazy, Suspense, useMemo } from 'react'
-import { useConnection, useWallet, ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import { clusterApiUrl } from '@solana/web3.js'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { useLanguage } from './LanguageContext'
 import { ArrowLeft, Wallet, Compass, CheckCircle2, AlertTriangle, RefreshCw, X } from 'lucide-react'
-import '@solana/wallet-adapter-react-ui/styles.css'
 
 import { useBatchTransaction } from '../hooks/useBatchTransaction'
+import { BATCH_ACCOUNT_SIZE } from '../hooks/useBlockchainBatches'
 import { getConfigPda, getFarmerPda, getLabRolePda, getLogisticsPda } from '../lib/pda'
 import { readLocalBatches, STATIC_BATCH_IDS } from '../lib/localLedger'
 
 import FarmerPanel from './management/FarmerPanel'
 import LabPanel from './management/LabPanel'
 import LogisticsPanel from './management/LogisticsPanel'
+import CustodyPanel from './management/CustodyPanel'
 import AdminPanel from './management/AdminPanel'
 
 const BatchQRLabel = lazy(() => import('./BatchQRLabel'))
 const WalletMultiButton = lazy(() => import('@solana/wallet-adapter-react-ui').then(module => ({ default: module.WalletMultiButton })))
 
-function ManagementPortalContent() {
+export default function ManagementPortal() {
   const { language, copy } = useLanguage()
   const { connection } = useConnection()
   const wallet = useWallet()
@@ -124,8 +123,9 @@ function ManagementPortalContent() {
     registerBatch,
     updateLabReport,
     addTimelineEvent,
+    transferCustody,
+    acceptCustody,
     handleRoleAction,
-    handleInitializeProgram
   } = useBatchTransaction({
     program,
     connection,
@@ -141,10 +141,17 @@ function ManagementPortalContent() {
   useEffect(() => {
     async function loadContract() {
       try {
-        const configRes = await fetch(`${import.meta.env.BASE_URL}solana/idl.json`)
-        if (!configRes.ok) throw new Error('Contract IDL config not found')
-        const config = await configRes.json()
-        setContractInfo(config)
+        // Fetch the IDL only once. setContractInfo() stores a fresh object every call,
+        // and contractInfo feeds the `program` useMemo, which is a dependency of this
+        // effect — so re-setting it here would give `program` a new identity, re-run the
+        // effect, and loop forever, firing an IDL fetch + 3 getAccountInfo + batch.all()
+        // on every pass until devnet answers 429.
+        if (!contractInfo) {
+          const configRes = await fetch(`${import.meta.env.BASE_URL}solana/idl.json`)
+          if (!configRes.ok) throw new Error('Contract IDL config not found')
+          setContractInfo(await configRes.json())
+          return // this state change re-runs the effect once, with program now buildable
+        }
 
         if (wallet.publicKey && program) {
           const userPubkey = wallet.publicKey
@@ -162,15 +169,18 @@ function ManagementPortalContent() {
             console.warn('Could not fetch Config PDA account info', e)
           }
 
-          // Helper to check if a PDA account exists
-          const checkPdaExists = async (pda) => {
-            const accountInfo = await connection.getAccountInfo(pda)
-            return accountInfo !== null
-          }
-
-          const isFarmer = await checkPdaExists(getFarmerPda(userPubkey, program.programId))
-          const isLab = await checkPdaExists(getLabRolePda(userPubkey, program.programId))
-          const isLogistics = await checkPdaExists(getLogisticsPda(userPubkey, program.programId))
+          // One batched call instead of three: a role is granted iff its PDA exists.
+          // Never swallow an RPC failure here — a rate-limited node would then be
+          // indistinguishable from "this wallet has no roles", silently locking the
+          // user out of tabs they are in fact authorised for. Let it throw.
+          const [farmerAcc, labAcc, logisticsAcc] = await connection.getMultipleAccountsInfo([
+            getFarmerPda(userPubkey, program.programId),
+            getLabRolePda(userPubkey, program.programId),
+            getLogisticsPda(userPubkey, program.programId),
+          ])
+          const isFarmer = farmerAcc !== null
+          const isLab = labAcc !== null
+          const isLogistics = logisticsAcc !== null
 
           setUserRoles({
             isOwner,
@@ -179,7 +189,10 @@ function ManagementPortalContent() {
             isLogistics
           })
 
-          const fetched = await program.account.batch.all()
+          // Size filter, same reason as the demo page: a pre-custody batch is 69 bytes
+          // short and Anchor decodes it to zeros rather than rejecting it, so without
+          // this the dropdown would offer stale batches that cannot be acted on.
+          const fetched = await program.account.batch.all([{ dataSize: BATCH_ACCOUNT_SIZE }])
           const ids = fetched.map(item => item.account.id)
           setRegisteredIds(ids)
           if (ids.length > 0 && !selectedBatchId) {
@@ -207,8 +220,10 @@ function ManagementPortalContent() {
     }
 
     loadContract()
+    // contractInfo is a dep so the pass that stores the IDL re-runs this effect. It is
+    // only ever set once (guarded above), so this cannot loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wallet.publicKey, connection, program, reloadTrigger])
+  }, [wallet.publicKey, connection, program, reloadTrigger, contractInfo])
 
   // Resolved role string for displaying on wallet chip
   const getRoleLabel = () => {
@@ -304,41 +319,11 @@ function ManagementPortalContent() {
               <p>
                 {copy.managePortal.gating.adminDenied}
               </p>
-              {wallet.publicKey && (
-                <div className="manage-init-btn-wrap">
-                  <button
-                    onClick={handleInitializeProgram}
-                    disabled={loading}
-                    className="button button-primary"
-                  >
-                    <span>{copy.managePortal.gating.initProgram}</span>
-                  </button>
-                </div>
-              )}
             </div>
           )
         }
         return (
           <div className="manage-admin-container">
-            {wallet.publicKey && (
-              <div className="dashboard-card telemetry-card">
-                <div className="card-header-with-icon">
-                  <h2>{copy.managePortal.admin.initTitle}</h2>
-                </div>
-                <div className="manage-init-body">
-                  <p className="manage-init-text">
-                    {copy.managePortal.admin.initDesc}
-                  </p>
-                  <button
-                    onClick={handleInitializeProgram}
-                    disabled={loading}
-                    className="button button-primary"
-                  >
-                    <span>{copy.managePortal.gating.initProgram}</span>
-                  </button>
-                </div>
-              </div>
-            )}
             <AdminPanel
               language={language}
               copy={copy}
@@ -514,6 +499,24 @@ function ManagementPortalContent() {
           {renderTabWithGating()}
         </div>
 
+        {/* Custody sits outside the role tabs on purpose: holding a batch is not a
+            role. An importer with no farmer/lab/logistics grant can still be handed
+            custody, and only the current holder can pass it on. */}
+        {wallet.publicKey && (
+          <CustodyPanel
+            language={language}
+            loading={loading}
+            registeredIds={registeredIds}
+            selectedBatchId={selectedBatchId}
+            setSelectedBatchId={setSelectedBatchId}
+            transferCustody={transferCustody}
+            acceptCustody={acceptCustody}
+            walletAddress={wallet.publicKey.toString()}
+            program={program}
+            reloadTrigger={reloadTrigger}
+          />
+        )}
+
         {/* Success QR display code */}
         {newlyRegisteredBatchId && activeTab === 'farmer' && (
           <div className="dashboard-card qr-success-card">
@@ -590,22 +593,5 @@ function ManagementPortalContent() {
 
       </div>
     </div>
-  )
-}
-
-export default function ManagementPortal() {
-  const endpoint = useMemo(() => import.meta.env.VITE_RPC_URL || clusterApiUrl('devnet'), [])
-  
-  // Phantom (and other Wallet Standard wallets) auto-register; no adapters needed.
-  const wallets = useMemo(() => [], [])
-
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <ManagementPortalContent />
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
   )
 }

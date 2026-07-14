@@ -7,6 +7,12 @@ use anchor_lang::solana_program::{
 
 declare_id!("4EZcqRn9LYK5VMuhLC2bNDaUqVBHxc6KCZ6zhFet3Par");
 
+// Only this wallet may call `initialize` on a fresh deploy. Later handoff uses
+// propose_authority_transfer / accept_authority_transfer. Matches the on-chain
+// Config authority / scripts/seed-devnet.mjs payer (solana id.json).
+const GENESIS_AUTHORITY: Pubkey =
+    anchor_lang::pubkey!("52WpskyDdHaLyAcyTLQrqvLBUh3azKFAe3XmNkYDaFJu");
+
 const MAX_ID_LEN: usize = 32;
 const MAX_FARM_LEN: usize = 96;
 const MAX_PROVINCE_LEN: usize = 64;
@@ -23,6 +29,10 @@ pub mod durian_trust {
     // ── initialization ────────────────────────────────────────────
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+        require!(
+            ctx.accounts.authority.key() == GENESIS_AUTHORITY,
+            DurianTrustError::Unauthorized
+        );
         let config = &mut ctx.accounts.config;
         config.authority = ctx.accounts.authority.key();
         config.next_token_id = 0;
@@ -212,6 +222,9 @@ pub mod durian_trust {
                 .checked_add(1)
                 .ok_or(DurianTrustError::CounterOverflow)?,
             created_at: now,
+            owner: registrant,
+            pending_owner: None,
+            custody_count: 0,
         });
 
         ctx.accounts.lab_report.set_inner(LabReport {
@@ -333,6 +346,105 @@ pub mod durian_trust {
             batch: batch_key,
             index,
             reporter,
+        });
+
+        Ok(())
+    }
+
+    // ── custody transfer (2-step) ─────────────────────────────────
+    //
+    // Custody is the transferable right over a batch: farm → packer → exporter →
+    // importer → customs. Step 1 nominates the next holder; step 2 requires that
+    // holder to sign, so a batch can never be pushed onto a party that did not
+    // consent to receive it. The receiving party declares its own role and the
+    // location it took delivery at — that claim is signed by the receiver, not
+    // asserted on their behalf by the sender.
+
+    /// Step 1: the current owner (or authority) nominates the next custody holder.
+    /// Re-calling this overwrites the previous nomination, which is how a mistaken
+    /// nomination is corrected.
+    pub fn transfer_custody(
+        ctx: Context<TransferCustody>,
+        id: String,
+        new_owner: Pubkey,
+    ) -> Result<()> {
+        require_not_paused(&ctx.accounts.config)?;
+        validate_id(&id)?;
+
+        // Deliberately owner-only: the config authority is NOT an escape hatch here.
+        // An admin who could reassign custody could seize any batch, which would make
+        // the ownership record meaningless. Admin power over custody is limited to
+        // `pause`, which halts everything rather than moving one batch.
+        // ponytail: no key-loss recovery path. If a holder loses their key the batch
+        // is stranded; a production deployment would add a timelocked recovery, not
+        // an unconditional admin override.
+        let signer = ctx.accounts.signer.key();
+        let current_owner = ctx.accounts.batch.owner;
+        require!(signer == current_owner, DurianTrustError::Unauthorized);
+        require!(
+            new_owner != current_owner,
+            DurianTrustError::SelfCustodyTransfer
+        );
+
+        let batch_key = ctx.accounts.batch.key();
+        ctx.accounts.batch.pending_owner = Some(new_owner);
+
+        emit!(CustodyProposed {
+            id,
+            batch: batch_key,
+            from: current_owner,
+            to: new_owner,
+        });
+
+        Ok(())
+    }
+
+    /// Step 2: the nominated holder accepts, taking ownership and appending an
+    /// immutable CustodyRecord at the batch's next custody index.
+    pub fn accept_custody(
+        ctx: Context<AcceptCustody>,
+        id: String,
+        role: CustodyRole,
+        location: String,
+    ) -> Result<()> {
+        require_not_paused(&ctx.accounts.config)?;
+        validate_id(&id)?;
+        validate_string_len(&location, MAX_LOCATION_LEN)?;
+
+        let signer = ctx.accounts.signer.key();
+        let pending = ctx
+            .accounts
+            .batch
+            .pending_owner
+            .ok_or(DurianTrustError::NoPendingCustody)?;
+        require!(signer == pending, DurianTrustError::Unauthorized);
+
+        let from = ctx.accounts.batch.owner;
+        let index = ctx.accounts.batch.custody_count;
+        let batch_key = ctx.accounts.batch.key();
+
+        ctx.accounts.custody_record.set_inner(CustodyRecord {
+            from,
+            to: signer,
+            role,
+            location,
+            timestamp: Clock::get()?.unix_timestamp,
+        });
+
+        let batch = &mut ctx.accounts.batch;
+        batch.owner = signer;
+        batch.pending_owner = None;
+        batch.custody_count = batch
+            .custody_count
+            .checked_add(1)
+            .ok_or(DurianTrustError::CounterOverflow)?;
+
+        emit!(CustodyTransferred {
+            id,
+            batch: batch_key,
+            from,
+            to: signer,
+            index,
         });
 
         Ok(())
@@ -672,6 +784,36 @@ pub struct UpdateLabReport<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(id: String)]
+pub struct TransferCustody<'info> {
+    #[account(seeds = [b"config"], bump)]
+    pub config: Account<'info, Config>,
+    #[account(mut, seeds = [b"batch", id.as_bytes()], bump)]
+    pub batch: Account<'info, Batch>,
+    pub signer: Signer<'info>,
+}
+
+#[derive(Accounts)]
+#[instruction(id: String)]
+pub struct AcceptCustody<'info> {
+    #[account(seeds = [b"config"], bump)]
+    pub config: Account<'info, Config>,
+    #[account(mut, seeds = [b"batch", id.as_bytes()], bump)]
+    pub batch: Account<'info, Batch>,
+    #[account(
+        init,
+        payer = signer,
+        space = 8 + CustodyRecord::INIT_SPACE,
+        seeds = [b"custody", id.as_bytes(), &batch.custody_count.to_le_bytes()],
+        bump
+    )]
+    pub custody_record: Account<'info, CustodyRecord>,
+    #[account(mut)]
+    pub signer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 #[instruction(id: String, lab_report_index: u32)]
 pub struct AttestLabReport<'info> {
     #[account(seeds = [b"config"], bump)]
@@ -723,6 +865,12 @@ pub struct Config {
     pub paused: bool,
 }
 
+/// MIGRATION NOTE (custody): three fields were appended — `owner` (+32 bytes),
+/// `pending_owner` (+33) and `custody_count` (+4), so Batch grew by 69 bytes.
+/// Batch PDAs created by the *previous* program version are now undersized and
+/// will fail to deserialise. There is no realloc path for them (the PDA seed is
+/// the batch id, so they cannot be re-inited under the same address): on devnet,
+/// re-register the demo batches after deploying this version.
 #[account]
 #[derive(InitSpace)]
 pub struct Batch {
@@ -742,6 +890,26 @@ pub struct Batch {
     /// counter after writing, so `lab_count` always equals the next available index.
     pub lab_count: u32,
     pub created_at: i64,
+    /// Current custody holder. Starts as the registrant and moves through the
+    /// export chain via `transfer_custody` / `accept_custody`.
+    pub owner: Pubkey,
+    /// Nominated next holder, set by `transfer_custody` and cleared on accept.
+    pub pending_owner: Option<Pubkey>,
+    /// Append index for CustodyRecord PDAs — same pattern as `timeline_count`.
+    pub custody_count: u32,
+}
+
+/// One completed custody handoff. Written only by the receiving party, at
+/// `[b"custody", id, index]`, and never mutated afterwards.
+#[account]
+#[derive(InitSpace)]
+pub struct CustodyRecord {
+    pub from: Pubkey,
+    pub to: Pubkey,
+    pub role: CustodyRole,
+    #[max_len(MAX_LOCATION_LEN)]
+    pub location: String,
+    pub timestamp: i64,
 }
 
 #[account]
@@ -831,6 +999,19 @@ pub enum TimelineStatus {
     Rejected = 3,
 }
 
+/// The link in the export chain that the *receiving* party claims when accepting
+/// custody. Same guarantees as `RiskLevel` — invalid bytes are rejected at
+/// deserialisation.
+#[repr(u8)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq, InitSpace)]
+pub enum CustodyRole {
+    Farmer = 0,
+    Packer = 1,
+    Exporter = 2,
+    Importer = 3,
+    Customs = 4,
+}
+
 /// Used only in `RoleGranted` / `RoleRevoked` events — not stored in any account.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum RoleType {
@@ -901,6 +1082,23 @@ pub struct LabReportUpdated {
 }
 
 #[event]
+pub struct CustodyProposed {
+    pub id: String,
+    pub batch: Pubkey,
+    pub from: Pubkey,
+    pub to: Pubkey,
+}
+
+#[event]
+pub struct CustodyTransferred {
+    pub id: String,
+    pub batch: Pubkey,
+    pub from: Pubkey,
+    pub to: Pubkey,
+    pub index: u32,
+}
+
+#[event]
 pub struct LabReportAttested {
     pub id: String,
     pub lab_report_index: u32,
@@ -932,6 +1130,10 @@ pub enum DurianTrustError {
     Paused,
     #[msg("No pending authority transfer exists.")]
     NoPendingTransfer,
+    #[msg("No pending custody transfer exists for this batch.")]
+    NoPendingCustody,
+    #[msg("Cannot transfer custody to the current owner.")]
+    SelfCustodyTransfer,
     #[msg("Date must be formatted as YYYY-MM-DD with a valid month (01-12) and day (01-31).")]
     InvalidDateFormat,
     #[msg("Transaction must include an Ed25519SigVerify instruction at index 0.")]
@@ -1063,16 +1265,20 @@ fn compute_payload_hash(
 /// Parses the Ed25519SigVerify instruction that must appear at ix index 0 and
 /// verifies that it attests exactly `(expected_pubkey, expected_message, expected_sig)`.
 ///
-/// Ed25519 instruction data layout (one entry):
-///   [0]      count (u8)  — must be >= 1
+/// Assumption: the native Ed25519 verify instruction is placed at transaction
+/// index 0, and this program instruction runs at a later index (`current_index > 0`).
+/// Clients must build the transaction in that order.
+///
+/// Ed25519 instruction data layout (exactly one entry):
+///   [0]      count (u8)  — must be == 1
 ///   [1]      padding (u8)
 ///   [2..3]   sig_offset (u16 LE)       offset of the signature within this ix data
-///   [4..5]   sig_ix_index (u16 LE)     0xFFFF = current instruction
+///   [4..5]   sig_ix_index (u16 LE)     must be 0xFFFF (this instruction only)
 ///   [6..7]   pubkey_offset (u16 LE)
-///   [8..9]   pubkey_ix_index (u16 LE)
+///   [8..9]   pubkey_ix_index (u16 LE)  must be 0xFFFF
 ///   [10..11] msg_offset (u16 LE)
 ///   [12..13] msg_size (u16 LE)
-///   [14..15] msg_ix_index (u16 LE)
+///   [14..15] msg_ix_index (u16 LE)     must be 0xFFFF
 ///   [16+]    actual sig (64 B), pubkey (32 B), message (variable)
 fn verify_ed25519_ix(
     ix_sysvar: &AccountInfo,
@@ -1086,6 +1292,7 @@ fn verify_ed25519_ix(
         DurianTrustError::MissingEd25519Instruction
     );
 
+    // Fixed at index 0: keeps the client contract simple and matches seed/demo txs.
     let ed25519_ix = load_instruction_at_checked(0, ix_sysvar)
         .map_err(|_| DurianTrustError::MissingEd25519Instruction)?;
     require!(
@@ -1094,17 +1301,31 @@ fn verify_ed25519_ix(
     );
 
     let data = &ed25519_ix.data;
-    // Minimum: 2-byte prefix + 14-byte entry header = 16 bytes
+    // Minimum: 2-byte prefix + 14-byte entry header = 16 bytes.
+    // Exactly one signature entry — multi-entry is unused attack surface.
     require!(
-        data.len() >= 16 && data[0] >= 1,
+        data.len() >= 16 && data[0] == 1,
         DurianTrustError::InvalidEd25519Instruction
     );
 
     // Parse the first entry header (offset 2, one entry = 14 bytes)
     let sig_offset = u16::from_le_bytes([data[2], data[3]]) as usize;
+    let sig_ix_index = u16::from_le_bytes([data[4], data[5]]);
     let pubkey_offset = u16::from_le_bytes([data[6], data[7]]) as usize;
+    let pubkey_ix_index = u16::from_le_bytes([data[8], data[9]]);
     let msg_offset = u16::from_le_bytes([data[10], data[11]]) as usize;
     let msg_size = u16::from_le_bytes([data[12], data[13]]) as usize;
+    let msg_ix_index = u16::from_le_bytes([data[14], data[15]]);
+
+    // 0xFFFF = offsets refer to this Ed25519 instruction's own data. Any other
+    // index would let the native program verify a different instruction's bytes
+    // while we read our local buffer — closing cross-instruction confusion.
+    require!(
+        sig_ix_index == u16::MAX
+            && pubkey_ix_index == u16::MAX
+            && msg_ix_index == u16::MAX,
+        DurianTrustError::InvalidEd25519Instruction
+    );
 
     require!(
         data.len() >= sig_offset.saturating_add(64)

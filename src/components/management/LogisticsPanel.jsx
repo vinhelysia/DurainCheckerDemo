@@ -139,7 +139,9 @@ export default function LogisticsPanel({
         >
           <Plus size={16} />
           <span>
-            {loading ? (language === 'vi' ? 'Đang ghi sổ...' : 'Writing Ledger...') : (language === 'vi' ? 'Ghi Sự Kiện Vào Blockchain' : 'Broadcast Timeline Event')}
+            {loading
+              ? (language === 'vi' ? 'Đang ký giao dịch...' : 'Signing...')
+              : (language === 'vi' ? 'Ghi mốc hành trình' : 'Log milestone')}
           </span>
         </button>
       </form>

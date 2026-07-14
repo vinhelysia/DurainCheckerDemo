@@ -9,6 +9,10 @@
  *   3. Update [programs.localnet] + [programs.devnet] in Anchor.toml
  *      to the same address.
  *   4. anchor build   ← regenerates target/idl/durian_trust.json
+ *   5. initialize() is gated to GENESIS_AUTHORITY
+ *      (52WpskyDdHaLyAcyTLQrqvLBUh3azKFAe3XmNkYDaFJu). Point ANCHOR_WALLET
+ *      at that deployer keypair (usually ~/.config/solana/id.json) so the
+ *      suite can sign initialize. Without it, initialize tests fail closed.
  *
  * Phase-2 tests (authority transfer, pause gating, enum rejection)
  * are marked describe.skip — they require those features in lib.rs first.
@@ -18,9 +22,10 @@ import { startAnchor } from 'anchor-bankrun'
 import { BankrunProvider } from 'anchor-bankrun'
 import { Program, AnchorError, BN } from '@coral-xyz/anchor'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
+import { homedir } from 'os'
 import { fileURLToPath } from 'url'
-import { dirname, resolve } from 'path'
+import { dirname, resolve, join } from 'path'
 import assert from 'assert/strict'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -30,6 +35,29 @@ const IDL = JSON.parse(
   readFileSync(resolve(__dirname, '../target/idl/durian_trust.json'), 'utf8')
 )
 
+// Must match GENESIS_AUTHORITY in programs/durian_trust/src/lib.rs
+const GENESIS_PUBKEY = '52WpskyDdHaLyAcyTLQrqvLBUh3azKFAe3XmNkYDaFJu'
+
+function tryLoadGenesisKeypair() {
+  const candidates = [
+    process.env.ANCHOR_WALLET,
+    process.env.SOLANA_WALLET,
+    join(homedir(), '.config/solana/id.json'),
+  ].filter(Boolean)
+  for (const p of candidates) {
+    try {
+      if (!existsSync(p)) continue
+      const kp = Keypair.fromSecretKey(
+        Uint8Array.from(JSON.parse(readFileSync(p, 'utf8')))
+      )
+      if (kp.publicKey.toBase58() === GENESIS_PUBKEY) return kp
+    } catch {
+      // try next path
+    }
+  }
+  return null
+}
+
 // ─── Test keypairs (funded via startAnchor initial accounts) ─────────────────
 
 const farmer        = Keypair.generate()
@@ -37,6 +65,7 @@ const labUser       = Keypair.generate()
 const logisticsUser = Keypair.generate()
 const intruder      = Keypair.generate()
 const tempTarget    = Keypair.generate() // used only for remove-role tests
+const genesisKp     = tryLoadGenesisKeypair()
 
 const SOL10 = 10_000_000_000
 
@@ -51,6 +80,7 @@ const pda = {
   batch:      (id, p = pid) => pf([Buffer.from('batch'), Buffer.from(id)], p),
   lab:        (id, idx, p = pid) => pf([Buffer.from('lab'),      Buffer.from(id), u32le(idx)], p),
   timeline:   (id, idx, p = pid) => pf([Buffer.from('timeline'), Buffer.from(id), u32le(idx)], p),
+  custody:    (id, idx, p = pid) => pf([Buffer.from('custody'),  Buffer.from(id), u32le(idx)], p),
   farmer:     (user, p = pid) => pf([Buffer.from('farmer'),    user.toBuffer()], p),
   labRole:    (user, p = pid) => pf([Buffer.from('lab_role'),  user.toBuffer()], p),
   logistics:  (user, p = pid) => pf([Buffer.from('logistics'), user.toBuffer()], p),
@@ -116,6 +146,71 @@ function expectAnchorError(codeName) {
   }
 }
 
+// ─── Ed25519 ix layout helpers (mirrors verify_ed25519_ix in lib.rs) ─────────
+// Full bankrun exercise of the Ed25519 precompile + instructions sysvar is not
+// wired here; these pure checks lock the header contract the on-chain parser uses.
+
+const ED25519_IX_INDEX_SELF = 0xffff
+
+/**
+ * Build a single-entry Ed25519SigVerify instruction data buffer.
+ * Layout (one entry): count, pad, then 14-byte offsets header, then sig/pk/msg.
+ *
+ * @param {{
+ *   count?: number,
+ *   sigIxIndex?: number,
+ *   pubkeyIxIndex?: number,
+ *   msgIxIndex?: number,
+ * }} [opts]
+ */
+function buildEd25519IxData(opts = {}) {
+  const count = opts.count ?? 1
+  const sigIxIndex = opts.sigIxIndex ?? ED25519_IX_INDEX_SELF
+  const pubkeyIxIndex = opts.pubkeyIxIndex ?? ED25519_IX_INDEX_SELF
+  const msgIxIndex = opts.msgIxIndex ?? ED25519_IX_INDEX_SELF
+
+  const sigOffset = 16
+  const pubkeyOffset = 80 // 16 + 64
+  const msgOffset = 112 // 80 + 32
+  const msgSize = 32
+
+  const data = Buffer.alloc(msgOffset + msgSize)
+  data[0] = count
+  data[1] = 0
+  data.writeUInt16LE(sigOffset, 2)
+  data.writeUInt16LE(sigIxIndex, 4)
+  data.writeUInt16LE(pubkeyOffset, 6)
+  data.writeUInt16LE(pubkeyIxIndex, 8)
+  data.writeUInt16LE(msgOffset, 10)
+  data.writeUInt16LE(msgSize, 12)
+  data.writeUInt16LE(msgIxIndex, 14)
+  return data
+}
+
+/**
+ * Pure JS mirror of the header gates in `verify_ed25519_ix` (count + ix indexes).
+ * Returns null if ok, or a reason string if rejected.
+ */
+function rejectEd25519Header(data) {
+  if (!(data instanceof Uint8Array) || data.length < 16) {
+    return 'too_short'
+  }
+  if (data[0] !== 1) {
+    return 'count_not_one'
+  }
+  const sigIxIndex = data[4] | (data[5] << 8)
+  const pubkeyIxIndex = data[8] | (data[9] << 8)
+  const msgIxIndex = data[14] | (data[15] << 8)
+  if (
+    sigIxIndex !== ED25519_IX_INDEX_SELF ||
+    pubkeyIxIndex !== ED25519_IX_INDEX_SELF ||
+    msgIxIndex !== ED25519_IX_INDEX_SELF
+  ) {
+    return 'ix_index_not_self'
+  }
+  return null
+}
+
 async function registerBatch(prog, signer, id, farmerRoleAddr = null) {
   return prog.methods
     .registerBatch(
@@ -148,23 +243,58 @@ describe('durian_trust', function () {
   this.timeout(60_000)
 
   before(async function () {
-    context = await startAnchor('.', [], [
+    const initial = [
       fundedAccount(farmer.publicKey),
       fundedAccount(labUser.publicKey),
       fundedAccount(logisticsUser.publicKey),
       fundedAccount(intruder.publicKey),
       fundedAccount(tempTarget.publicKey),
-    ])
+    ]
+    if (genesisKp) initial.unshift(fundedAccount(genesisKp.publicKey))
+
+    context = await startAnchor('.', [], initial)
     provider  = new BankrunProvider(context)
-    program   = new Program(IDL, provider)
-    authority = provider.wallet.payer
-    pid       = program.programId
+    pid       = new Program(IDL, provider).programId
+
+    // Prefer the real genesis deployer key so initialize() can pass the on-chain gate.
+    if (genesisKp) {
+      authority = genesisKp
+      provider  = providerFor(genesisKp)
+      program   = programFor(genesisKp)
+    } else {
+      authority = provider.wallet.payer
+      program   = new Program(IDL, provider)
+      console.warn(
+        '[durian_trust tests] Genesis keypair not loaded. ' +
+          `initialize requires ${GENESIS_PUBKEY}. Set ANCHOR_WALLET to that keypair JSON.`
+      )
+    }
   })
 
   // ── initialize ─────────────────────────────────────────────────────────
 
   describe('initialize', function () {
+    it('rejects a non-genesis signer with Unauthorized', async function () {
+      const prog2 = programFor(intruder)
+      await assert.rejects(
+        () =>
+          prog2.methods
+            .initialize()
+            .accounts({
+              config:        pda.config(),
+              authority:     intruder.publicKey,
+              systemProgram: SystemProgram.programId,
+            })
+            .signers([intruder])
+            .rpc(),
+        expectAnchorError('Unauthorized')
+      )
+    })
+
     it('creates config with authority and zero token counter', async function () {
+      if (!genesisKp) {
+        this.skip()
+      }
       await program.methods
         .initialize()
         .accounts({
@@ -177,6 +307,7 @@ describe('durian_trust', function () {
 
       const cfg = await program.account.config.fetch(pda.config())
       assert.ok(cfg.authority.equals(authority.publicKey), 'authority mismatch')
+      assert.equal(cfg.authority.toBase58(), GENESIS_PUBKEY)
       assert.equal(cfg.nextTokenId.toNumber(), 0)
     })
   })
@@ -646,6 +777,198 @@ describe('durian_trust', function () {
             .rpc(),
         expectAnchorError('Unauthorized')
       )
+    })
+  })
+
+  describe('transferCustody / acceptCustody', function () {
+    const BATCH_C = 'BATCH-CUSTODY-1'
+    const receiver = logisticsUser // any funded keypair; custody is gated on ownership, not role
+
+    before(async function () {
+      await registerBatch(program, authority, BATCH_C)
+    })
+
+    it('registrant is the initial owner, with no pending transfer', async function () {
+      const b = await program.account.batch.fetch(pda.batch(BATCH_C))
+      assert.equal(b.owner.toBase58(), authority.publicKey.toBase58())
+      assert.equal(b.pendingOwner, null)
+      assert.equal(b.custodyCount, 0)
+    })
+
+    it('a non-owner cannot propose a transfer', async function () {
+      await assert.rejects(
+        () =>
+          programFor(intruder)
+            .methods.transferCustody(BATCH_C, intruder.publicKey)
+            .accounts({
+              config: pda.config(),
+              batch:  pda.batch(BATCH_C),
+              signer: intruder.publicKey,
+            })
+            .signers([intruder])
+            .rpc(),
+        expectAnchorError('Unauthorized')
+      )
+    })
+
+    it('the owner cannot transfer custody to itself', async function () {
+      await assert.rejects(
+        () =>
+          program.methods
+            .transferCustody(BATCH_C, authority.publicKey)
+            .accounts({
+              config: pda.config(),
+              batch:  pda.batch(BATCH_C),
+              signer: authority.publicKey,
+            })
+            .rpc(),
+        expectAnchorError('SelfCustodyTransfer')
+      )
+    })
+
+    it('accept is rejected when nothing is pending', async function () {
+      await assert.rejects(
+        () =>
+          programFor(receiver)
+            .methods.acceptCustody(BATCH_C, { packer: {} }, 'Cai Lay packhouse')
+            .accounts({
+              config:        pda.config(),
+              batch:         pda.batch(BATCH_C),
+              custodyRecord: pda.custody(BATCH_C, 0),
+              signer:        receiver.publicKey,
+              systemProgram: SystemProgram.programId,
+            })
+            .signers([receiver])
+            .rpc(),
+        expectAnchorError('NoPendingCustody')
+      )
+    })
+
+    it('the owner nominates a successor without yet losing ownership', async function () {
+      await program.methods
+        .transferCustody(BATCH_C, receiver.publicKey)
+        .accounts({
+          config: pda.config(),
+          batch:  pda.batch(BATCH_C),
+          signer: authority.publicKey,
+        })
+        .rpc()
+
+      const b = await program.account.batch.fetch(pda.batch(BATCH_C))
+      assert.equal(b.pendingOwner.toBase58(), receiver.publicKey.toBase58())
+      assert.equal(b.owner.toBase58(), authority.publicKey.toBase58())
+      assert.equal(b.custodyCount, 0)
+    })
+
+    it('a party who was not nominated cannot accept', async function () {
+      await assert.rejects(
+        () =>
+          programFor(intruder)
+            .methods.acceptCustody(BATCH_C, { packer: {} }, 'Cai Lay packhouse')
+            .accounts({
+              config:        pda.config(),
+              batch:         pda.batch(BATCH_C),
+              custodyRecord: pda.custody(BATCH_C, 0),
+              signer:        intruder.publicKey,
+              systemProgram: SystemProgram.programId,
+            })
+            .signers([intruder])
+            .rpc(),
+        expectAnchorError('Unauthorized')
+      )
+    })
+
+    it('the nominee accepts, taking ownership and appending a custody record', async function () {
+      await programFor(receiver)
+        .methods.acceptCustody(BATCH_C, { packer: {} }, 'Cai Lay packhouse')
+        .accounts({
+          config:        pda.config(),
+          batch:         pda.batch(BATCH_C),
+          custodyRecord: pda.custody(BATCH_C, 0),
+          signer:        receiver.publicKey,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([receiver])
+        .rpc()
+
+      const b = await program.account.batch.fetch(pda.batch(BATCH_C))
+      assert.equal(b.owner.toBase58(), receiver.publicKey.toBase58())
+      assert.equal(b.pendingOwner, null)
+      assert.equal(b.custodyCount, 1)
+
+      const rec = await program.account.custodyRecord.fetch(pda.custody(BATCH_C, 0))
+      assert.equal(rec.from.toBase58(), authority.publicKey.toBase58())
+      assert.equal(rec.to.toBase58(), receiver.publicKey.toBase58())
+      assert.equal(rec.location, 'Cai Lay packhouse')
+      assert.ok('packer' in rec.role)
+    })
+
+    it('the old owner can no longer move the batch', async function () {
+      await assert.rejects(
+        () =>
+          program.methods
+            .transferCustody(BATCH_C, intruder.publicKey)
+            .accounts({
+              config: pda.config(),
+              batch:  pda.batch(BATCH_C),
+              signer: authority.publicKey,
+            })
+            .rpc(),
+        expectAnchorError('Unauthorized')
+      )
+    })
+  })
+
+  // ── Ed25519 attestation header constraints (layout unit checks) ────────
+  // Full bankrun sysvar injection for verify_ed25519_ix needs a working
+  // toolchain + redeploy; pure JS mirrors the on-chain header gates
+  // (count==1, all *_ix_index == 0xFFFF). Assumption on-chain: Ed25519
+  // precompile is at tx index 0; program ix runs later (current_index > 0).
+
+  describe('ed25519 instruction layout (verify_ed25519_ix contract)', function () {
+    it('accepts count==1 and all ix_index fields == 0xFFFF', function () {
+      const data = buildEd25519IxData()
+      assert.equal(data[0], 1)
+      assert.equal(data.readUInt16LE(4), ED25519_IX_INDEX_SELF)
+      assert.equal(data.readUInt16LE(8), ED25519_IX_INDEX_SELF)
+      assert.equal(data.readUInt16LE(14), ED25519_IX_INDEX_SELF)
+      assert.equal(rejectEd25519Header(data), null)
+    })
+
+    it('rejects count != 1 (including multi-entry)', function () {
+      assert.equal(rejectEd25519Header(buildEd25519IxData({ count: 0 })), 'count_not_one')
+      assert.equal(rejectEd25519Header(buildEd25519IxData({ count: 2 })), 'count_not_one')
+    })
+
+    it('rejects non-0xFFFF ix_index (cross-instruction confusion)', function () {
+      // Program must reject this: native Ed25519 would verify another ix's bytes
+      // while our parser reads local offsets — closed by requiring u16::MAX.
+      assert.equal(
+        rejectEd25519Header(buildEd25519IxData({ sigIxIndex: 0 })),
+        'ix_index_not_self'
+      )
+      assert.equal(
+        rejectEd25519Header(buildEd25519IxData({ pubkeyIxIndex: 1 })),
+        'ix_index_not_self'
+      )
+      assert.equal(
+        rejectEd25519Header(buildEd25519IxData({ msgIxIndex: 2 })),
+        'ix_index_not_self'
+      )
+      assert.equal(
+        rejectEd25519Header(
+          buildEd25519IxData({
+            sigIxIndex: 0,
+            pubkeyIxIndex: 0,
+            msgIxIndex: 0,
+          })
+        ),
+        'ix_index_not_self'
+      )
+    })
+
+    it('rejects undersized instruction data', function () {
+      assert.equal(rejectEd25519Header(Buffer.alloc(15)), 'too_short')
     })
   })
 

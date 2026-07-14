@@ -138,13 +138,15 @@ export default function FarmerPanel({
       return
     }
 
+    const controller = new AbortController()
+
     const fetchDiseasePrediction = async () => {
       setDiseasePredicting(true)
       setDiseaseError('')
-      
+
       const parsedMonth = new Date(harvestDate).getMonth() + 1
       const month = Number.isNaN(parsedMonth) ? 6 : parsedMonth
-      
+
       const tempVal = parseFloat(temperature) || 28.0
       const humVal = parseFloat(humidity) || 80.0
       const rainVal = parseFloat(rainfall) || 150.0
@@ -167,7 +169,8 @@ export default function FarmerPanel({
             harvest_month: month,
             tree_age_years: ageVal,
             prior_infection: priorVal
-          })
+          }),
+          signal: controller.signal,
         })
 
         if (response.ok) {
@@ -180,6 +183,9 @@ export default function FarmerPanel({
           throw new Error('API server returned error status')
         }
       } catch (err) {
+        if (err?.name === 'AbortError' || controller.signal.aborted) {
+          return
+        }
         console.warn('Disease AI backend offline. Falling back to local JS auditor simulation.', err)
         const fallbackRes = runDiseaseAuditor(
           tempVal,
@@ -191,12 +197,17 @@ export default function FarmerPanel({
         )
         setDiseaseResult(fallbackRes)
       } finally {
-        setDiseasePredicting(false)
+        if (!controller.signal.aborted) {
+          setDiseasePredicting(false)
+        }
       }
     }
 
     const timer = setTimeout(fetchDiseasePrediction, 300)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
   }, [temperature, humidity, rainfall, leafWetness, soilDrainage, harvestDate, treeAge, priorInfection])
 
   // Pre-lab AI predictions
@@ -208,13 +219,15 @@ export default function FarmerPanel({
       return
     }
 
+    const controller = new AbortController()
+
     const fetchAiPrediction = async () => {
       setAiPredicting(true)
       setAiError('')
-      
+
       const parsedMonth = new Date(harvestDate).getMonth() + 1
       const month = Number.isNaN(parsedMonth) ? 6 : parsedMonth
-      
+
       try {
         const response = await fetch('/api/predict', {
           method: 'POST',
@@ -226,7 +239,8 @@ export default function FarmerPanel({
             harvest_month: month,
             farm_violation_history: Number(violations),
             rainfall_mm: Number(rainfall)
-          })
+          }),
+          signal: controller.signal,
         })
 
         if (response.ok) {
@@ -238,7 +252,10 @@ export default function FarmerPanel({
         } else {
           throw new Error('API server returned error status')
         }
-      } catch {
+      } catch (err) {
+        if (err?.name === 'AbortError' || controller.signal.aborted) {
+          return
+        }
         let baseline = 0.1
         if (provinceVi === 'Đắk Lắk' || provinceVi === 'Dak Lak') baseline = 1.2
         else if (provinceVi === 'Tiền Giang' || provinceVi === 'Tien Giang') baseline = 0.5
@@ -246,7 +263,7 @@ export default function FarmerPanel({
         else if (provinceVi === 'Bến Tre' || provinceVi === 'Ben Tre') baseline = 0.3
 
         const score = baseline + Number(violations) * 0.5 + Number(rainfall) * 0.004
-        
+
         const risk = score >= 2.0 ? 'high' : score >= 1.0 ? 'medium' : 'low'
         const probability = score >= 2.0
           ? Math.min(0.99, 0.7 + (score - 2.0) * 0.1)
@@ -261,12 +278,17 @@ export default function FarmerPanel({
           source: 'fallback'
         })
       } finally {
-        setAiPredicting(false)
+        if (!controller.signal.aborted) {
+          setAiPredicting(false)
+        }
       }
     }
 
     const timer = setTimeout(fetchAiPrediction, 300)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
   }, [provinceVi, harvestDate, violations, rainfall])
 
   const onSubmit = (e) => {

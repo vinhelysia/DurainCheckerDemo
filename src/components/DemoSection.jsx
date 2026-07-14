@@ -6,6 +6,7 @@ import { useBlockchainBatches } from '../hooks/useBlockchainBatches'
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 import AIResultCard from './AIResultCard'
 import BlockchainTimeline from './BlockchainTimeline'
+import ChainOfCustody from './ChainOfCustody'
 import HashProofChip from './HashProofChip'
 import ProvenanceBadge from './ProvenanceBadge'
 
@@ -86,13 +87,33 @@ function DemoSection() {
       <div className="section-shell">
         <div className="section-heading demo-heading">
           <div>
-            <p className="section-kicker">{copy.demo.kicker}</p>
+            {copy.demo.kicker ? (
+              <p className="section-kicker">{copy.demo.kicker}</p>
+            ) : null}
             <h2 id="demo-title">{copy.demo.title}</h2>
           </div>
           <p className="demo-note">
             {copy.demo.note}
           </p>
         </div>
+
+        {copy.demo.bannerImage ? (
+          <figure className="demo-banner">
+            <picture>
+              <source
+                srcSet={`${import.meta.env.BASE_URL}images/${copy.demo.bannerImage}`}
+                type="image/webp"
+              />
+              <img
+                src={`${import.meta.env.BASE_URL}images/${String(copy.demo.bannerImage).replace(/\.webp$/i, '.jpg')}`}
+                alt={copy.demo.bannerAlt || ''}
+                width={1200}
+                height={480}
+                loading="lazy"
+              />
+            </picture>
+          </figure>
+        ) : null}
 
         <div className="demo-controls" aria-label={copy.demo.ariaLabelControls}>
           {batches.map((batch) => (
@@ -165,7 +186,16 @@ function DemoSection() {
 
         <div className="demo-result-grid-wrapper">
           <div className="demo-result-grid">
-            <BlockchainTimeline timeline={currentBatch.timeline} loading={loading} source={source} />
+            <div className="ledger-stack">
+              <BlockchainTimeline timeline={currentBatch.timeline} loading={loading} source={source} />
+              <ChainOfCustody
+                custody={currentBatch.custody}
+                owner={currentBatch.owner}
+                pendingOwner={currentBatch.pendingOwner}
+                loading={loading}
+                source={source}
+              />
+            </div>
             <div className="ai-result-stack">
               <AIResultCard batch={currentBatch} loading={loading} source={source} />
               <Suspense fallback={<div className="qr-fallback" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-ink-soft)', fontStyle: 'italic', fontSize: '0.85rem' }}>{language === 'vi' ? 'Đang tải mã QR...' : 'Loading QR Code...'}</div>}>

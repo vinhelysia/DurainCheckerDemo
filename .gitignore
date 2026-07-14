@@ -32,4 +32,8 @@ coverage/
 .env.local
 .env.*.local
 
+# Local seed-script operator keypairs (scripts/seed-devnet.mjs)
+.keys/
+.keys/**
+
 .vercel
