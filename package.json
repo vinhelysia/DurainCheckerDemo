@@ -8,7 +8,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed:devnet": "node scripts/seed-devnet.mjs",
+    "smoke:farmer": "node scripts/smoke-farmer-only.mjs",
+    "smoke:lab": "node scripts/smoke-lab-only.mjs"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.0",

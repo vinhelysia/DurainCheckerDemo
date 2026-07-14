@@ -10,8 +10,12 @@ declare_id!("4EZcqRn9LYK5VMuhLC2bNDaUqVBHxc6KCZ6zhFet3Par");
 // Only this wallet may call `initialize` on a fresh deploy. Later handoff uses
 // propose_authority_transfer / accept_authority_transfer. Matches the on-chain
 // Config authority / scripts/seed-devnet.mjs payer (solana id.json).
-const GENESIS_AUTHORITY: Pubkey =
-    anchor_lang::pubkey!("52WpskyDdHaLyAcyTLQrqvLBUh3azKFAe3XmNkYDaFJu");
+// Explicit bytes (not pubkey!) so the 32-byte key is forced into SBF rodata and
+// is greppable in the deployed ELF — pubkey! was optimized away from the .so.
+const GENESIS_AUTHORITY_BYTES: [u8; 32] = [
+    59, 210, 13, 95, 146, 216, 201, 167, 22, 227, 36, 97, 210, 249, 124, 67, 111,
+    142, 19, 60, 166, 139, 147, 111, 87, 57, 255, 176, 142, 17, 87, 142,
+];
 
 const MAX_ID_LEN: usize = 32;
 const MAX_FARM_LEN: usize = 96;
@@ -29,8 +33,9 @@ pub mod durian_trust {
     // ── initialization ────────────────────────────────────────────
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+        let genesis = Pubkey::new_from_array(GENESIS_AUTHORITY_BYTES);
         require!(
-            ctx.accounts.authority.key() == GENESIS_AUTHORITY,
+            ctx.accounts.authority.key() == genesis,
             DurianTrustError::Unauthorized
         );
         let config = &mut ctx.accounts.config;

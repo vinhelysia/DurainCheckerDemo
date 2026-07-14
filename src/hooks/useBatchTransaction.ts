@@ -207,6 +207,7 @@ export function useBatchTransaction({
               date,
               TIMELINE_DELIVERED
             ).accounts({
+              config: configPda,
               batch: batchPda,
               timelineEvent: timelineEventPda,
               signer: wallet.publicKey,
@@ -336,6 +337,7 @@ export function useBatchTransaction({
 
     if (providerMode === 'chain' && program && wallet.publicKey) {
       try {
+        const configPda = getConfigPda(program.programId)
         const batchPda = getBatchPda(selectedBatchId, program.programId)
         const batchAccount = await program.account.batch.fetch(batchPda)
         const currentLabCount = batchAccount.labCount
@@ -349,6 +351,8 @@ export function useBatchTransaction({
         })
 
         // Primary write alone — never bundle with add_timeline_event (logistics-gated).
+        // `config` is required by UpdateLabReport (pause/authority gate) — omitting it
+        // fails Anchor account resolution before Phantom signs.
         const txSig = await trackStagedTx(setTxStage, () => program.methods.updateLabReport(
           selectedBatchId,
           new BN(cadmiumValueScaled),
@@ -358,6 +362,7 @@ export function useBatchTransaction({
           audit.aiResultVi,
           audit.riskCauseVi
         ).accounts({
+          config: configPda,
           batch: batchPda,
           labReport: labReportPda,
           signer: wallet.publicKey,
@@ -379,6 +384,7 @@ export function useBatchTransaction({
               new Date().toISOString().split('T')[0],
               TIMELINE_DELIVERED
             ).accounts({
+              config: configPda,
               batch: batchPda,
               timelineEvent: timelineEventPda,
               signer: wallet.publicKey,
@@ -502,6 +508,7 @@ export function useBatchTransaction({
 
     if (providerMode === 'chain' && program && wallet.publicKey) {
       try {
+        const configPda = getConfigPda(program.programId)
         const batchPda = getBatchPda(selectedBatchId, program.programId)
         const batchAccount = await program.account.batch.fetch(batchPda)
         const currentCount = batchAccount.timelineCount
@@ -521,6 +528,7 @@ export function useBatchTransaction({
           eventDate || new Date().toISOString().split('T')[0],
           timelineStatusEnum(eventStatus)
         ).accounts({
+          config: configPda,
           batch: batchPda,
           timelineEvent: timelineEventPda,
           signer: wallet.publicKey,
