@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "submission" / "DurianTrust_Intro_73s.mp4"
+OUTPUT = ROOT / "public" / "DurianTrust_Intro_73s.mp4"
 LOGO = ROOT / "public" / "durian.png"
 WIDTH, HEIGHT = 1280, 720
 INK = "#173D2F"
