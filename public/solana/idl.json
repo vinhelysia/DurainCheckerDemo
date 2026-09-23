@@ -712,6 +712,192 @@
       ]
     },
     {
+      "name": "attest_lab_report_v2",
+      "docs": [
+        "Attest an existing LabReport using an Ed25519 signature verified in ix 0.",
+        "The caller must be the lab role holder (or authority) and must be the Ed25519",
+        "signing key used in ix 0."
+      ],
+      "discriminator": [
+        98,
+        45,
+        237,
+        227,
+        184,
+        58,
+        7,
+        107
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "batch",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lab_report",
+          "docs": [
+            "The existing LabReport being attested; must already exist at this index."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  98
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              },
+              {
+                "kind": "arg",
+                "path": "lab_report_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "attestation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  118,
+                  50
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              },
+              {
+                "kind": "arg",
+                "path": "lab_report_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lab_role",
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  98,
+                  95,
+                  114,
+                  111,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ix_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "lab_report_index",
+          "type": "u32"
+        },
+        {
+          "name": "sig",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
+        },
+        {
+          "name": "payload_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "initialize",
       "discriminator": [
         175,
@@ -1555,6 +1741,93 @@
           "type": "u32"
         }
       ]
+    },
+    {
+      "name": "verify_attestation_v2",
+      "docs": [
+        "Read-only tamper-evidence check: recomputes the payload hash from the live",
+        "LabReport and asserts it still matches the stored LabAttestation. Emits",
+        "`AttestationVerifiedV2` on success. Anyone may call this."
+      ],
+      "discriminator": [
+        250,
+        138,
+        80,
+        81,
+        126,
+        180,
+        240,
+        26
+      ],
+      "accounts": [
+        {
+          "name": "lab_report",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  98
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              },
+              {
+                "kind": "arg",
+                "path": "lab_report_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "attestation",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  118,
+                  50
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              },
+              {
+                "kind": "arg",
+                "path": "lab_report_index"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "lab_report_index",
+          "type": "u32"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -1691,6 +1964,19 @@
       ]
     },
     {
+      "name": "AttestationVerifiedV2",
+      "discriminator": [
+        1,
+        219,
+        39,
+        181,
+        243,
+        117,
+        218,
+        197
+      ]
+    },
+    {
       "name": "AuthorityTransferAccepted",
       "discriminator": [
         149,
@@ -1766,6 +2052,19 @@
         170,
         180,
         165
+      ]
+    },
+    {
+      "name": "LabReportAttestedV2",
+      "discriminator": [
+        209,
+        162,
+        68,
+        44,
+        249,
+        149,
+        219,
+        14
       ]
     },
     {
@@ -1922,6 +2221,35 @@
   "types": [
     {
       "name": "AttestationVerified",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "lab_report_index",
+            "type": "u32"
+          },
+          {
+            "name": "lab_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "payload_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttestationVerifiedV2",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2259,7 +2587,7 @@
           {
             "name": "payload_hash",
             "docs": [
-              "SHA-256 of the canonical payload bytes (see `compute_payload_hash`)."
+              "SHA-256 of the payload; the PDA seed selects legacy or V2 encoding."
             ],
             "type": {
               "array": [
@@ -2340,6 +2668,35 @@
     },
     {
       "name": "LabReportAttested",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "lab_report_index",
+            "type": "u32"
+          },
+          {
+            "name": "lab_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "payload_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "LabReportAttestedV2",
       "type": {
         "kind": "struct",
         "fields": [

@@ -3,16 +3,18 @@ from email import message_from_bytes
 from email.policy import default as email_policy
 from io import BytesIO
 import json
+import logging
 import os
 import sys
 import numpy as np
 import onnxruntime as ort
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(CURRENT_DIR, "leaf_disease_model.onnx")
 LABELS_PATH = os.path.join(CURRENT_DIR, "leaf_labels.json")
 MAX_BODY_BYTES = 5 * 1024 * 1024  # 5MB
+MAX_IMAGE_PIXELS = 20_000_000
 ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "http://localhost:5173")
 
 session = None
@@ -58,7 +60,13 @@ def _send_json(handler, status, payload):
 
 def image_to_array(image_bytes):
     """Decode image bytes to model input ndarray of shape (1, 224, 224, 3)."""
-    img = Image.open(BytesIO(image_bytes)).convert("RGB").resize((224, 224))
+    try:
+        with Image.open(BytesIO(image_bytes)) as source:
+            if source.width * source.height > MAX_IMAGE_PIXELS:
+                raise ValueError("image exceeds 20 million pixels")
+            img = source.convert("RGB").resize((224, 224))
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
+        raise ValueError("invalid or unsupported image") from exc
     arr = np.asarray(img, dtype=np.float32) / 255.0
     return arr.reshape((1, 224, 224, 3))
 
@@ -142,24 +150,35 @@ class handler(BaseHTTPRequestHandler):
             _send_json(self, 415, {"error": "Content-Type must be multipart/form-data"})
             return
 
-        content_length = int(self.headers.get("Content-Length", 0))
+        try:
+            content_length = int(self.headers.get("Content-Length", 0))
+        except (TypeError, ValueError):
+            content_length = -1
+        if content_length <= 0:
+            _send_json(self, 400, {"error": "Content-Length must be a positive integer"})
+            return
         if content_length > MAX_BODY_BYTES:
             # Cap body WITHOUT reading it
             _send_json(self, 413, {"error": "payload too large (max 5MB)"})
-            return
-
-        if not load_resources():
-            _send_json(self, 503, {"error": "model not available"})
             return
 
         try:
             post_data = self.rfile.read(content_length)
             image_bytes = extract_multipart_image(content_type, post_data)
             X = image_to_array(image_bytes)
+        except ValueError as e:
+            _send_json(self, 400, {"error": str(e)})
+            return
+
+        try:
+            if not load_resources():
+                _send_json(self, 503, {"error": "model not available"})
+                return
             result = predict_leaf(X)
             _send_json(self, 200, result)
-        except Exception as e:
-            _send_json(self, 400, {"error": str(e)})
+        except Exception:
+            logging.exception("Leaf prediction failed")
+            _send_json(self, 500, {"error": "prediction unavailable"})
 
 if __name__ == "__main__":
     print("--- Running Local Verification of predict_leaf.py ---")

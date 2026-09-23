@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import math
+import logging
 import os
 import numpy as np
 import onnxruntime as ort
@@ -15,6 +16,10 @@ MAX_BODY = 16_384
 session = None
 schema = None
 
+
+class InvalidInput(ValueError):
+    """A validation error safe to return to the caller."""
+
 def load_resources():
     global session, schema
     if session is None:
@@ -25,27 +30,34 @@ def load_resources():
 
 def require_field(data, name):
     if name not in data:
-        raise ValueError(f"missing field: {name}")
+        raise InvalidInput(f"missing field: {name}")
     return data[name]
 
 def parse_finite_number(value, name, lo, hi):
     """Parse a numeric field; reject bool, non-numeric, non-finite, out-of-range."""
     if isinstance(value, bool) or value is None:
-        raise ValueError(f"{name} must be numeric")
+        raise InvalidInput(f"{name} must be numeric")
     try:
         num = float(value)
-    except (TypeError, ValueError):
-        raise ValueError(f"{name} must be numeric")
+    except (TypeError, ValueError, OverflowError):
+        raise InvalidInput(f"{name} must be numeric")
     if not math.isfinite(num):
-        raise ValueError(f"{name} must be finite")
+        raise InvalidInput(f"{name} must be finite")
     if num < lo or num > hi:
-        raise ValueError(f"{name} out of range [{lo}, {hi}]")
+        raise InvalidInput(f"{name} out of range [{lo}, {hi}]")
     return num
+
+def parse_integer(value, name, lo, hi):
+    num = parse_finite_number(value, name, lo, hi)
+    if not num.is_integer():
+        raise InvalidInput(f"{name} must be an integer")
+    return int(num)
+
 
 def map_province(prov_str, schema_mapping):
     # Map both Vietnamese and English province spellings to canonical keys in the schema
     if not isinstance(prov_str, str):
-        raise ValueError("province must be a string")
+        raise InvalidInput("province must be a string")
     normalized_map = {
         "lam dong": "Lâm Đồng",
         "lâm đồng": "Lâm Đồng",
@@ -62,18 +74,18 @@ def map_province(prov_str, schema_mapping):
     canonical_key = normalized_map.get(key, prov_str.strip())
     if canonical_key not in schema_mapping:
         accepted = ", ".join(schema_mapping.keys())
-        raise ValueError(f"unknown province: {prov_str!r}; accepted: {accepted}")
+        raise InvalidInput(f"unknown province: {prov_str!r}; accepted: {accepted}")
     return schema_mapping[canonical_key]
 
 def parse_predict_payload(data):
     """Validate request body fields. Ranges assumed for model-safe inputs (# ponytail)."""
     province = require_field(data, "province")
     # ponytail: harvest_month 1-12
-    harvest_month = int(parse_finite_number(require_field(data, "harvest_month"), "harvest_month", 1, 12))
+    harvest_month = parse_integer(require_field(data, "harvest_month"), "harvest_month", 1, 12)
     # ponytail: farm_violation_history 0-100
-    farm_violation_history = int(parse_finite_number(
+    farm_violation_history = parse_integer(
         require_field(data, "farm_violation_history"), "farm_violation_history", 0, 100
-    ))
+    )
     # ponytail: rainfall_mm 0-2000
     rainfall_mm = parse_finite_number(require_field(data, "rainfall_mm"), "rainfall_mm", 0, 2000)
     return province, harvest_month, farm_violation_history, rainfall_mm
@@ -109,7 +121,8 @@ def predict_batch(province, harvest_month, farm_violation_history, rainfall_mm):
     return {
         "risk": risk_level_str,
         "probability": round(pred_prob, 4),
-        "needs_full_testing": risk_level_str != "low"
+        # A synthetic risk estimate cannot waive laboratory testing.
+        "needs_full_testing": True
     }
 
 class handler(BaseHTTPRequestHandler):
@@ -136,8 +149,15 @@ class handler(BaseHTTPRequestHandler):
 
             try:
                 content_length = int(self.headers.get('Content-Length', 0))
-            except (TypeError, ValueError):
-                content_length = 0
+            except (TypeError, ValueError, OverflowError):
+                content_length = -1
+            if content_length <= 0:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self._cors_headers()
+                self.end_headers()
+                self.wfile.write(b'{"error": "Content-Length must be a positive integer"}')
+                return
             if content_length > MAX_BODY:
                 self.send_response(413)
                 self.send_header('Content-Type', 'application/json')
@@ -149,9 +169,12 @@ class handler(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
 
             try:
-                data = json.loads(post_data.decode('utf-8'))
+                try:
+                    data = json.loads(post_data.decode('utf-8'))
+                except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+                    raise InvalidInput("invalid JSON body") from exc
                 if not isinstance(data, dict):
-                    raise ValueError("JSON body must be an object")
+                    raise InvalidInput("JSON body must be an object")
                 province, harvest_month, farm_violation_history, rainfall_mm = parse_predict_payload(data)
 
                 result = predict_batch(province, harvest_month, farm_violation_history, rainfall_mm)
@@ -162,13 +185,20 @@ class handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(result).encode('utf-8'))
 
-            except Exception as e:
+            except InvalidInput as e:
                 self.send_response(400)
                 self.send_header('Content-Type', 'application/json')
                 self._cors_headers()
                 self.end_headers()
                 error_response = {"error": str(e)}
                 self.wfile.write(json.dumps(error_response).encode('utf-8'))
+            except Exception:
+                logging.exception("Prediction failed")
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self._cors_headers()
+                self.end_headers()
+                self.wfile.write(b'{"error": "prediction unavailable"}')
         else:
             self.send_response(404)
             self._cors_headers()

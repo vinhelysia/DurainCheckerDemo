@@ -131,8 +131,8 @@ add_text_box(s, Inches(0.7), Inches(2.15), Inches(7.5), Inches(1.2),
 multiline_box(
     s, Inches(0.7), Inches(3.35), Inches(7.2), Inches(1.2),
     [
-        "Xác minh lô sầu riêng xuất khẩu trên blockchain —",
-        "từ vườn đến hải quan, trong vài giây thay vì vài ngày.",
+        "Tra hồ sơ lô sầu riêng lưu trên blockchain —",
+        "từ vườn đến hải quan trên một màn tra cứu.",
     ],
     size=18, color=MUTED, space_before=4,
 )
@@ -154,7 +154,7 @@ accent_bar(s)
 section_label(s, "Vấn đề")
 add_text_box(
     s, Inches(0.55), Inches(0.7), Inches(12), Inches(0.9),
-    "Trái cây hỏng ở cửa khẩu trong khi giấy tờ còn đang truy vết.",
+    "Chứng từ của một lô nằm ở nhiều nơi, khó đối chiếu khi cần.",
     size=28, bold=True, color=INK,
 )
 cards = [
@@ -164,11 +164,11 @@ cards = [
     ),
     (
         "Chứng từ manh mún",
-        "Phiếu lab giấy/PDF, mã vùng trồng dễ tái sử dụng/giả, hồ sơ chuỗi lạnh không xuất trình kịp.",
+        "Phiếu lab, mã vùng trồng và nhật ký vận chuyển lưu ở nhiều nguồn khác nhau.",
     ),
     (
-        "Mất ngày để truy nguồn",
-        "Khi lô bị nghi, truy về vườn có thể mất nhiều ngày — phần còn lại hỏng tại biên giới.",
+        "Truy vết phân tán",
+        "Khi lô bị nghi vấn, các bên phải ghép hồ sơ để xác định nguồn và người giữ lô.",
     ),
 ]
 for i, (title, body) in enumerate(cards):
@@ -197,14 +197,14 @@ multiline_box(
     s, Inches(0.55), Inches(0.7), Inches(12), Inches(1.0),
     [
         "Một lô sầu riêng là tài sản thật —",
-        "mỗi lần chuyển tay là trách nhiệm pháp lý cũng chuyển theo.",
+        "ứng dụng ghi lại người giữ lô sau mỗi lần chuyển giao.",
     ],
     size=26, bold=True, color=INK, space_before=2,
 )
 rows = [
     ("Lô vật lý", "Hàng xuất khẩu thật ngoài đời"),
     ("Batch PDA", "Bản sao số trên Solana (không mint NFT)"),
-    ("Quyền sở hữu (custody)", "Ai đang nắm quyền / chịu trách nhiệm lô này"),
+    ("Người giữ lô (custody)", "Ví nào đang giữ lô trong ứng dụng"),
     ("Vai trò (roles)", "Ai được ghi dữ liệu: nông hộ / lab / logistics"),
 ]
 for i, (a, b) in enumerate(rows):
@@ -235,7 +235,7 @@ features = [
     ("Cổng Cadimi 0,05 ppm",
      "Kết quả xét nghiệm đối chiếu ngưỡng ngay khi nhập. Quyết định pass / xem xét / giữ — minh bạch, không hộp đen."),
     ("AI hỗ trợ sớm",
-     "Mô hình ONNX: rủi ro Cadimi, bệnh, ảnh lá — chỉ sàng lọc; phiếu lab có chữ ký mới là chuẩn."),
+     "ONNX chạy với dữ liệu tổng hợp và ảnh mẫu; cần kiểm định thực địa. Phiếu lab gốc xác thực riêng."),
     ("QR cho mọi người",
      "Người mua & hải quan quét là thấy timeline, custody, bằng chứng Explorer. Không cần ví để tra cứu."),
     ("Hai chế độ trung thực",
@@ -289,7 +289,7 @@ accent_bar(s)
 section_label(s, "Kiến trúc")
 add_text_box(
     s, Inches(0.55), Inches(0.7), Inches(12), Inches(0.6),
-    "Chain là nguồn sự thật. UI đọc chain. AI chỉ hỗ trợ.",
+    "Chain lưu bản ghi. UI tra cứu. AI chỉ hỗ trợ.",
     size=26, bold=True, color=INK,
 )
 layers = [
@@ -388,14 +388,14 @@ accent_bar(s)
 section_label(s, "Bảng trung thực")
 add_text_box(
     s, Inches(0.55), Inches(0.7), Inches(12), Inches(0.6),
-    "Cái gì là thật — cái gì hỗ trợ — cái gì chưa claim.",
+    "Phạm vi đã làm và giới hạn của bản demo.",
     size=26, bold=True, color=INK,
 )
 table_data = [
-    ("Đăng ký lô / lab / timeline", "Thật trên Solana devnet"),
+    ("Đăng ký lô / lab / timeline", "Giao dịch devnet; dữ liệu tự nhập"),
     ("Chuỗi custody (2 chữ ký)", "Thật — chỉ on-chain, không giả fallback"),
     ("Cổng Cadimi 0,05 ppm", "Hằng số quy tắc, kiểm được"),
-    ("Mô hình AI (ONNX)", "Hỗ trợ sàng lọc thật"),
+    ("Mô hình AI (ONNX)", "Pipeline chạy; chưa đánh giá thực địa"),
     ("QR + bằng chứng Explorer", "Deep link / chữ ký thật"),
     ("Triển khai toàn quốc nông hộ", "Chưa claim — có lộ trình pilot"),
     ("Mainnet / thông quan thật", "Chưa — demo trên devnet"),
@@ -448,8 +448,8 @@ multiline_box(
     s, Inches(0.7), Inches(2.15), Inches(12), Inches(2.0),
     [
         "Bản sao số của lô xuất khẩu.",
-        "Trách nhiệm đi cùng quyền custody.",
-        "Cổng an toàn có thể kiểm toán.",
+        "Lịch sử bàn giao gắn với ví nhận.",
+        "Quy tắc Cadimi có thể kiểm toán.",
         "QR cho mọi người còn lại.",
     ],
     size=26, bold=True, color=WHITE, space_before=4,

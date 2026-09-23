@@ -101,6 +101,13 @@ jobs:
               exit 1
             }
 
+      - name: Contract source and IDL synchronization
+        run: node scripts/sync-contract.mjs --check
+
+      - name: Attestation v2 native signature integration
+        working-directory: program
+        run: TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:attestation
+
       - name: anchor test (bankrun — no validator required)
         working-directory: program
         run: anchor test --skip-build

@@ -1,17 +1,17 @@
 import { Fingerprint } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 
-function HashProofChip({ hash, batchId, loading }) {
+function HashProofChip({ hash, batchId, loading, source }) {
   const { copy, language } = useLanguage()
 
   const certificateHref = `${import.meta.env.BASE_URL}#/unit/demo?batchId=${batchId || ''}`
-  
-  const isChain = hash && 
-                  hash !== 'simulated, not on-chain' && 
-                  hash !== 'on-chain (Solana)' && 
+
+  const isChain = source === 'chain' && hash &&
+                  hash !== 'simulated, not on-chain' &&
+                  hash !== 'on-chain (Solana)' &&
                   hash !== 'on-chain (signature not cached)' &&
                   !hash.startsWith('simulated')
-                  
+
   const explorerHref = isChain ? `https://explorer.solana.com/tx/${hash}?cluster=devnet` : null
 
   return (
@@ -28,7 +28,7 @@ function HashProofChip({ hash, batchId, loading }) {
           href={certificateHref}
           style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', color: 'var(--color-green-deep)', fontWeight: 600, textDecoration: 'underline' }}
         >
-          {language === 'vi' ? 'Xem Chứng Thư' : 'View Certificate'}
+          {language === 'vi' ? 'Xem hồ sơ lô' : 'View batch record'}
         </a>
         {explorerHref && (
           <a

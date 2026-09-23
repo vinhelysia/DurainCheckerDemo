@@ -13,8 +13,8 @@ declare_id!("4EZcqRn9LYK5VMuhLC2bNDaUqVBHxc6KCZ6zhFet3Par");
 // Explicit bytes (not pubkey!) so the 32-byte key is forced into SBF rodata and
 // is greppable in the deployed ELF — pubkey! was optimized away from the .so.
 const GENESIS_AUTHORITY_BYTES: [u8; 32] = [
-    59, 210, 13, 95, 146, 216, 201, 167, 22, 227, 36, 97, 210, 249, 124, 67, 111,
-    142, 19, 60, 166, 139, 147, 111, 87, 57, 255, 176, 142, 17, 87, 142,
+    59, 210, 13, 95, 146, 216, 201, 167, 22, 227, 36, 97, 210, 249, 124, 67, 111, 142, 19, 60, 166,
+    139, 147, 111, 87, 57, 255, 176, 142, 17, 87, 142,
 ];
 
 const MAX_ID_LEN: usize = 32;
@@ -574,6 +574,92 @@ pub mod durian_trust {
 
         Ok(())
     }
+
+    // V2 is additive: the legacy instructions and attestation PDAs remain valid.
+    // Signatures bind the program, report index, and length-prefixed text fields.
+    /// Attest an existing LabReport using an Ed25519 signature verified in ix 0.
+    /// The caller must be the lab role holder (or authority) and must be the Ed25519
+    /// signing key used in ix 0.
+    pub fn attest_lab_report_v2(
+        ctx: Context<AttestLabReportV2>,
+        id: String,
+        lab_report_index: u32,
+        sig: [u8; 64],
+        payload_hash: [u8; 32],
+    ) -> Result<()> {
+        require_not_paused(&ctx.accounts.config)?;
+        require_role_or_authority(
+            &ctx.accounts.config,
+            &ctx.accounts.signer,
+            ctx.accounts.lab_role.is_some(),
+        )?;
+
+        // Recompute the expected hash from the stored LabReport and verify it matches
+        // what the caller claims to have signed. This binds the signature to the actual
+        // on-chain data, not just whatever bytes the caller passed in.
+        let report = &ctx.accounts.lab_report;
+        let expected_hash = compute_payload_hash_v2(ctx.program_id, &id, lab_report_index, report)?;
+        require!(
+            expected_hash == payload_hash,
+            DurianTrustError::PayloadHashMismatch
+        );
+
+        // Verify the Ed25519 pre-instruction (ix 0) matches this signer + payload_hash + sig.
+        verify_ed25519_ix(
+            &ctx.accounts.ix_sysvar.to_account_info(),
+            &ctx.accounts.signer.key().to_bytes(),
+            &payload_hash,
+            &sig,
+        )?;
+
+        let lab_pubkey = ctx.accounts.signer.key();
+        let timestamp = Clock::get()?.unix_timestamp;
+
+        ctx.accounts.attestation.set_inner(LabAttestation {
+            lab_report_index,
+            payload_hash,
+            sig,
+            lab_pubkey,
+            timestamp,
+        });
+
+        emit!(LabReportAttestedV2 {
+            id,
+            lab_report_index,
+            lab_pubkey,
+            payload_hash,
+        });
+
+        Ok(())
+    }
+
+    /// Read-only tamper-evidence check: recomputes the payload hash from the live
+    /// LabReport and asserts it still matches the stored LabAttestation. Emits
+    /// `AttestationVerifiedV2` on success. Anyone may call this.
+    pub fn verify_attestation_v2(
+        ctx: Context<VerifyAttestationV2>,
+        id: String,
+        lab_report_index: u32,
+    ) -> Result<()> {
+        let report = &ctx.accounts.lab_report;
+        let attestation = &ctx.accounts.attestation;
+
+        let computed_hash = compute_payload_hash_v2(ctx.program_id, &id, lab_report_index, report)?;
+
+        require!(
+            computed_hash == attestation.payload_hash,
+            DurianTrustError::PayloadHashMismatch
+        );
+
+        emit!(AttestationVerifiedV2 {
+            id,
+            lab_report_index,
+            lab_pubkey: attestation.lab_pubkey,
+            payload_hash: attestation.payload_hash,
+        });
+
+        Ok(())
+    }
 }
 
 // ── context structs ───────────────────────────────────────────────
@@ -855,6 +941,43 @@ pub struct VerifyAttestation<'info> {
     pub attestation: Account<'info, LabAttestation>,
 }
 
+#[derive(Accounts)]
+#[instruction(id: String, lab_report_index: u32)]
+pub struct AttestLabReportV2<'info> {
+    #[account(seeds = [b"config"], bump)]
+    pub config: Account<'info, Config>,
+    #[account(seeds = [b"batch", id.as_bytes()], bump)]
+    pub batch: Account<'info, Batch>,
+    /// The existing LabReport being attested; must already exist at this index.
+    #[account(seeds = [b"lab", id.as_bytes(), &lab_report_index.to_le_bytes()], bump)]
+    pub lab_report: Account<'info, LabReport>,
+    #[account(
+        init,
+        payer = signer,
+        space = 8 + LabAttestation::INIT_SPACE,
+        seeds = [b"attestation_v2", id.as_bytes(), &lab_report_index.to_le_bytes()],
+        bump
+    )]
+    pub attestation: Account<'info, LabAttestation>,
+    #[account(seeds = [b"lab_role", signer.key().as_ref()], bump)]
+    pub lab_role: Option<Account<'info, LabRole>>,
+    #[account(mut)]
+    pub signer: Signer<'info>,
+    /// CHECK: verified to be the Solana instructions sysvar by the address constraint.
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub ix_sysvar: UncheckedAccount<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(id: String, lab_report_index: u32)]
+pub struct VerifyAttestationV2<'info> {
+    #[account(seeds = [b"lab", id.as_bytes(), &lab_report_index.to_le_bytes()], bump)]
+    pub lab_report: Account<'info, LabReport>,
+    #[account(seeds = [b"attestation_v2", id.as_bytes(), &lab_report_index.to_le_bytes()], bump)]
+    pub attestation: Account<'info, LabAttestation>,
+}
+
 // ── account types ─────────────────────────────────────────────────
 
 /// MIGRATION NOTE (Phase 2): two fields were added — `pending_authority` (+33 bytes)
@@ -949,7 +1072,7 @@ pub struct LabReport {
 pub struct LabAttestation {
     /// Which lab report (index into the batch's lab_count sequence) is attested.
     pub lab_report_index: u32,
-    /// SHA-256 of the canonical payload bytes (see `compute_payload_hash`).
+    /// SHA-256 of the payload; the PDA seed selects legacy or V2 encoding.
     pub payload_hash: [u8; 32],
     /// The Ed25519 signature that was verified by the native Ed25519SigVerify program.
     pub sig: [u8; 64],
@@ -1119,6 +1242,22 @@ pub struct AttestationVerified {
     pub payload_hash: [u8; 32],
 }
 
+#[event]
+pub struct LabReportAttestedV2 {
+    pub id: String,
+    pub lab_report_index: u32,
+    pub lab_pubkey: Pubkey,
+    pub payload_hash: [u8; 32],
+}
+
+#[event]
+pub struct AttestationVerifiedV2 {
+    pub id: String,
+    pub lab_report_index: u32,
+    pub lab_pubkey: Pubkey,
+    pub payload_hash: [u8; 32],
+}
+
 // ── errors ────────────────────────────────────────────────────────
 
 #[error_code]
@@ -1180,12 +1319,7 @@ fn require_role_or_authority(
     }
 }
 
-fn validate_batch_strings(
-    id: &str,
-    farm: &str,
-    province: &str,
-    harvest_date: &str,
-) -> Result<()> {
+fn validate_batch_strings(id: &str, farm: &str, province: &str, harvest_date: &str) -> Result<()> {
     validate_id(id)?;
     validate_string_len(farm, MAX_FARM_LEN)?;
     validate_string_len(province, MAX_PROVINCE_LEN)?;
@@ -1267,6 +1401,46 @@ fn compute_payload_hash(
     .to_bytes()
 }
 
+/// V2 uses Borsh encoding: fixed domain and public keys, LE integers, and
+/// u32 byte-length prefixes for UTF-8 strings. Field order is the wire contract.
+/// The report index and program ID prevent cross-report and cross-program reuse.
+#[derive(AnchorSerialize)]
+struct AttestationPayloadV2 {
+    domain: [u8; 31],
+    program_id: Pubkey,
+    batch_id: String,
+    lab_report_index: u32,
+    cadmium_ppm: u64,
+    threshold_ppm: u64,
+    confidence: u64,
+    risk_level: u8,
+    ai_result: String,
+    risk_cause: String,
+    reporter: Pubkey,
+}
+
+fn compute_payload_hash_v2(
+    program_id: &Pubkey,
+    id: &str,
+    lab_report_index: u32,
+    report: &LabReport,
+) -> Result<[u8; 32]> {
+    let payload = AttestationPayloadV2 {
+        domain: *b"durian-trust:lab-attestation:v2",
+        program_id: *program_id,
+        batch_id: id.to_owned(),
+        lab_report_index,
+        cadmium_ppm: report.cadmium_ppm,
+        threshold_ppm: report.threshold_ppm,
+        confidence: report.confidence,
+        risk_level: report.risk_level.as_u8(),
+        ai_result: report.ai_result.clone(),
+        risk_cause: report.risk_cause.clone(),
+        reporter: report.reporter,
+    };
+    Ok(hashv(&[&payload.try_to_vec()?]).to_bytes())
+}
+
 /// Parses the Ed25519SigVerify instruction that must appear at ix index 0 and
 /// verifies that it attests exactly `(expected_pubkey, expected_message, expected_sig)`.
 ///
@@ -1326,9 +1500,7 @@ fn verify_ed25519_ix(
     // index would let the native program verify a different instruction's bytes
     // while we read our local buffer — closing cross-instruction confusion.
     require!(
-        sig_ix_index == u16::MAX
-            && pubkey_ix_index == u16::MAX
-            && msg_ix_index == u16::MAX,
+        sig_ix_index == u16::MAX && pubkey_ix_index == u16::MAX && msg_ix_index == u16::MAX,
         DurianTrustError::InvalidEd25519Instruction
     );
 
@@ -1351,10 +1523,76 @@ fn verify_ed25519_ix(
         msg_size == 32 && ix_message == expected_message,
         DurianTrustError::PayloadHashMismatch
     );
-    require!(
-        ix_sig == expected_sig,
-        DurianTrustError::SignatureMismatch
-    );
+    require!(ix_sig == expected_sig, DurianTrustError::SignatureMismatch);
 
     Ok(())
+}
+
+#[cfg(test)]
+mod attestation_v2_tests {
+    use super::*;
+
+    fn report() -> LabReport {
+        LabReport {
+            cadmium_ppm: 400,
+            threshold_ppm: 500,
+            confidence: 0,
+            risk_level: RiskLevel::Low,
+            ai_result: "ab".into(),
+            risk_cause: "c".into(),
+            reporter: Pubkey::new_from_array([2; 32]),
+            timestamp: 0,
+        }
+    }
+
+    #[test]
+    fn payload_v2_matches_cross_language_golden_vector() {
+        let hash =
+            compute_payload_hash_v2(&Pubkey::new_from_array([1; 32]), "BATCH-V2", 7, &report())
+                .unwrap();
+        let hex: String = hash.iter().map(|byte| format!("{byte:02x}")).collect();
+        assert_eq!(
+            hex,
+            "59347afa1fbaf7a933509daff52df2d09ae0557884737e28efd9cf34ba604fe3"
+        );
+    }
+
+    #[test]
+    fn payload_v2_separates_adjacent_text_fields() {
+        let program_id = Pubkey::new_from_array([1; 32]);
+        let original = report();
+        let mut repartitioned = report();
+        repartitioned.ai_result = "a".into();
+        repartitioned.risk_cause = "bc".into();
+        assert_ne!(
+            compute_payload_hash_v2(&program_id, "BATCH-V2", 7, &original).unwrap(),
+            compute_payload_hash_v2(&program_id, "BATCH-V2", 7, &repartitioned).unwrap(),
+        );
+    }
+
+    #[test]
+    fn payload_v2_binds_program_batch_index_and_reporter() {
+        let program_id = Pubkey::new_from_array([1; 32]);
+        let original = report();
+        let hash = compute_payload_hash_v2(&program_id, "BATCH-V2", 7, &original).unwrap();
+        assert_ne!(
+            hash,
+            compute_payload_hash_v2(&Pubkey::new_from_array([3; 32]), "BATCH-V2", 7, &original,)
+                .unwrap()
+        );
+        assert_ne!(
+            hash,
+            compute_payload_hash_v2(&program_id, "OTHER", 7, &original).unwrap()
+        );
+        assert_ne!(
+            hash,
+            compute_payload_hash_v2(&program_id, "BATCH-V2", 8, &original).unwrap()
+        );
+        let mut other_reporter = report();
+        other_reporter.reporter = Pubkey::new_from_array([4; 32]);
+        assert_ne!(
+            hash,
+            compute_payload_hash_v2(&program_id, "BATCH-V2", 7, &other_reporter).unwrap()
+        );
+    }
 }

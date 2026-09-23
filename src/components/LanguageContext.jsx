@@ -6,14 +6,22 @@ const LanguageContext = createContext(null)
 
 export function LanguageProvider({ children }) {
   const [language, setLanguageState] = useState(() => {
-    const stored = localStorage.getItem('duriantrust-language')
-    return stored === 'vi' || stored === 'en' ? stored : 'vi'
+    try {
+      const stored = localStorage.getItem('duriantrust-language')
+      return stored === 'vi' || stored === 'en' ? stored : 'vi'
+    } catch {
+      return 'vi'
+    }
   })
 
   const setLanguage = (lang) => {
     if (lang === 'vi' || lang === 'en') {
       setLanguageState(lang)
-      localStorage.setItem('duriantrust-language', lang)
+      try {
+        localStorage.setItem('duriantrust-language', lang)
+      } catch {
+        // Language switching still works for this session when storage is blocked.
+      }
     }
   }
 

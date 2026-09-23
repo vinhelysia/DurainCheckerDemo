@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import math
+import logging
 import os
 import numpy as np
 import onnxruntime as ort
@@ -15,6 +16,10 @@ MAX_BODY = 16_384
 session = None
 schema = None
 
+
+class InvalidInput(ValueError):
+    """A validation error safe to return to the caller."""
+
 def load_resources():
     global session, schema
     if session is None:
@@ -25,30 +30,37 @@ def load_resources():
 
 def require_field(data, name):
     if name not in data:
-        raise ValueError(f"missing field: {name}")
+        raise InvalidInput(f"missing field: {name}")
     return data[name]
 
 def parse_finite_number(value, name, lo, hi):
     """Parse a numeric field; reject bool, non-numeric, non-finite, out-of-range."""
     if isinstance(value, bool) or value is None:
-        raise ValueError(f"{name} must be numeric")
+        raise InvalidInput(f"{name} must be numeric")
     try:
         num = float(value)
-    except (TypeError, ValueError):
-        raise ValueError(f"{name} must be numeric")
+    except (TypeError, ValueError, OverflowError):
+        raise InvalidInput(f"{name} must be numeric")
     if not math.isfinite(num):
-        raise ValueError(f"{name} must be finite")
+        raise InvalidInput(f"{name} must be finite")
     if num < lo or num > hi:
-        raise ValueError(f"{name} out of range [{lo}, {hi}]")
+        raise InvalidInput(f"{name} out of range [{lo}, {hi}]")
     return num
+
+def parse_integer(value, name, lo, hi):
+    num = parse_finite_number(value, name, lo, hi)
+    if not num.is_integer():
+        raise InvalidInput(f"{name} must be an integer")
+    return int(num)
+
 
 def map_soil_drainage(drainage_str, schema_mapping):
     if not isinstance(drainage_str, str):
-        raise ValueError("soil_drainage must be a string")
+        raise InvalidInput("soil_drainage must be a string")
     key = drainage_str.strip().lower()
     if key not in schema_mapping:
         accepted = ", ".join(schema_mapping.keys())
-        raise ValueError(f"unknown soil_drainage: {drainage_str!r}; accepted: {accepted}")
+        raise InvalidInput(f"unknown soil_drainage: {drainage_str!r}; accepted: {accepted}")
     return schema_mapping[key]
 
 def parse_disease_payload(data):
@@ -65,13 +77,13 @@ def parse_disease_payload(data):
     )
     soil_drainage = require_field(data, "soil_drainage")
     # ponytail: harvest_month 1-12
-    harvest_month = int(parse_finite_number(require_field(data, "harvest_month"), "harvest_month", 1, 12))
+    harvest_month = parse_integer(require_field(data, "harvest_month"), "harvest_month", 1, 12)
     # ponytail: tree_age_years 0-100
     tree_age_years = parse_finite_number(require_field(data, "tree_age_years"), "tree_age_years", 0, 100)
     # ponytail: prior_infection 0 or 1
-    prior_infection = int(parse_finite_number(require_field(data, "prior_infection"), "prior_infection", 0, 1))
+    prior_infection = parse_integer(require_field(data, "prior_infection"), "prior_infection", 0, 1)
     if prior_infection not in (0, 1):
-        raise ValueError("prior_infection must be 0 or 1")
+        raise InvalidInput("prior_infection must be 0 or 1")
     return (
         temperature_c,
         humidity_pct,
@@ -154,8 +166,15 @@ class handler(BaseHTTPRequestHandler):
 
             try:
                 content_length = int(self.headers.get('Content-Length', 0))
-            except (TypeError, ValueError):
-                content_length = 0
+            except (TypeError, ValueError, OverflowError):
+                content_length = -1
+            if content_length <= 0:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self._cors_headers()
+                self.end_headers()
+                self.wfile.write(b'{"error": "Content-Length must be a positive integer"}')
+                return
             if content_length > MAX_BODY:
                 self.send_response(413)
                 self.send_header('Content-Type', 'application/json')
@@ -167,9 +186,12 @@ class handler(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
 
             try:
-                data = json.loads(post_data.decode('utf-8'))
+                try:
+                    data = json.loads(post_data.decode('utf-8'))
+                except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+                    raise InvalidInput("invalid JSON body") from exc
                 if not isinstance(data, dict):
-                    raise ValueError("JSON body must be an object")
+                    raise InvalidInput("JSON body must be an object")
                 (
                     temperature_c,
                     humidity_pct,
@@ -198,13 +220,20 @@ class handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(result).encode('utf-8'))
 
-            except Exception as e:
+            except InvalidInput as e:
                 self.send_response(400)
                 self.send_header('Content-Type', 'application/json')
                 self._cors_headers()
                 self.end_headers()
                 error_response = {"error": str(e)}
                 self.wfile.write(json.dumps(error_response).encode('utf-8'))
+            except Exception:
+                logging.exception("Prediction failed")
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self._cors_headers()
+                self.end_headers()
+                self.wfile.write(b'{"error": "prediction unavailable"}')
         else:
             self.send_response(404)
             self._cors_headers()

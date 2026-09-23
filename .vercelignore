@@ -5,3 +5,6 @@ dist
 .vite
 __pycache__
 *.log
+
+# Local regression tests are not API endpoints
+api/test_*.py

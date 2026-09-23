@@ -2,8 +2,8 @@
  * UI copy (VI/EN).
  *
  * Export verdict glossary (use everywhere for low|medium|high export gate):
- *   VI: Đạt xuất khẩu | Cần xem lại | Giữ lô
- *   EN: Export-ready | Needs review | Hold
+ *   VI: Dưới ngưỡng minh họa | Cần xem lại | Giữ lô
+ *   EN: Below demo threshold | Needs review | Hold
  *
  * Disease risk (diseaseModel only — not export gate):
  *   VI/EN: Rủi ro thấp|trung bình|cao / Low|Medium|High risk
@@ -46,9 +46,9 @@ export const copyData = {
       lead: 'Thu hoạch, phiếu lab Cadimi, chặng lạnh — một hồ sơ. Quét QR là mở được, không lục PDF rời.',
       ctaDemo: 'Thử quét một lô mẫu',
       ctaProblem: 'Vì sao lô bị giữ?',
-      batchProof: 'Chứng thư kiểm định',
-      ledgerEvents: '4 mốc trên sổ · Đạt xuất khẩu · Cadimi trong ngưỡng',
-      verified: 'Đã xác thực',
+      batchProof: 'Hồ sơ lô minh họa',
+      ledgerEvents: '4 mốc trên sổ · Dưới ngưỡng minh họa · Cadimi trong ngưỡng',
+      verified: 'Dữ liệu minh họa',
       ariaLabelLedger: 'Mẫu trạng thái lô hàng',
       ariaLabelActions: 'Hành động chính',
       photoAlt: 'Sầu riêng chín trên bàn gỗ, ảnh tư liệu',
@@ -60,28 +60,28 @@ export const copyData = {
       steps: [
         {
           title: 'Vườn',
-          text: 'Ngày thu hoạch và mã số vùng trồng (PUC) dính vào lô ngay từ đầu.',
+          text: 'Ghi tên vườn, tỉnh và ngày thu hoạch; chưa xác minh mã vùng trồng chính thức.',
           href: '#/unit/farm',
           alt: 'Vườn sầu riêng',
           image: 'orchard.webp',
         },
         {
           title: 'Lab',
-          text: 'Phiếu Cadimi và Vàng O được lab ký số; báo cáo băm để đối chiếu sau này.',
+          text: 'Ghi số Cadimi do người dùng nhập. Xác thực phiếu lab và dữ liệu Vàng O chưa tích hợp trong giao diện.',
           href: '#/unit/testing',
           alt: 'Kỹ thuật viên xử lý mẫu trong phòng lab',
           image: 'lab.webp',
         },
         {
           title: 'Lạnh',
-          text: 'Nhiệt độ container và mốc giao nhận được ghi theo chặng, không chỉ “đã giao”.',
+          text: 'Ghi mốc vận chuyển và bàn giao; kết nối cảm biến nhiệt độ là hướng phát triển.',
           href: '#/unit/transport',
           alt: 'Container lạnh xếp tại bãi',
           image: 'reefer.webp',
         },
         {
           title: 'Cảng',
-          text: 'Hồ sơ thông quan khớp với các mốc trước đó khi hải quan hỏi.',
+          text: 'Đối chiếu các mốc đã ghi; chưa kết nối hệ thống thông quan.',
           href: '#/unit/export',
           alt: 'Tàu container tại cảng',
           image: 'port.webp',
@@ -92,20 +92,20 @@ export const copyData = {
       records: [
         { name: 'Đăng ký lô', detail: 'Mã lô, vùng trồng, ngày thu hoạch.' },
         { name: 'Ghi mốc hành trình', detail: 'Canh tác, đóng gói, chặng lạnh.' },
-        { name: 'Xác nhận phiếu lab', detail: 'Lab ký số lên báo cáo đã băm.' },
-        { name: 'Đối chiếu chứng thư', detail: 'Ai cũng kiểm chữ ký và mã băm trên blockchain.' },
+        { name: 'Ghi kết quả', detail: 'Số Cadimi và ngưỡng do người dùng nhập.' },
+        { name: 'Đối chiếu giao dịch', detail: 'Xem ví ký và lịch sử trên Devnet; không xác thực phiếu lab.' },
       ],
     },
     problem: {
       kicker: '',
       title: 'Vì sao lô sầu riêng vẫn bị kẹt ở cửa khẩu?',
       body1: 'Nhiều lô Việt Nam bị cảnh báo hoặc dừng thông quan khi phía nhập khẩu siết Cadimi và Vàng O.',
-      body2: 'Trái có thể đạt. Hồ sơ thì rời: phiếu lab PDF, mã vùng trồng mượn, nhiệt độ container không ai đưa ra kịp.',
+      body2: 'Rủi ro hóa chất và hồ sơ rời rạc đều cần xử lý. Đề tài tập trung liên kết dữ liệu lô, không thay kiểm nghiệm.',
       photoCaption: 'Sầu riêng là ngành tỷ đô. Một phát hiện dư lượng có thể giữ cả container.',
       photo: 'market.webp',
       figures: [
-        { value: '0.05 ppm', label: 'Ngưỡng Cadimi tối đa theo quy định hải quan Trung Quốc (GACC)' },
-        { value: '248/249', label: 'Hai nghị định siết nguồn gốc và an toàn thực phẩm trong nước' },
+        { value: '0.05 ppm', label: 'Ngưỡng Cadimi minh họa của demo; chưa xác minh áp dụng pháp lý' },
+        { value: 'Hồ sơ', label: 'Liên kết nguồn gốc, số đo và bàn giao theo lô' },
         { value: '2025', label: 'Năm kiểm tra cửa khẩu gắt hơn với Vàng O' },
       ],
       newsTitle: 'Báo chí đã viết về chuyện này',
@@ -130,7 +130,7 @@ export const copyData = {
         {
           icon: 'temp',
           title: 'Container không có sổ nhiệt',
-          desc: 'Không chứng minh được 2–4 °C suốt đường đi, hàng chín ép trong thùng trước cửa khẩu.',
+          desc: 'Thiếu nhật ký nhiệt độ làm khó việc đối chiếu điều kiện bảo quản. Khoảng nhiệt phù hợp tùy sản phẩm và quy trình.',
           image: 'reefer.webp',
         },
         {
@@ -141,7 +141,7 @@ export const copyData = {
         },
         {
           icon: 'clock',
-          title: 'Sự cố thì mất cả tuần truy vết',
+          title: 'Truy vết khi lô gặp sự cố',
           desc: 'Vượt ngưỡng ở biên giới rồi mới gọi từng nông trại — lúc đó container đã nằm chờ.',
           image: 'port.webp',
         },
@@ -167,8 +167,8 @@ export const copyData = {
         },
         {
           title: 'Cổng Cadimi theo quy tắc',
-          subtitle: 'So với 0.05 ppm',
-          body: 'Lab nhập số → hệ thống so ngưỡng minh họa → Đạt xuất khẩu, Cần xem lại, hoặc Giữ lô. Rõ ràng, kiểm lại được.',
+          subtitle: 'Ngưỡng demo 0.05 ppm',
+          body: 'Lab nhập số → hệ thống so ngưỡng minh họa → Dưới ngưỡng, Cần xem lại, hoặc Giữ lô. Rõ ràng, kiểm lại được.',
           tags: ['Xác nhận lab', 'Đối chiếu'],
           image: 'lab.webp',
         },
@@ -197,20 +197,26 @@ export const copyData = {
         status: 'Trạng thái',
       },
       riskNames: {
-        low: 'Đạt xuất khẩu',
+        unknown: 'Chưa có kết quả',
+        low: 'Dưới ngưỡng demo',
         medium: 'Cần xem lại',
         high: 'Giữ lô',
       },
       riskSubnames: {
-        low: 'Đạt xuất khẩu',
+        low: 'Dưới ngưỡng demo',
         medium: 'Cần xem lại',
         high: 'Giữ lô',
       },
       provenance: {
         live: 'Trực tiếp trên Solana Devnet',
-        demo: 'Dữ liệu minh họa, Devnet không khả dụng',
+        demo: 'Dữ liệu demo / lưu trên máy — chưa được xác minh trên blockchain',
         viewExplorer: 'Xem trên Solana Explorer',
       },
+      storageError: 'Không thể đọc dữ liệu lưu trên máy. Ứng dụng giữ nguyên dữ liệu đã lưu; hãy kiểm tra quyền lưu trữ hoặc bản sao lưu trước khi thử lại.',
+      notFound: 'Không tìm thấy mã lô đã chọn',
+      unavailable: 'Chưa thể tải thông tin lô',
+      notFoundChainHint: 'Không có hồ sơ tương ứng trên Solana Devnet. Hãy kiểm tra lại mã QR hoặc chọn một lô trong danh sách.',
+      notFoundFallbackHint: 'Không có hồ sơ tương ứng trong dữ liệu demo / lưu trên máy. Chưa thể xác nhận lô có tồn tại trên blockchain; hãy thử lại khi kết nối Devnet khả dụng.',
     },
     leafScanner: {
       kicker: 'Chẩn đoán lá',
@@ -250,12 +256,12 @@ export const copyData = {
       pendingDate: 'Chưa có lịch',
     },
     custody: {
-      title: 'Chuỗi quyền sở hữu',
-      ariaLabel: 'Các lần chuyển quyền sở hữu lô hàng',
-      empty: 'Lô hàng vẫn thuộc quyền sở hữu của người đăng ký. Chưa có lần chuyển giao nào.',
+      title: 'Chuỗi bàn giao lô hàng',
+      ariaLabel: 'Các lần bàn giao lô hàng trên Devnet',
+      empty: 'Chưa có lần bàn giao nào được ghi trên Devnet.',
       currentHolder: 'Đang nắm giữ:',
       pendingTitle: 'Đang chờ bên nhận xác nhận',
-      pendingHint: 'Quyền sở hữu chỉ chuyển khi bên nhận ký chấp nhận.',
+      pendingHint: 'Bản ghi người giữ lô chỉ cập nhật khi bên nhận ký chấp nhận.',
       pendingStatus: 'Chờ ký',
       roles: {
         farmer: 'Nông trại',
@@ -266,15 +272,19 @@ export const copyData = {
       },
     },
     aiResult: {
-      title: 'Kết quả kiểm định chất lượng',
-      sourceChain: 'Đã xác thực Blockchain',
-      sourceFallback: 'Ngoại tuyến · dữ liệu tĩnh',
+      title: 'Đối chiếu Cadimi từ giá trị đã nhập',
+      sourceChain: 'Đọc từ Solana Devnet',
+      measurementSourceChain: 'Số đo lưu trên Solana Devnet',
+      sourceFallback: 'Demo / lưu trên máy',
       riskLabels: {
-        low: 'Đạt xuất khẩu',
+        unknown: 'Chưa có kết quả',
+        low: 'Dưới ngưỡng demo',
         medium: 'Cần xem lại',
         high: 'Giữ lô',
       },
       confidence: 'Độ tin cậy kiểm định',
+      unknownHint: 'Chưa có kết quả kiểm nghiệm hợp lệ để đánh giá rủi ro của lô.',
+      noData: 'Chưa có dữ liệu',
       history: 'Lịch sử kiểm định',
       cadmium: 'Cadimi',
       threshold: 'Ngưỡng minh họa',
@@ -305,8 +315,8 @@ export const copyData = {
       outcomesTitle: 'Ai dùng được gì?',
       outcomes: [
         { who: 'Nhà vườn', text: 'Mã vùng trồng dính vào lô của mình, không bị mượn lung tung.' },
-        { who: 'Doanh nghiệp xuất khẩu', text: 'Cadimi và Vàng O theo từng lô — mang ra khi được hỏi.' },
-        { who: 'Đối tác nhập khẩu', text: 'Đối chiếu chữ ký lab trên blockchain, không chỉ tin file gửi tay.' },
+        { who: 'Doanh nghiệp xuất khẩu', text: 'Tra số Cadimi đã nhập theo từng lô; dữ liệu Vàng O chưa tích hợp.' },
+        { who: 'Đối tác nhập khẩu', text: 'Xem lịch sử báo cáo và giao dịch trên chain; phiếu lab gốc cần xác thực riêng.' },
         { who: 'Người mua (demo)', text: 'Quét QR trên bao/thùng để xem đường đi vườn → cảng.' },
       ],
       photos: [
@@ -341,7 +351,7 @@ export const copyData = {
       backToHome: 'Quay lại trang chủ',
       iotTelemetry: 'Số đo cảm biến (mẫu demo)',
       blockchainProof: 'Bằng chứng trên blockchain',
-      statusApproved: 'Đạt xuất khẩu',
+      statusApproved: 'Dưới ngưỡng minh họa',
       statusPending: 'Đang chờ xử lý',
       statusRejected: 'Giữ lô',
     },
@@ -413,7 +423,7 @@ export const copyData = {
       },
       security: {
         title: 'Bảo mật trên blockchain',
-        desc: 'Mọi ghi nhận từ cổng này được ký bằng ví Phantom của người vận hành. Khi vào sổ Solana devnet, hệ thống tạo mã giao dịch không thể sửa. Người quét QR có thể đối chiếu kết quả Cadimi đã được xác nhận tại nguồn.'
+        desc: 'Mọi ghi nhận từ cổng này được ký bằng ví Phantom của người vận hành. Khi vào sổ Solana devnet, hệ thống tạo mã giao dịch không thể sửa. Người quét QR có thể đối chiếu ví ký và dữ liệu đã ghi; chưa chứng minh phép đo hay phiếu lab là chính thức.'
       }
     },
     getRuleResult: (audit) => audit.aiResultVi,
@@ -426,20 +436,20 @@ export const copyData = {
       harvestDateLabel: 'Ngày thu hoạch',
       violationsLabel: 'Lịch sử vi phạm của vườn (0-5)',
       rainfallLabel: 'Lượng mưa ước tính (mm)',
-      cadmiumLabel: 'Kết quả kiểm nghiệm Cadimi tạm tính (ppm)',
-      cadmiumHint: 'Ngưỡng an toàn tối đa của Hải quan là 0.050 ppm',
+      cadmiumLabel: 'Số Cadimi do người dùng nhập (ppm)',
+      cadmiumHint: 'Ngưỡng minh họa: 0.050 ppm; không xác nhận đủ điều kiện xuất khẩu.',
       aiForecast: {
-        title: 'Dự báo Cadimi trước lab',
+        title: 'Mô hình rủi ro minh họa (dữ liệu tổng hợp)',
         loading: 'Đang phân tích dữ liệu...',
         riskText: (risk) => `Nguy cơ: ${risk === 'low' ? 'Thấp' : risk === 'medium' ? 'Trung bình' : 'Cao'}`,
         statusLabels: {
-          low: 'Đạt xuất khẩu',
+          low: 'Rủi ro thấp',
           medium: 'Cần xem lại',
           high: 'Giữ lô'
         },
-        probabilityLabel: 'Khả năng xảy ra: ',
+        probabilityLabel: 'Đầu ra mô hình minh họa: ',
         requiresTesting: 'Yêu cầu kiểm nghiệm đầy đủ trong phòng thí nghiệm',
-        eligibleFastTrack: 'Đạt điều kiện miễn giảm quy trình kiểm nghiệm phụ'
+        eligibleFastTrack: 'Dự báo minh họa; vẫn cần kiểm nghiệm đầy đủ'
       },
       diseaseForecast: {
         loading: 'Đang phân tích điều kiện môi trường...',
@@ -448,7 +458,7 @@ export const copyData = {
       ruleAudit: {
         title: 'Đánh giá theo quy tắc (tạm tính)',
         statusLabels: {
-          low: 'Đạt xuất khẩu',
+          low: 'Dưới ngưỡng demo',
           medium: 'Cần xem lại',
           high: 'Giữ lô'
         },
@@ -464,11 +474,11 @@ export const copyData = {
       selectBatchLabel: 'Chọn lô sầu riêng cần kiểm định',
       selectBatchPlaceholder: '-- Chọn lô sầu riêng --',
       cadmiumLabel: 'Hàm lượng Cadimi phân tích (ppm)',
-      thresholdLabel: 'Ngưỡng kiểm định tối đa (ppm)',
+      thresholdLabel: 'Ngưỡng đối chiếu cấu hình (ppm)',
       ruleAudit: {
         title: 'Kết quả đối chiếu quy tắc',
         statusLabels: {
-          low: 'Đạt xuất khẩu',
+          low: 'Dưới ngưỡng demo',
           medium: 'Cần xem lại',
           high: 'Giữ lô'
         },
@@ -484,6 +494,7 @@ export const copyData = {
         summary: (count) => `Có ${count} báo cáo hóa chất được tìm thấy:`,
         run: (index) => `Lần kiểm nghiệm #${index}`,
         noData: 'Không tìm thấy lịch sử báo cáo nào của lô hàng này.',
+        error: 'Chưa thể tải lịch sử kiểm nghiệm. Hãy thử lại khi kết nối Devnet khả dụng.',
         selectPrompt: 'Vui lòng chọn Lô hàng để xem lịch sử.'
       }
     },
@@ -492,16 +503,16 @@ export const copyData = {
       initCamera: 'Đang khởi chạy camera...',
       cameraFailed: 'Không thể truy cập Camera',
       cameraHint: 'Vui lòng kiểm tra quyền camera hoặc nhập mã bên dưới',
-      verified: 'Đã xác thực lô hàng',
+      verified: 'Đã đọc mã lô — đang mở hồ sơ',
       manualLabel: 'Nhập mã lô hàng thủ công:',
-      verifyBtn: 'Xác thực',
+      verifyBtn: 'Tra cứu',
       selectDemo: 'Chọn nhanh lô hàng mẫu:',
-      footer: 'Mã QR liên kết trực tiếp với hồ sơ lô trên blockchain',
+      footer: 'QR mở hồ sơ lô; không xác nhận hàng thật hoặc chống sao chép nhãn',
       error: {
         empty: 'Vui lòng điền mã lô!'
       },
       riskLabels: {
-        low: 'Đạt xuất khẩu',
+        low: 'Dưới ngưỡng demo',
         medium: 'Cần xem lại',
         high: 'Giữ lô'
       }
@@ -617,9 +628,9 @@ export const copyData = {
       lead: 'Harvest, lab Cadmium result, cold-chain stops — one record. Open it with a QR; no hunting loose PDFs.',
       ctaDemo: 'Try a sample batch',
       ctaProblem: 'Why loads get held',
-      batchProof: 'Inspection certificate',
-      ledgerEvents: '4 ledger milestones · Export-ready · Cadmium within limit',
-      verified: 'Verified',
+      batchProof: 'Illustrative batch record',
+      ledgerEvents: '4 ledger milestones · Below demo threshold · Cadmium within limit',
+      verified: 'Illustrative data',
       ariaLabelLedger: 'Sample batch status',
       ariaLabelActions: 'Primary actions',
       photoAlt: 'Ripe durian fruit on a wooden table (stock photo)',
@@ -631,28 +642,28 @@ export const copyData = {
       steps: [
         {
           title: 'Orchard',
-          text: 'Harvest date and growing-area code (PUC) stick to the batch from day one.',
+          text: 'Record farm, province and harvest date; official growing-area codes are not verified.',
           href: '#/unit/farm',
           alt: 'Durian orchard',
           image: 'orchard.webp',
         },
         {
           title: 'Lab',
-          text: 'Cadmium and Yellow O results are signed by the lab; the report is hashed for later checks.',
+          text: 'Record user-entered Cadmium. Certificate authentication and Yellow O data are not integrated into this UI.',
           href: '#/unit/testing',
           alt: 'Technician processing samples in a testing laboratory',
           image: 'lab.webp',
         },
         {
           title: 'Cold chain',
-          text: 'Container temperature and handoff points are logged per leg — not just “delivered.”',
+          text: 'Log transport and custody milestones; temperature sensor integration is future work.',
           href: '#/unit/transport',
           alt: 'Refrigerated containers at a depot',
           image: 'reefer.webp',
         },
         {
           title: 'Port',
-          text: 'Customs paperwork lines up with the earlier milestones when someone asks.',
+          text: 'Review recorded milestones; no customs-system integration is implemented.',
           href: '#/unit/export',
           alt: 'Container ship at port',
           image: 'port.webp',
@@ -663,20 +674,20 @@ export const copyData = {
       records: [
         { name: 'Register batch', detail: 'Batch ID, growing area, harvest date.' },
         { name: 'Log milestone', detail: 'Farm work, packing, cold-chain stops.' },
-        { name: 'Certify lab report', detail: 'Lab signs the hashed test report.' },
-        { name: 'Verify certificate', detail: 'Anyone can check signature and hash on the blockchain.' },
+        { name: 'Record measurement', detail: 'User-entered Cadmium and comparison threshold.' },
+        { name: 'Inspect transaction', detail: 'Inspect signer and history on Devnet; not certificate authentication.' },
       ],
     },
     problem: {
       kicker: '',
       title: 'Why durian loads still get stuck at the border',
       body1: 'Vietnamese shipments keep getting flagged when importers tighten Cadmium and Yellow O checks.',
-      body2: 'The fruit may be fine. The file often isn’t: scattered lab PDFs, borrowed growing-area codes, reefer temps nobody can produce on demand.',
+      body2: 'Contamination and fragmented records both need attention. This prototype addresses linked batch records, not chemical testing.',
       photoCaption: 'Durian is a multibillion-dollar trade. One contaminant hit can freeze a whole container.',
       photo: 'market.webp',
       figures: [
-        { value: '0.05 ppm', label: 'Max Cadmium under China customs (GACC) rules' },
-        { value: '248/249', label: 'Two domestic decrees tightening origin and food safety' },
+        { value: '0.05 ppm', label: 'Demo Cadmium threshold; legal applicability not verified' },
+        { value: 'Records', label: 'Link origin, measurements and custody to each batch' },
         { value: '2025', label: 'The year border checks got harder on Yellow O' },
       ],
       newsTitle: 'What the press has been reporting',
@@ -701,7 +712,7 @@ export const copyData = {
         {
           icon: 'temp',
           title: 'No reefer temperature log',
-          desc: 'If you cannot show 2–4 °C for the trip, fruit can ripen in the box before customs.',
+          desc: 'Missing temperature logs hinder storage-condition checks. Suitable temperatures depend on the product and handling protocol.',
           image: 'reefer.webp',
         },
         {
@@ -712,7 +723,7 @@ export const copyData = {
         },
         {
           icon: 'clock',
-          title: 'A hold, then days of phone calls',
+          title: 'A hold, then records to retrieve',
           desc: 'Limits fail at the border first; only then does someone call orchards — while the container waits.',
           image: 'port.webp',
         },
@@ -738,8 +749,8 @@ export const copyData = {
         },
         {
           title: 'Cadmium rule gate',
-          subtitle: 'Against 0.05 ppm',
-          body: 'Lab enters a number → compare to the demo threshold → Export-ready, Needs review, or Hold. Clear and checkable.',
+          subtitle: 'Demo threshold 0.05 ppm',
+          body: 'Lab enters a number → compare to the demo threshold → Below threshold, Needs review, or Hold. Clear and checkable.',
           tags: ['Lab certify', 'Verify'],
           image: 'lab.webp',
         },
@@ -768,20 +779,26 @@ export const copyData = {
         status: 'Status',
       },
       riskNames: {
-        low: 'Export-ready',
+        unknown: 'No result yet',
+        low: 'Below demo threshold',
         medium: 'Needs review',
         high: 'Hold',
       },
       riskSubnames: {
-        low: 'Export-ready',
+        low: 'Below demo threshold',
         medium: 'Needs review',
         high: 'Hold',
       },
       provenance: {
         live: 'Live on Solana Devnet',
-        demo: 'Demo data, devnet unreachable',
+        demo: 'Demo / local data — not verified on blockchain',
         viewExplorer: 'View on Solana Explorer',
       },
+      storageError: 'Local data could not be read. Stored data has been preserved; check storage permissions or your backup before retrying.',
+      notFound: 'Selected batch ID not found',
+      unavailable: 'Batch details are unavailable',
+      notFoundChainHint: 'No matching record was found on Solana Devnet. Check the QR code or select a batch from the list.',
+      notFoundFallbackHint: 'No matching record was found in demo / local data. Its existence on blockchain is unconfirmed; retry when Devnet is available.',
     },
     leafScanner: {
       kicker: 'Leaf check',
@@ -823,10 +840,10 @@ export const copyData = {
     custody: {
       title: 'Chain of custody',
       ariaLabel: 'Custody handoffs for this batch',
-      empty: 'Still held by the registrant. No handoff has been recorded yet.',
+      empty: 'No custody handoff has been recorded on Devnet yet.',
       currentHolder: 'Currently held by:',
       pendingTitle: 'Awaiting the recipient',
-      pendingHint: 'Ownership only moves once the recipient signs to accept it.',
+      pendingHint: 'The recorded holder changes only after the recipient signs to accept.',
       pendingStatus: 'Unsigned',
       roles: {
         farmer: 'Farm',
@@ -837,15 +854,19 @@ export const copyData = {
       },
     },
     aiResult: {
-      title: 'Quality gate result',
-      sourceChain: 'Blockchain verified',
-      sourceFallback: 'Offline · static data',
+      title: 'Cadmium comparison from entered values',
+      sourceChain: 'Read from Solana Devnet',
+      measurementSourceChain: 'Measurements stored on Solana Devnet',
+      sourceFallback: 'Demo / local data',
       riskLabels: {
-        low: 'Export-ready',
+        unknown: 'No result yet',
+        low: 'Below demo threshold',
         medium: 'Needs review',
         high: 'Hold',
       },
       confidence: 'Audit confidence',
+      unknownHint: 'No valid lab result is available to assess this batch’s risk.',
+      noData: 'No data',
       history: 'Audit history',
       cadmium: 'Cadmium',
       threshold: 'Demo threshold',
@@ -870,14 +891,14 @@ export const copyData = {
         },
         {
           value: 'Cadmium with the load',
-          label: 'Readings plus Export-ready / Needs review / Hold on one record',
+          label: 'Readings plus Below demo threshold / Needs review / Hold on one record',
         },
       ],
       outcomesTitle: 'Who can use what?',
       outcomes: [
         { who: 'Growers', text: 'Your growing-area code sticks to your batch — harder to borrow.' },
-        { who: 'Exporters', text: 'Cadmium and Yellow O per batch when someone asks at the border.' },
-        { who: 'Importers', text: 'Check the lab signature on-chain, not only a forwarded PDF.' },
+        { who: 'Exporters', text: 'Look up entered Cadmium values by batch; Yellow O data is not integrated.' },
+        { who: 'Importers', text: 'Review report history and chain transactions; verify original lab records separately.' },
         { who: 'Buyers (demo)', text: 'Scan a carton QR to see orchard-to-port stops.' },
       ],
       photos: [
@@ -912,7 +933,7 @@ export const copyData = {
       backToHome: 'Back to home',
       iotTelemetry: 'Sensor readings (demo sample)',
       blockchainProof: 'Blockchain proof',
-      statusApproved: 'Export-ready',
+      statusApproved: 'Below demo threshold',
       statusPending: 'Processing / pending',
       statusRejected: 'Hold',
     },
@@ -984,7 +1005,7 @@ export const copyData = {
       },
       security: {
         title: 'Blockchain security',
-        desc: 'Every entry from this console is signed with the operator\'s Phantom wallet. On Solana devnet it creates an immutable transaction ID. Anyone scanning the QR can verify that the Cadmium result was certified at the source.'
+        desc: 'Every entry from this console is signed with the operator\'s Phantom wallet. On Solana devnet it creates an immutable transaction ID. QR viewers can inspect the signer and recorded data; this does not authenticate an official assay or certificate.'
       }
     },
     getRuleResult: (audit) => audit.aiResultEn,
@@ -997,20 +1018,20 @@ export const copyData = {
       harvestDateLabel: 'Harvest date',
       violationsLabel: 'Farm Violation History (0-5)',
       rainfallLabel: 'Estimated Rainfall (mm)',
-      cadmiumLabel: 'Estimated Cadmium Level (ppm)',
-      cadmiumHint: 'Customs safety limit is 0.050 ppm',
+      cadmiumLabel: 'User-entered Cadmium (ppm)',
+      cadmiumHint: 'Demo threshold: 0.050 ppm; does not establish export eligibility.',
       aiForecast: {
-        title: 'Pre-lab Cadmium forecast',
+        title: 'Illustrative risk model (synthetic data)',
         loading: 'Analyzing farm data...',
         riskText: (risk) => `Risk Level: ${risk.toUpperCase()}`,
         statusLabels: {
-          low: 'Export-ready',
+          low: 'Low risk',
           medium: 'Needs review',
           high: 'Hold'
         },
-        probabilityLabel: 'Probability: ',
+        probabilityLabel: 'Illustrative model output: ',
         requiresTesting: 'Requires comprehensive lab assay',
-        eligibleFastTrack: 'Eligible for fast-track processing'
+        eligibleFastTrack: 'Illustrative prediction; full laboratory testing is still required'
       },
       diseaseForecast: {
         loading: 'Analyzing environmental variables...',
@@ -1019,7 +1040,7 @@ export const copyData = {
       ruleAudit: {
         title: 'Rule-based quality preview',
         statusLabels: {
-          low: 'Export-ready',
+          low: 'Below demo threshold',
           medium: 'Needs review',
           high: 'Hold'
         },
@@ -1035,11 +1056,11 @@ export const copyData = {
       selectBatchLabel: 'Select Target Batch ID',
       selectBatchPlaceholder: '-- Select Batch ID --',
       cadmiumLabel: 'Assayed Cadmium (ppm)',
-      thresholdLabel: 'Max Threshold (ppm)',
+      thresholdLabel: 'Configured comparison threshold (ppm)',
       ruleAudit: {
         title: 'Rule check result',
         statusLabels: {
-          low: 'Export-ready',
+          low: 'Below demo threshold',
           medium: 'Needs review',
           high: 'Hold'
         },
@@ -1055,6 +1076,7 @@ export const copyData = {
         summary: (count) => `${count} reports logged for batch:`,
         run: (index) => `Assay Run #${index}`,
         noData: 'No chemical assays recorded for this batch yet.',
+        error: 'Lab history could not be loaded. Retry when Devnet is available.',
         selectPrompt: 'Please select a Batch ID above to fetch history.'
       }
     },
@@ -1063,16 +1085,16 @@ export const copyData = {
       initCamera: 'Initializing device camera...',
       cameraFailed: 'Camera Access Failed',
       cameraHint: 'Please check browser permissions or type the batch ID below',
-      verified: 'Batch verified',
+      verified: 'Batch ID read — opening record',
       manualLabel: 'Or enter batch ID manually:',
-      verifyBtn: 'Verify',
+      verifyBtn: 'Look up',
       selectDemo: 'Or select a demo batch to simulate:',
-      footer: 'QR code links directly to the batch record on the blockchain',
+      footer: 'QR opens a batch record; it does not authenticate physical goods or prevent label copying',
       error: {
         empty: 'Please enter a batch ID!'
       },
       riskLabels: {
-        low: 'Export-ready',
+        low: 'Below demo threshold',
         medium: 'Needs review',
         high: 'Hold'
       }

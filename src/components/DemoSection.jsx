@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { BadgeCheck, CalendarDays, MapPin, QrCode, Sprout } from 'lucide-react'
+import { BadgeCheck, CalendarDays, CircleHelp, MapPin, QrCode, Sprout } from 'lucide-react'
 import { defaultBatchId, localized, formatDate } from '../data/batches'
 import { useLanguage } from './LanguageContext'
 import { useBlockchainBatches } from '../hooks/useBlockchainBatches'
@@ -36,7 +36,7 @@ function DemoSection() {
   const [isScannerOpen, setIsScannerOpen] = useState(false)
   const [ref, isVisible] = useIntersectionObserver({ threshold: 0.08 })
 
-  const { batches, activeBatch, loading, source } = useBlockchainBatches(selectedBatchId)
+  const { batches, activeBatch, loading, source, storageError, lookupMissing } = useBlockchainBatches(selectedBatchId)
 
   useEffect(() => {
     const handleUrlChange = () => {
@@ -53,17 +53,17 @@ function DemoSection() {
     }
   }, [selectedBatchId])
 
-  // Use fallback if activeBatch is not loaded yet
+  // Only use this empty shape for the loading skeleton, never as a lookup result.
   const currentBatch = activeBatch || {
     id: selectedBatchId,
     farm: { vi: '', en: '' },
     province: { vi: '', en: '' },
     harvestDate: '',
-    cadmiumPpm: 0,
-    thresholdPpm: 0.05,
+    cadmiumPpm: null,
+    thresholdPpm: null,
     aiResult: { vi: '', en: '' },
     confidence: 0,
-    riskLevel: 'low',
+    riskLevel: 'unknown',
     riskCause: { vi: '', en: '' },
     timeline: [],
     blockchainHash: ''
@@ -125,7 +125,7 @@ function DemoSection() {
               onClick={() => handleSelect(batch.id)}
             >
               <span>{copy.demo.riskNames[batch.riskLevel]}</span>
-              <small>{copy.demo.riskSubnames[batch.riskLevel]}</small>
+              <small>{batch.id}</small>
             </button>
           ))}
         </div>
@@ -147,6 +147,16 @@ function DemoSection() {
           </button>
         </div>
 
+        {storageError && <p className="lookup-notice" role="status">{copy.demo.storageError}</p>}
+
+        {!loading && !activeBatch && (
+          <div className="lookup-notice" role="status">
+            <strong>{lookupMissing ? copy.demo.notFound : copy.demo.unavailable}</strong>
+            <p>{source === 'chain' ? copy.demo.notFoundChainHint : copy.demo.notFoundFallbackHint}</p>
+          </div>
+        )}
+
+        {(loading || activeBatch) && <>
         <ProvenanceBadge source={source} hash={currentBatch.blockchainHash} loading={loading} />
 
         <div
@@ -176,10 +186,10 @@ function DemoSection() {
             </span>
           </div>
           <div>
-            <BadgeCheck size={20} aria-hidden="true" />
+            {currentBatch.riskLevel === 'low' ? <BadgeCheck size={20} aria-hidden="true" /> : <CircleHelp size={20} aria-hidden="true" />}
             <span>
               <small>{copy.demo.summary.status}</small>
-              <strong>{localized(currentBatch.aiResult, language)}</strong>
+              <strong>{currentBatch.riskLevel === 'unknown' ? copy.demo.riskNames.unknown : localized(currentBatch.aiResult, language)}</strong>
             </span>
           </div>
         </div>
@@ -201,10 +211,12 @@ function DemoSection() {
               <Suspense fallback={<div className="qr-fallback" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-ink-soft)', fontStyle: 'italic', fontSize: '0.85rem' }}>{language === 'vi' ? 'Đang tải mã QR...' : 'Loading QR Code...'}</div>}>
                 <BatchQRLabel batchId={currentBatch.id} language={language} loading={loading} />
               </Suspense>
-              <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} batchId={currentBatch.id} loading={loading} />
+              <HashProofChip hash={currentBatch.blockchainHash} tokenId={currentBatch.tokenId} batchId={currentBatch.id} loading={loading} source={source} />
             </div>
           </div>
         </div>
+
+        </>}
 
         {/* Leaf Disease Scanner Section */}
         <div className="leaf-scanner-wrapper">

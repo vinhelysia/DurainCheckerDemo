@@ -7,7 +7,7 @@ import { ArrowLeft, Wallet, Compass, CheckCircle2, AlertTriangle, RefreshCw, X }
 import { useBatchTransaction } from '../hooks/useBatchTransaction'
 import { BATCH_ACCOUNT_SIZE } from '../hooks/useBlockchainBatches'
 import { getConfigPda, getFarmerPda, getLabRolePda, getLogisticsPda } from '../lib/pda'
-import { readLocalBatches, STATIC_BATCH_IDS } from '../lib/localLedger'
+import { readLocalLedger, STATIC_BATCH_IDS } from '../lib/localLedger'
 
 import FarmerPanel from './management/FarmerPanel'
 import LabPanel from './management/LabPanel'
@@ -34,6 +34,7 @@ export default function ManagementPortal() {
   const [account, setAccount] = useState('')
   const [providerMode, setProviderMode] = useState('fallback') // 'chain' | 'fallback'
   const [reloadTrigger, setReloadTrigger] = useState(0)
+  const [storageError, setStorageError] = useState(null)
 
   // Derive program from wallet + connection + IDL info
   const program = useMemo(() => {
@@ -157,6 +158,7 @@ export default function ManagementPortal() {
           const userPubkey = wallet.publicKey
           setAccount(userPubkey.toString())
           setProviderMode('chain')
+          setStorageError(null)
           
           // 1. Fetch Config to get authority
           const configPda = getConfigPda(program.programId)
@@ -211,7 +213,8 @@ export default function ManagementPortal() {
       setProviderMode('fallback')
       setAccount('')
       
-      const localBatches = readLocalBatches()
+      const { batches: localBatches, error } = readLocalLedger()
+      setStorageError(error)
       const allIds = [...STATIC_BATCH_IDS, ...localBatches.map(b => b.id)]
       setRegisteredIds(allIds)
       if (allIds.length > 0 && !selectedBatchId) {
@@ -409,6 +412,14 @@ export default function ManagementPortal() {
             </div>
           )}
         </div>
+
+        {providerMode === 'fallback' && (
+          <p className="lookup-notice" role="status">{copy.demo.provenance.demo}</p>
+        )}
+
+        {storageError && (
+          <p className="lookup-notice" role="alert">{copy.demo.storageError}</p>
+        )}
 
         {isPhantomMissing && (
           <div className="wallet-guidance-banner" role="status">

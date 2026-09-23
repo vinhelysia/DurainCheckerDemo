@@ -68,7 +68,7 @@ export interface LabReportAccount {
 
 // --- UI/presentation types (after mapping from chain) ---
 
-export type RiskLevel = 'low' | 'medium' | 'high'
+export type RiskLevel = 'low' | 'medium' | 'high' | 'unknown'
 
 export interface LocalizedString {
   vi: string

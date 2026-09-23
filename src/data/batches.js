@@ -13,14 +13,14 @@ export const batches = [
     cadmiumPpm: 0.03,
     thresholdPpm: 0.05,
     aiResult: {
-      vi: 'Đạt xuất khẩu',
-      en: 'Export-ready',
+      vi: 'Dưới ngưỡng đối chiếu',
+      en: 'Below comparison threshold',
     },
-    confidence: 0.94,
+    confidence: 0,
     riskLevel: 'low',
     riskCause: {
-      vi: 'Cadimi và Vàng O trong ngưỡng cho phép',
-      en: 'Cadmium and Yellow O within limits',
+      vi: 'Cadimi dưới ngưỡng đối chiếu (< 0.05 ppm)',
+      en: 'Cadmium below comparison threshold (< 0.05 ppm)',
     },
     timeline: [
       {
@@ -91,11 +91,11 @@ export const batches = [
       vi: 'Cần xem lại',
       en: 'Needs review',
     },
-    confidence: 0.71,
+    confidence: 0,
     riskLevel: 'medium',
     riskCause: {
-      vi: 'Cadimi gần ngưỡng cho phép, đề nghị kiểm nghiệm bổ sung',
-      en: 'Cadmium close to limit, additional testing recommended',
+      vi: 'Cadimi gần ngưỡng đối chiếu (0.05 ppm), đề nghị kiểm tra bổ sung',
+      en: 'Cadmium near comparison threshold (0.05 ppm); supplementary assay recommended',
     },
     timeline: [
       {
@@ -166,11 +166,11 @@ export const batches = [
       vi: 'Giữ lô',
       en: 'Hold',
     },
-    confidence: 0.88,
+    confidence: 0,
     riskLevel: 'high',
     riskCause: {
-      vi: 'Cadimi vượt ngưỡng cho phép, lô hàng bị giữ để xử lý',
-      en: 'Cadmium exceeds limit; batch held pending action',
+      vi: 'Cadimi đạt hoặc vượt ngưỡng đối chiếu (>= 0.05 ppm)',
+      en: 'Cadmium reaches or exceeds comparison threshold (>= 0.05 ppm)',
     },
     timeline: [
       {

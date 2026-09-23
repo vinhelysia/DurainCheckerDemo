@@ -643,6 +643,39 @@
   color: var(--color-risk-low);
 }
 
+.batch-tab.risk-unknown,
+.risk-pill.risk-unknown,
+.risk-badge.risk-unknown {
+  color: var(--color-ink-soft);
+}
+
+.batch-tab.risk-unknown[aria-pressed='true'],
+.risk-pill.risk-unknown,
+.ai-card.risk-unknown .ai-result-main {
+  background: var(--color-surface-alt);
+}
+
+.ai-card.risk-unknown {
+  border-top: 4px solid var(--color-ink-soft);
+}
+
+.ai-card.risk-unknown .ai-result-main svg {
+  color: var(--color-ink-soft);
+}
+
+.lookup-notice {
+  padding: 16px;
+  margin: 16px 0;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-alt);
+  color: var(--color-ink);
+}
+
+.lookup-notice p {
+  margin: 8px 0 0;
+}
+
 .batch-tab.risk-medium {
   color: var(--color-risk-medium);
 }

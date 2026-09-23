@@ -274,7 +274,7 @@ export default function FarmerPanel({
         setAiResult({
           risk,
           probability: parseFloat(probability.toFixed(2)),
-          needs_full_testing: risk !== 'low',
+          needs_full_testing: true,
           source: 'fallback'
         })
       } finally {
@@ -293,6 +293,7 @@ export default function FarmerPanel({
 
   const onSubmit = (e) => {
     e.preventDefault()
+    if (!ruleAudit.valid) return
     registerBatch(
       batchId,
       farmVi,
@@ -626,7 +627,7 @@ export default function FarmerPanel({
           <input 
             id="m-cadmium"
             type="number" 
-            step="0.001"
+            step="0.0001"
             min="0"
             max="1.5"
             value={cadmiumPpm} 
@@ -651,9 +652,6 @@ export default function FarmerPanel({
                 {copy.farmerPanel.ruleAudit.statusLabels[ruleAudit.riskLevel]}
               </span>
             </div>
-            <div className="text-xs opacity-80">
-              <strong>{copy.farmerPanel.ruleAudit.confidenceLabel}</strong> {ruleAudit.confidence}%
-            </div>
             <div className="text-xs mt-1 italic opacity-90">
               &ldquo;{copy.getRuleCause(ruleAudit)}&rdquo;
             </div>
@@ -662,7 +660,7 @@ export default function FarmerPanel({
 
         <button 
           type="submit" 
-          disabled={loading}
+          disabled={loading || !ruleAudit.valid}
           className="button button-primary w-full mt-4"
         >
           <Send size={16} />

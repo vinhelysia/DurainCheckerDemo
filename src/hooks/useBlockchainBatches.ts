@@ -3,7 +3,9 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { AnchorProvider, Program, utils } from '@coral-xyz/anchor'
 import { batches as staticBatches } from '../data/batches'
 import { getBatchPda, getTimelinePda, getLabPda, getCustodyPda } from '../lib/pda'
-import { readLocalBatches } from '../lib/localLedger'
+import { readLocalLedger } from '../lib/localLedger'
+import { mapRiskLevel } from '../lib/riskLevel'
+import { runRuleAuditor } from '../lib/ruleAuditor'
 import { fromPpm } from '../lib/units'
 import type {
   DurianTrustProgram,
@@ -37,26 +39,28 @@ const MAX_BATCHES = 200
 // re-checks because it fetches by id and never goes through that filter.
 export const BATCH_ACCOUNT_SIZE = 373
 
-// Program enum RiskLevel { Safe, Low, Medium, High, Critical } → UI 3-level scale.
-// Anchor decodes enums as single-key objects ({ low: {} }); numbers cover legacy data.
-const CHAIN_RISK: Record<string, RiskLevel> = {
-  safe: 'low',
-  low: 'low',
-  medium: 'medium',
-  high: 'high',
-  critical: 'high',
-}
-const CHAIN_RISK_BY_INDEX = ['safe', 'low', 'medium', 'high', 'critical']
-
-function mapRiskLevel(enumVal: unknown): RiskLevel {
-  if (enumVal && typeof enumVal === 'object') {
-    return CHAIN_RISK[Object.keys(enumVal)[0]] ?? 'low'
-  }
-  return CHAIN_RISK[CHAIN_RISK_BY_INDEX[Number(enumVal)]] ?? 'low'
-}
-
 // Program enum CustodyRole { Farmer, Packer, Exporter, Importer, Customs }
 const CUSTODY_ROLES: CustodyRole[] = ['farmer', 'packer', 'exporter', 'importer', 'customs']
+
+// Older reports store unsupported export/Yellow O claims and a made-up confidence.
+// Show the reproducible Cadmium comparison while preserving raw reports in history.
+function qualitySummary(cadmiumPpm: unknown, thresholdPpm: unknown) {
+  const result = runRuleAuditor(cadmiumPpm, thresholdPpm)
+  if (!result.valid) {
+    return {
+      riskLevel: 'unknown' as RiskLevel,
+      aiResult: { vi: '', en: '' },
+      riskCause: { vi: '', en: '' },
+      confidence: 0,
+    }
+  }
+  return {
+    riskLevel: result.riskLevel as RiskLevel,
+    aiResult: { vi: result.aiResultVi, en: result.aiResultEn },
+    riskCause: { vi: result.riskCauseVi, en: result.riskCauseEn },
+    confidence: 0,
+  }
+}
 
 function mapCustodyRole(enumVal: unknown): CustodyRole {
   if (enumVal && typeof enumVal === 'object') {
@@ -93,12 +97,18 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
   const [loading, setLoading] = useState(true)
   const [source, setSource] = useState<'chain' | 'fallback'>('fallback')
 
+  const [storageError, setStorageError] = useState<string | null>(null)
+  const [lookupMissing, setLookupMissing] = useState(false)
+
   useEffect(() => {
     let active = true
 
     async function init() {
       try {
         setLoading(true)
+        setActiveBatch(null)
+        setStorageError(null)
+        setLookupMissing(false)
 
         const configRes = await fetch(`${import.meta.env.BASE_URL}solana/idl.json`)
         if (!configRes.ok) {
@@ -137,7 +147,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
               const data = Buffer.from(acct.account.data as Buffer)
               const idLen = data.readUInt32LE(8)
               const id = data.slice(12, 12 + Math.min(idLen, 52)).toString('utf8')
-              return { id, riskLevel: 'low' as RiskLevel }
+              return { id, riskLevel: 'unknown' as RiskLevel }
             })
             .filter(b => b.id.length > 0)
           const tId = selectedBatchId || (mapped[0] ? mapped[0].id : null)
@@ -158,16 +168,36 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
         console.warn('Solana blockchain connection failed. Falling back to static data.', err)
         if (!active) return
 
-        const localBatches: UIBatch[] = readLocalBatches()
-        const allBatches = [...staticBatches, ...localBatches]
+        const { batches: localBatches, error } = readLocalLedger()
+        setStorageError(error)
+        const localSummaries = localBatches.map(batch => {
+          const latest = batch.labReports[batch.labReports.length - 1]
+          return {
+            ...batch,
+            riskLevel: latest?.riskLevel ?? 'unknown' as RiskLevel,
+            cadmiumPpm: latest?.cadmiumPpm ?? 0,
+            thresholdPpm: latest?.thresholdPpm ?? 0,
+            confidence: latest?.confidence ?? 0,
+            aiResult: latest?.aiResult ?? { vi: '', en: '' },
+            riskCause: latest?.riskCause ?? { vi: '', en: '' },
+          }
+        })
+        const allBatches = [...staticBatches, ...localSummaries]
 
         const list: UIBatchSummary[] = allBatches.map(b => ({
           id: b.id,
-          riskLevel: b.riskLevel as RiskLevel,
+          riskLevel: qualitySummary(b.cadmiumPpm, b.thresholdPpm).riskLevel,
         }))
         setBatches(list)
 
-        const matched = allBatches.find(b => b.id === selectedBatchId) || allBatches[0]
+        const matched = selectedBatchId ? allBatches.find(b => b.id === selectedBatchId) : allBatches[0]
+        setSource('fallback')
+        if (!matched) {
+          setActiveBatch(null)
+          setLookupMissing(true)
+          setLoading(false)
+          return
+        }
 
         const staticTokenIds: Record<string, number> = {
           'DRN-2026-LD-0429': 8801,
@@ -182,26 +212,16 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
           tokenId = 8800 + (sum % 1000)
         }
 
-        const matchedRiskLevel = matched.riskLevel as RiskLevel
         const matchedTimeline: UITimelineEvent[] = matched.timeline.map(evt => ({
           ...evt,
           status: evt.status === 'complete' ? 'complete' : 'pending',
         }))
 
-        const labReports: UILabReport[] = matched.labReports || [{
-          cadmiumPpm: matched.cadmiumPpm,
-          thresholdPpm: matched.thresholdPpm,
-          aiResult: matched.aiResult,
-          confidence: matched.confidence,
-          riskLevel: matchedRiskLevel,
-          riskCause: matched.riskCause,
-          timestamp: Math.floor(Date.now() / 1000),
-          reporter: 'durian1111111111111111111111111111111111111',
-        }]
+        const labReports: UILabReport[] = matched.labReports || []
 
         const formattedMatched: UIBatch = {
           ...matched,
-          riskLevel: matchedRiskLevel,
+          ...qualitySummary(matched.cadmiumPpm, matched.thresholdPpm),
           timeline: matchedTimeline,
           tokenId,
           blockchainHash: 'simulated, not on-chain',
@@ -256,17 +276,10 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
             status: mapTimelineStatus(evt.status),
           }))
 
-        let blockchainHash = 'simulated, not on-chain'
+        let blockchainHash = 'on-chain (Solana)'
         try {
-          const localHashes: Record<string, string> = JSON.parse(
-            localStorage.getItem('duriantrust_tx_hashes') || '{}'
-          )
-          if (localHashes[id]) {
-            blockchainHash = localHashes[id]
-          } else {
-            const sigs = await connection.getSignaturesForAddress(batchPda, { limit: 1 })
-            blockchainHash = sigs.length > 0 ? sigs[0].signature : 'on-chain (Solana)'
-          }
+          const sigs = await connection.getSignaturesForAddress(batchPda, { limit: 1 })
+          blockchainHash = sigs.length > 0 ? sigs[0].signature : 'on-chain (Solana)'
         } catch (e) {
           console.warn('Could not query transaction signature for batch', id, e)
         }
@@ -316,7 +329,12 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
 
         // Quality fields live in the lab reports, not the Batch account.
         // On-chain index order is authoritative: last report is the latest.
-        const primary = labReports.length > 0 ? labReports[labReports.length - 1] : undefined
+        // Never substitute an older report if the latest indexed account is missing.
+        const primary = reports.length > 0 && reports[reports.length - 1] !== null
+          ? labReports[labReports.length - 1] : undefined
+        const comparison = primary
+          ? qualitySummary(primary.cadmiumPpm, primary.thresholdPpm)
+          : qualitySummary(null, null)
         const formattedBatch: UIBatch = {
           id,
           tokenId: Number(b.tokenId),
@@ -328,16 +346,15 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
           harvestDate: b.harvestDate,
           cadmiumPpm: primary?.cadmiumPpm ?? 0,
           thresholdPpm: primary?.thresholdPpm ?? 0,
-          aiResult: primary?.aiResult ?? { vi: '', en: '' },
-          confidence: primary?.confidence ?? 0,
-          riskLevel: primary?.riskLevel ?? 'low',
-          riskCause: primary?.riskCause ?? { vi: '', en: '' },
+          ...comparison,
           timeline: formattedTimeline,
           blockchainHash,
           labReports,
         }
 
         if (!active) return
+        setBatches(previous => previous.map(batch => batch.id === id
+          ? { ...batch, riskLevel: formattedBatch.riskLevel } : batch))
         setActiveBatch(formattedBatch)
         setLoading(false)
       } catch (e) {
@@ -353,5 +370,5 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
     }
   }, [selectedBatchId])
 
-  return { batches, activeBatch, loading, source }
+  return { batches, activeBatch, loading, source, storageError, lookupMissing }
 }

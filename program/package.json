@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "mocha tests/durian_trust.test.mjs --timeout 60000"
+    "test": "mocha tests/durian_trust.test.mjs --timeout 60000",
+    "test:attestation": "mocha tests/attestation_v2.test.mjs --timeout 60000"
   },
   "devDependencies": {
     "@coral-xyz/anchor": "^0.31.1",

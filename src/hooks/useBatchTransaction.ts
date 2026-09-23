@@ -12,8 +12,9 @@ import {
   getLogisticsPda,
 } from '../lib/pda'
 import { readLocalBatches, writeLocalBatches, STATIC_BATCH_IDS } from '../lib/localLedger'
-import { DEFAULT_CADMIUM_THRESHOLD_PPM } from '../lib/ruleAuditor'
-import type { AnchorRiskLevel, AnchorTimelineStatus, DurianTrustProgram } from '../types/durian_trust'
+import { DEFAULT_CADMIUM_THRESHOLD_PPM, runRuleAuditor } from '../lib/ruleAuditor'
+import { toPpmScaled } from '../lib/units'
+import type { AnchorRiskLevel, AnchorTimelineStatus, DurianTrustProgram, UIBatch } from '../types/durian_trust'
 
 type Language = 'vi' | 'en'
 type ProviderMode = 'chain' | 'fallback'
@@ -101,6 +102,7 @@ function humanizeTxError(rawMessage: string, language: Language): string {
 }
 
 interface RuleAudit {
+  valid: boolean
   confidence: number
   riskLevel: 'low' | 'medium' | 'high'
   aiResultVi: string
@@ -143,6 +145,12 @@ export function useBatchTransaction({
     cadmiumPpm: string | number,
     ruleAudit: RuleAudit
   ): Promise<boolean> => {
+    ruleAudit = runRuleAuditor(cadmiumPpm)
+    if (!ruleAudit.valid) {
+      setTxMessage({ text: language === 'vi' ? ruleAudit.riskCauseVi : ruleAudit.riskCauseEn, type: 'error' })
+      return false
+    }
+
     if (!batchId) {
       setTxMessage({
         text: language === 'vi' ? 'Vui lòng nhập Mã Lô hàng!' : 'Please enter Batch ID!',
@@ -156,8 +164,8 @@ export function useBatchTransaction({
     setTxStage('idle')
     setNewlyRegisteredBatchId('')
 
-    const cadmiumValueScaled = Math.round(parseFloat(String(cadmiumPpm)) * 10000)
-    const thresholdValueScaled = Math.round(DEFAULT_CADMIUM_THRESHOLD_PPM * 10000)
+    const cadmiumValueScaled = toPpmScaled(cadmiumPpm)
+    const thresholdValueScaled = toPpmScaled(DEFAULT_CADMIUM_THRESHOLD_PPM)
     const confidenceScaled = Math.round(ruleAudit.confidence * 100)
     const riskLevel = riskEnum(ruleAudit.riskLevel)
 
@@ -252,12 +260,13 @@ export function useBatchTransaction({
           throw new Error('Batch already exists')
         }
 
-        const newBatch = {
+        const newBatch: UIBatch = {
+          tokenId: 0,
           id: batchId,
           farm: { vi: farmVi, en: farmEn },
           province: { vi: provinceVi, en: provinceEn },
           harvestDate: harvestDate || new Date().toISOString().split('T')[0],
-          cadmiumPpm: parseFloat(String(cadmiumPpm)),
+          cadmiumPpm: Number(cadmiumPpm),
           thresholdPpm: DEFAULT_CADMIUM_THRESHOLD_PPM,
           aiResult: { vi: ruleAudit.aiResultVi, en: ruleAudit.aiResultEn },
           confidence: ruleAudit.confidence / 100,
@@ -274,7 +283,7 @@ export function useBatchTransaction({
           blockchainHash: 'simulated, not on-chain',
           labReports: [
             {
-              cadmiumPpm: parseFloat(String(cadmiumPpm)),
+              cadmiumPpm: Number(cadmiumPpm),
               thresholdPpm: DEFAULT_CADMIUM_THRESHOLD_PPM,
               aiResult: { vi: ruleAudit.aiResultVi, en: ruleAudit.aiResultEn },
               confidence: ruleAudit.confidence / 100,
@@ -318,6 +327,12 @@ export function useBatchTransaction({
     thresholdPpmLab: string | number,
     audit: RuleAudit
   ): Promise<boolean> => {
+    audit = runRuleAuditor(cadmiumPpmLab, thresholdPpmLab)
+    if (!audit.valid) {
+      setTxMessage({ text: language === 'vi' ? audit.riskCauseVi : audit.riskCauseEn, type: 'error' })
+      return false
+    }
+
     if (!selectedBatchId) {
       setTxMessage({
         text: language === 'vi' ? 'Vui lòng chọn Lô sầu riêng!' : 'Please select a Batch ID!',
@@ -330,8 +345,8 @@ export function useBatchTransaction({
     setTxMessage({ text: '', type: '' })
     setTxStage('idle')
 
-    const cadmiumValueScaled = Math.round(parseFloat(String(cadmiumPpmLab)) * 10000)
-    const thresholdValueScaled = Math.round(parseFloat(String(thresholdPpmLab)) * 10000)
+    const cadmiumValueScaled = toPpmScaled(cadmiumPpmLab)
+    const thresholdValueScaled = toPpmScaled(thresholdPpmLab)
     const confidenceScaled = Math.round(audit.confidence * 100)
     const riskLevel = riskEnum(audit.riskLevel)
 
@@ -427,8 +442,8 @@ export function useBatchTransaction({
         if (index === -1) throw new Error('Batch not found')
 
         const newReport = {
-          cadmiumPpm: parseFloat(String(cadmiumPpmLab)),
-          thresholdPpm: parseFloat(String(thresholdPpmLab)),
+          cadmiumPpm: Number(cadmiumPpmLab),
+          thresholdPpm: Number(thresholdPpmLab),
           aiResult: { vi: audit.aiResultVi, en: audit.aiResultEn },
           confidence: audit.confidence / 100,
           riskLevel: audit.riskLevel,

@@ -13,7 +13,7 @@ export default function BatchQRLabel({ batchId, language, loading }) {
 
     // QR URL formatting: `${window.location.origin}${import.meta.env.BASE_URL}#/unit/demo?batchId=<ID>`
     const baseUrl = import.meta.env.BASE_URL || '/'
-    const qrUrl = `${window.location.origin}${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}#/unit/demo?batchId=${batchId}`
+    const qrUrl = `${window.location.origin}${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}#/unit/demo?batchId=${encodeURIComponent(batchId)}`
 
     QRCode.toCanvas(
       canvas,
@@ -75,8 +75,8 @@ export default function BatchQRLabel({ batchId, language, loading }) {
         </h4>
         <p style={{ margin: '0 0 8px 0', fontSize: '0.8rem', color: 'var(--color-ink-soft)', lineHeight: '1.4' }}>
           {language === 'vi'
-            ? 'Quét bằng camera điện thoại để truy vết trên Blockchain'
-            : 'Scan with phone camera to trace origin on the Blockchain'}
+            ? 'Quét bằng camera điện thoại để mở thông tin lô và nguồn dữ liệu'
+            : 'Scan with your phone to view batch details and data source'}
         </p>
         <code className="text-xs" style={{ display: 'inline-block', padding: '3px 8px', background: 'rgba(31,71,52,0.06)', borderRadius: '4px', fontFamily: 'var(--font-mono)' }}>
           {batchId}

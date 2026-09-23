@@ -2,26 +2,8 @@ import { useState, useEffect } from 'react'
 import { RefreshCw, Cpu, Send } from 'lucide-react'
 import { getBatchPda, getLabPda } from '../../lib/pda'
 import { readLocalBatches } from '../../lib/localLedger'
-import { runRuleAuditor, DEFAULT_CADMIUM_THRESHOLD_PPM } from '../../lib/ruleAuditor'
+import { runRuleAuditor } from '../../lib/ruleAuditor'
 import { batches as staticBatches } from '../../data/batches'
-
-// Program enum RiskLevel → UI 3-level scale (same mapping as useBlockchainBatches).
-// Anchor decodes enums as single-key objects ({ low: {} }); numbers cover legacy data.
-const CHAIN_RISK = {
-  safe: 'low',
-  low: 'low',
-  medium: 'medium',
-  high: 'high',
-  critical: 'high',
-}
-const CHAIN_RISK_BY_INDEX = ['safe', 'low', 'medium', 'high', 'critical']
-
-function mapRiskLevel(enumVal) {
-  if (enumVal && typeof enumVal === 'object') {
-    return CHAIN_RISK[Object.keys(enumVal)[0]] ?? 'low'
-  }
-  return CHAIN_RISK[CHAIN_RISK_BY_INDEX[Number(enumVal)]] ?? 'low'
-}
 
 export default function LabPanel({
   copy,
@@ -39,24 +21,29 @@ export default function LabPanel({
   const [thresholdPpmLab, setThresholdPpmLab] = useState('0.050')
   const [labHistory, setLabHistory] = useState([])
   const [loadingHistory, setLoadingHistory] = useState(false)
+  const [historyError, setHistoryError] = useState(false)
 
   const ruleAuditLab = runRuleAuditor(
     cadmiumPpmLab,
-    parseFloat(thresholdPpmLab) || DEFAULT_CADMIUM_THRESHOLD_PPM
+    thresholdPpmLab
   )
 
   // Fetch testing history for selected batch
   useEffect(() => {
     if (!selectedBatchId) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setLabHistory([])
+        setLoadingHistory(false)
+        setHistoryError(false)
       }, 0)
-      return
+      return () => clearTimeout(timer)
     }
 
     let active = true
 
     async function fetchHistory() {
+      setLabHistory([])
+      setHistoryError(false)
       if (providerMode === 'chain' && contractInfo && program) {
         try {
           setLoadingHistory(true)
@@ -77,26 +64,31 @@ export default function LabPanel({
 
           const formatted = reports
             .filter(r => r !== null)
-            .map(r => ({
-              cadmiumPpm: Number(r.cadmiumPpm) / 10000,
-              thresholdPpm: Number(r.thresholdPpm) / 10000,
-              aiResult: { vi: r.aiResult, en: r.aiResult },
-              confidence: Number(r.confidence) / 10000,
-              riskLevel: mapRiskLevel(r.riskLevel),
-              riskCause: { vi: r.riskCause, en: r.riskCause },
-              timestamp: Number(r.timestamp),
-              reporter: r.reporter.toString()
-            }))
+            .map(r => {
+              const cadmiumPpm = Number(r.cadmiumPpm) / 10000
+              const thresholdPpm = Number(r.thresholdPpm) / 10000
+              const audit = runRuleAuditor(cadmiumPpm, thresholdPpm)
+              return {
+                cadmiumPpm,
+                thresholdPpm,
+                riskLevel: audit.valid ? audit.riskLevel : 'unknown',
+                riskCause: { vi: audit.riskCauseVi, en: audit.riskCauseEn },
+                timestamp: Number(r.timestamp),
+                reporter: r.reporter.toString()
+              }
+            })
 
           if (active) {
             setLabHistory(formatted)
           }
         } catch (e) {
           console.warn('Could not fetch lab reports history', e)
+          if (active) setHistoryError(true)
         } finally {
           if (active) setLoadingHistory(false)
         }
       } else {
+        setLoadingHistory(false)
         // Fallback: local ledger first, then static seed data — never invent a report.
         const localBatches = readLocalBatches()
         const matched = localBatches.find(b => b.id === selectedBatchId)
@@ -118,6 +110,7 @@ export default function LabPanel({
 
   const onSubmit = (e) => {
     e.preventDefault()
+    if (!ruleAuditLab.valid) return
     updateLabReport(
       selectedBatchId,
       cadmiumPpmLab,
@@ -156,7 +149,7 @@ export default function LabPanel({
               <input 
                 id="m-lab-cadmium"
                 type="number"
-                step="0.001"
+                step="0.0001"
                 min="0"
                 max="1.5"
                 value={cadmiumPpmLab}
@@ -168,8 +161,9 @@ export default function LabPanel({
               <label htmlFor="m-lab-threshold">{copy.labPanel.thresholdLabel}</label>
               <input 
                 id="m-lab-threshold"
+                min="0.001"
                 type="number"
-                step="0.001"
+                step="0.0001"
                 value={thresholdPpmLab}
                 onChange={(e) => setThresholdPpmLab(e.target.value)}
                 required
@@ -192,9 +186,6 @@ export default function LabPanel({
                   {copy.labPanel.ruleAudit.statusLabels[ruleAuditLab.riskLevel]}
                 </span>
               </div>
-              <div className="text-xs opacity-80">
-                <strong>{copy.labPanel.ruleAudit.confidenceLabel}</strong> {ruleAuditLab.confidence}%
-              </div>
               <div className="text-xs mt-1 italic opacity-90">
                 &ldquo;{copy.getRuleCause(ruleAuditLab)}&rdquo;
               </div>
@@ -203,7 +194,7 @@ export default function LabPanel({
 
           <button 
             type="submit" 
-            disabled={loading}
+            disabled={loading || !ruleAuditLab.valid}
             className="button button-primary w-full mt-4"
           >
             <Send size={16} />
@@ -225,6 +216,8 @@ export default function LabPanel({
             <RefreshCw className="animate-spin inline-block mr-2" size={18} />
             <span>{copy.labPanel.history.loading}</span>
           </div>
+        ) : historyError ? (
+          <p className="lookup-notice" role="status">{copy.labPanel.history.error}</p>
         ) : selectedBatchId && labHistory.length > 0 ? (
           <div className="lab-history-wrap">
             <p className="text-xs font-semibold lab-history-title">
@@ -236,12 +229,12 @@ export default function LabPanel({
                   <div className="lab-history-item-header">
                     <strong className="lab-history-item-run">{copy.labPanel.history.run(idx + 1)}</strong>
                     <span className={`risk-badge risk-${report.riskLevel} lab-history-risk-badge`}>
-                      {report.riskLevel.toUpperCase()}
+                      {copy.aiResult.riskLabels[report.riskLevel] ?? copy.aiResult.riskLabels.unknown}
                     </span>
                   </div>
                   <div className="lab-history-item-grid">
-                    <div>Cadmium: <strong>{report.cadmiumPpm.toFixed(3)} ppm</strong></div>
-                    <div>Threshold: <strong>{report.thresholdPpm.toFixed(3)} ppm</strong></div>
+                    <div>{copy.aiResult.cadmium}: <strong>{report.riskLevel !== 'unknown' && Number.isFinite(report.cadmiumPpm) ? `${report.cadmiumPpm.toFixed(4)} ppm` : copy.aiResult.noData}</strong></div>
+                    <div>{copy.aiResult.threshold}: <strong>{report.riskLevel !== 'unknown' && Number.isFinite(report.thresholdPpm) ? `${report.thresholdPpm.toFixed(4)} ppm` : copy.aiResult.noData}</strong></div>
                   </div>
                   <p className="lab-history-item-cause">
                     &ldquo;{copy.getLocalizedText(report.riskCause)}&rdquo;
