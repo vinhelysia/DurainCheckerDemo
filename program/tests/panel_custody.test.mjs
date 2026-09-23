@@ -7,16 +7,17 @@ import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import { spawn } from 'node:child_process'
 import { setTimeout as delay } from 'node:timers/promises'
-import { AnchorProvider, Wallet, BN, Program } from '@coral-xyz/anchor'
+import anchor from '@coral-xyz/anchor'
 import { Connection, Ed25519Program, Keypair, PublicKey, SYSVAR_INSTRUCTIONS_PUBKEY, SystemProgram, Transaction, VersionedTransaction } from '@solana/web3.js'
 import { DOMAIN_V2, payloadHashV1, payloadHashV2, u32 } from './attestation_payload.mjs'
+
+const { AnchorProvider, Wallet, BN, Program } = anchor
 
 const idl = JSON.parse(readFileSync(new URL('../target/idl/durian_trust.json', import.meta.url)))
 const pid = new PublicKey(idl.address)
 const authority = Keypair.generate()
 const farmer = Keypair.generate()
 const receiver = Keypair.generate()
-const records = []
 const lab = Keypair.generate()
 const intruder = Keypair.generate()
 const id = 'PANEL-CUSTODY-TEST'
@@ -94,7 +95,7 @@ async function execute(instructions, signer = lab) {
       if (!/^failed to simulate transaction: .*signature/i.test(error.message)) throw error
       return { result: error.message, meta: { logMessages: error.logs ?? [] } }
     }
-    if (simulation.value.err) { records.push({ utc: new Date().toISOString(), simulated: true, error: simulation.value.err, logs: simulation.value.logs }); return { result: simulation.value.err, meta: { logMessages: simulation.value.logs ?? [] } } }
+    if (simulation.value.err) return { result: simulation.value.err, meta: { logMessages: simulation.value.logs ?? [] } }
     const signature = await provider.connection.sendRawTransaction(signed.serialize())
     let confirmed = false
     for (let attempt = 0; attempt < 120; attempt++) {
@@ -107,7 +108,7 @@ async function execute(instructions, signer = lab) {
       await delay(250)
     }
     assert.ok(confirmed, `Local transaction did not confirm: ${signature}`)
-    records.push({ utc: new Date().toISOString(), signature, logs: simulation.value.logs }); return { result: null, meta: { logMessages: simulation.value.logs ?? [] } }
+    return { result: null, meta: { logMessages: simulation.value.logs ?? [] } }
   }
   tx.feePayer = context.payer.publicKey
   tx.recentBlockhash = (await context.banksClient.getLatestBlockhash())[0]
@@ -131,7 +132,12 @@ describe('Panel custody and authority regression on native local validator',func
  before(async()=>{
   assert(process.env.TEST_VALIDATOR_PATH,'Use native localhost validator; no production credentials')
   const coder=new Program(idl,{connection:{},publicKey:authority.publicKey}).coder.accounts
-  const owned=async(address,name,value)=>({address,info:{lamports:10000000,data:await coder.encode(name,value),owner:pid,executable:false}})
+  const owned=async(address,name,value)=>{
+    const encoded=await coder.encode(name,value)
+    // Option<Pubkey> grows by 32 bytes when pendingAuthority becomes Some.
+    const data=name==='config' ? Buffer.concat([encoded,Buffer.alloc(32)]) : encoded
+    return {address,info:{lamports:10000000,data,owner:pid,executable:false}}
+  }
   const fixtures=[...([authority,farmer,lab,receiver,intruder].map(k=>funded(k.publicKey))),
     await owned(config,'config',{authority:authority.publicKey,nextTokenId:new BN(0),pendingAuthority:null,paused:false}),
     await owned(role('farmer',farmer),'farmerRole',{}),await owned(labRole,'labRole',{})]
@@ -139,7 +145,6 @@ describe('Panel custody and authority regression on native local validator',func
   program=new Program(idl,provider)
  })
  after(async()=>{
-  writeFileSync(new URL('../../../artifacts/panel-revision/evidence/contract-custody-transactions.json',import.meta.url),JSON.stringify({timestamp:new Date().toISOString(),cluster:'isolated local validator',program:pid.toBase58(),configSeeded:true,records},null,2))
   if(validator&&validator.exitCode===null&&!validatorError){const exited=new Promise(resolve=>validator.once('exit',resolve));validator.kill();await exited}
  })
  it('A: farmer creates batch and registration report',async()=>{await good(register(farmer),farmer);const b=await read();assert(b.owner.equals(farmer.publicKey));assert.equal(b.labCount,1);assert.equal(b.pendingOwner,null)})
@@ -156,7 +161,7 @@ describe('Panel custody and authority regression on native local validator',func
  it('L: report rejected while paused',()=>bad(update(lab,2),lab,'Paused'))
  it('L: registration rejected while paused',()=>bad(register(farmer,'PANEL-PAUSED'),farmer,'Paused'))
  it('L: authority unpauses',async()=>{await good(program.methods.unpause().accountsStrict({config,authority:authority.publicKey}),authority);assert.equal((await program.account.config.fetch(config)).paused,false)})
- it('E-F-G: B accepts, becomes owner; record immutable at index 0',async()=>{await good(accept(receiver),receiver);const b=await read();assert(b.owner.equals(receiver.publicKey));assert.equal(b.pendingOwner,null);assert.equal(b.custodyCount,1);const r=await program.account.custodyRecord.fetch(indexed('custody'));assert(r.from.equals(farmer.publicKey));assert(r.to.equals(receiver.publicKey));assert.deepEqual(r.role,{packer:{}});assert.equal(r.location,'Synthetic test location');records.push({stateAfter:b,custodyRecord:r})})
+ it('E-F-G: B accepts, becomes owner; record immutable at index 0',async()=>{await good(accept(receiver),receiver);const b=await read();assert(b.owner.equals(receiver.publicKey));assert.equal(b.pendingOwner,null);assert.equal(b.custodyCount,1);const r=await program.account.custodyRecord.fetch(indexed('custody'));assert(r.from.equals(farmer.publicKey));assert(r.to.equals(receiver.publicKey));assert.deepEqual(r.role,{packer:{}});assert.equal(r.location,'Synthetic test location')})
  it('repeated acceptance rejected with no pending proposal',()=>bad(accept(receiver,1),receiver,'NoPendingCustody'))
  it('previous owner cannot transfer',()=>bad(propose(farmer),farmer,'Unauthorized'))
  it('authority cannot seize custody',()=>bad(propose(authority),authority,'Unauthorized'))

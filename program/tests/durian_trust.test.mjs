@@ -20,13 +20,15 @@
 
 import { startAnchor } from 'anchor-bankrun'
 import { BankrunProvider } from 'anchor-bankrun'
-import { Program, AnchorError, BN } from '@coral-xyz/anchor'
+import anchor from '@coral-xyz/anchor'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { readFileSync, existsSync } from 'fs'
 import { homedir } from 'os'
 import { fileURLToPath } from 'url'
 import { dirname, resolve, join } from 'path'
 import assert from 'assert/strict'
+
+const { Program, AnchorError, BN } = anchor
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)

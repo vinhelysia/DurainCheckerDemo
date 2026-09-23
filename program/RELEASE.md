@@ -14,12 +14,13 @@ From `program/`:
 ```sh
 anchor build
 cargo test --lib
-npm install
+npm ci --legacy-peer-deps
 TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:attestation
+TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:panel
 ```
 
 On Windows PowerShell, set `$env:TEST_VALIDATOR_PATH` to the full path of
-`solana-test-validator.exe`, then run `npm run test:attestation`. The runner uses
+`solana-test-validator.exe`, then run both native-validator scripts. The runner uses
 localhost port 18999, generated test wallets, seeded fixtures and a fresh ledger
 under `target/`. It needs no devnet SOL or production authority key. It waits for
 post-genesis slots before invoking preloaded programs and uses native Ed25519
@@ -39,9 +40,9 @@ npm run build
 
 Review the source and generated IDL together. The sync check checks source
 snapshots, IDL contents and declared program addresses; it does not check the
-on-chain deployment. CI retains the legacy bankrun suite as a separate gate.
-That suite still has genesis-authority setup requirements and skipped legacy
-cases; passing the new attestation suite does not establish that all CI passes.
+on-chain deployment. CI runs the attestation and custody/authority suites on a
+local validator. The older `npm test` bankrun suite remains manual because its
+genesis-authority fixture needs a specific signer and some cases are skipped.
 
 ## Attestation v2 encoding
 

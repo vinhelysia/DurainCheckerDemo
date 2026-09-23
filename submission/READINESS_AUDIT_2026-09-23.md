@@ -2,7 +2,7 @@
 
 ## Kết luận
 
-DurianTrust đã có demo đọc dữ liệu Solana Devnet, smart contract và pitch deck 11 slide. **Chưa sẵn sàng nộp**: bản production chưa chứa các sửa lỗi diễn giải kiểm định, GitHub repo đang private, chưa có video dự phòng 60–90 giây, và trạng thái đăng ký/được nhận của đội chưa rõ. Không nên trình bày mô hình synthetic, ngưỡng Cadimi minh họa, QR hoặc custody on-chain như chứng nhận kiểm nghiệm, đủ điều kiện xuất khẩu hay quyền sở hữu pháp lý.
+DurianTrust đã có demo Devnet, [public repo](https://github.com/vinhelysia/DurainCheckerDemo), bản production đã smoke và pitch deck 11 slide. **Còn thiếu trước khi nộp**: video dự phòng 60–90 giây và hồ sơ Corelia với thông tin đội; trạng thái đăng ký/được nhận chưa được xác nhận trên tài khoản đội. Không nên trình bày mô hình synthetic, ngưỡng Cadimi minh họa, QR hoặc custody on-chain như chứng nhận kiểm nghiệm, đủ điều kiện xuất khẩu hay quyền sở hữu pháp lý.
 
 ## Yêu cầu và mốc cần xác nhận
 
@@ -14,12 +14,12 @@ DurianTrust đã có demo đọc dữ liệu Solana Devnet, smart contract và p
 
 | Hạng mục | Kết quả | Giới hạn |
 | --- | --- | --- |
-| Production demo | [durian-web3.vercel.app/#/unit/demo](https://durian-web3.vercel.app/#/unit/demo) đọc được batch `DRN-2026-LD-0429` từ Devnet; leaf sample gọi API và nhận kết quả | Production hiện còn nhãn Cadimi/Vàng O và confidence gây hiểu sai; local đã sửa, chưa deploy |
+| Production demo | [durian-web3.vercel.app/#/unit/demo](https://durian-web3.vercel.app/#/unit/demo) đọc batch `DRN-2026-LD-0429` từ Devnet; nhãn Cadimi/Vàng O đã sửa; ảnh lá mẫu trả kết quả từ API sau deploy | Giá trị lab do người dùng nhập, không xác minh chứng thư hay mẫu vật |
 | Solana transaction | [Explorer transaction](https://explorer.solana.com/tx/SLXtNFUJN9kter2MgfqgVrzX1mASn1A1TERkFe5SgowQt5URn4cMMRRFKyvWdjrQqsyBrBREurxhpnv7BHpEA6o?cluster=devnet) `TransferCustody` finalized | Giao dịch này chứng minh đề xuất bàn giao, không tự chứng minh bên nhận đã ký chấp nhận |
-| App | 146 Vitest pass; lint, TypeScript và Vite build pass | Không thay thế browser smoke trên production sau deploy |
+| App | 146 Vitest pass; lint, TypeScript và Vite build pass; browser smoke production pass; frontend GitHub CI pass | Không đo hiệu năng hoặc tải cao |
 | API | 12 Python unit tests pass bằng runtime bundled | Stub không đo độ chính xác ONNX trên dữ liệu thực |
-| Contract | 4 Rust unit tests; 19 attestation tests với `solana-test-validator`; snapshot/IDL sync check pass | Attestation v2 mới test local, chưa xác minh binary Devnet khớp source; CI legacy suite chưa được chứng minh pass |
-| Deck | [Pitch deck đã rà soát](DurianTrust_Pitch_Deck_reviewed_v2.pptx), 11 slide; PPTX validation và render/layout pass | Cần đội điền speaker/team details nếu form yêu cầu |
+| Contract | 4 Rust unit tests; 19 attestation và 20 custody/authority tests với local validator; snapshot/IDL sync check pass | Attestation v2 mới test local, chưa xác minh binary Devnet khớp source; GitHub Anchor CI cần chạy lại sau sửa Node 20 import |
+| Deck | [Pitch deck chính đã rà soát](../DurianTrust_Pitch_Deck.pptx), 11 slide; PPTX validation và render/layout pass | Cần đội điền speaker/team details nếu form yêu cầu |
 
 ## Việc đã sửa trong workspace
 
@@ -30,7 +30,7 @@ DurianTrust đã có demo đọc dữ liệu Solana Devnet, smart contract và p
 ## Ưu tiên trước khi nộp
 
 1. **P0 — Nộp được hay không:** xác nhận đăng ký và deadline với BTC; tạo/cập nhật submission trên Corelia. Chọn đúng track/theme và điền đội.
-2. **P0 — Public artifacts:** review full Git history để chắc không có bí mật; đổi repo private → public, commit/push các sửa đã review, deploy Vercel và smoke production. Workspace đang có nhiều thay đổi từ trước audit, nên review diff trước khi publish. Không public `.keys/` hoặc secret.
+2. **Đã xong — Public artifacts:** repo public, commit đã push, Vercel production và ảnh lá mẫu smoke pass. `.keys/` vẫn bị ignore; rà tên file trong lịch sử và pattern secret ở workspace không thấy key được track. Tiếp tục giữ key ngoài Git.
 3. **P0 — Video:** quay màn hình 60–90 giây từ bản production mới. Kịch bản: 0–10s vấn đề/hứa hẹn; 10–35s QR mở batch Devnet, chỉ số đo Cadimi và ngưỡng minh họa; 35–55s timeline/custody và Explorer; 55–75s leaf sample AI với nhãn demo; 75–90s giới hạn và link repo. Tránh thao tác wallet mất thời gian trong video dự phòng.
 4. **P1 — Bằng chứng contract:** nếu demo live chuyển custody, cần riêng transaction `AcceptCustody` và người nhận ký; transaction `TransferCustody` hiện được kiểm tra chỉ là đề xuất. Kiểm tra đúng program ID, deployed binary và current source trước khi nói attestation v2 đang live.
 5. **P2 — Sau cuộc thi:** đánh giá ML với tập test độc lập có provenance, calibration/unknown handling; kiểm tra giá trị ngưỡng Cadimi với chuyên gia và tiêu chuẩn thị trường đích trước ứng dụng thực tế.

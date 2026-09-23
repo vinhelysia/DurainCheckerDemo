@@ -64,6 +64,8 @@ The React app is the single source of truth for the UI. It reads batch state dir
 
 **No wallet required to see it work.** Everything below the fold is real, running code — not mocked screenshots.
 
+Pitch deck: [DurianTrust_Pitch_Deck.pptx](DurianTrust_Pitch_Deck.pptx).
+
 1. Open the app and click **"Scan a demo batch"** on the landing page. This lands on `#/unit/demo`, which works with zero setup: no wallet, no devnet SOL, no install step. If devnet happens to be unreachable, the page says so explicitly (a gold "Demo data" badge instead of a green "Live on Solana Devnet" one) and still shows a fully realistic batch record.
 2. Look at the **chain of custody** panel next to the timeline. Inspect the selected batch and its data-source badge. Available records may change over time; use captured transaction evidence for a dated scenario. A pending recipient does not become the recorded holder until acceptance.
 3. Scroll to the **leaf disease scanner** and click one of the sample thumbnails — it runs the real ONNX model and returns a prediction in one click, no file upload needed.
@@ -145,13 +147,15 @@ These are two different things, and the program treats them that way.
 
 ## Testing
 
+Build the program, then run the native-validator suites from `program/`:
+
 ```bash
-cd program && npm install --legacy-peer-deps && npm test
+npm ci --legacy-peer-deps
+TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:attestation
+TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:panel
 ```
 
-The suite runs the Anchor program in-process with `anchor-bankrun` and covers the custody rules directly: a non-owner cannot propose a handoff, a wallet that was not nominated cannot accept one, ownership does not move until acceptance, and a previous owner cannot move a batch it has already passed on.
-
-> **Note:** these tests do not run on Windows. `solana-bankrun` ships no win32 native binary, and `solana-test-validator` needs symlink privileges. Run them on Linux/macOS or in CI; on Windows, verify against devnet instead.
+The suites use generated wallets and an isolated local validator to check native Ed25519 attestation, custody acceptance, role restrictions, pause and authority handover. On Windows PowerShell, set `$env:TEST_VALIDATOR_PATH` to the full path of `solana-test-validator.exe` before each command. The older `npm test` bankrun suite remains manual; its genesis-authority fixture requires a specific signer.
 
 
 ## Research limitations after panel review

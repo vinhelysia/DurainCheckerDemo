@@ -108,9 +108,9 @@ jobs:
         working-directory: program
         run: TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:attestation
 
-      - name: anchor test (bankrun — no validator required)
+      - name: Custody and authority native-validator integration
         working-directory: program
-        run: anchor test --skip-build
+        run: TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:panel
 
   # ── Frontend: lint, build, unit tests, translation parity ─────────────────
   frontend:

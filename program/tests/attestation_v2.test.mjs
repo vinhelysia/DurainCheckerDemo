@@ -7,9 +7,11 @@ import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import { spawn } from 'node:child_process'
 import { setTimeout as delay } from 'node:timers/promises'
-import { AnchorProvider, Wallet, BN, Program } from '@coral-xyz/anchor'
+import anchor from '@coral-xyz/anchor'
 import { Connection, Ed25519Program, Keypair, PublicKey, SYSVAR_INSTRUCTIONS_PUBKEY, SystemProgram, Transaction, VersionedTransaction } from '@solana/web3.js'
 import { DOMAIN_V2, payloadHashV1, payloadHashV2, u32 } from './attestation_payload.mjs'
+
+const { AnchorProvider, Wallet, BN, Program } = anchor
 
 const idl = JSON.parse(readFileSync(new URL('../target/idl/durian_trust.json', import.meta.url)))
 const pid = new PublicKey(idl.address)
