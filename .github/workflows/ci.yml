@@ -71,7 +71,7 @@ jobs:
 
       - name: Install program test dependencies
         working-directory: program
-        run: npm install
+        run: npm ci --legacy-peer-deps
 
       - name: anchor build
         working-directory: program
