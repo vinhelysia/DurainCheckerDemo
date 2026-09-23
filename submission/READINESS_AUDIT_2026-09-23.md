@@ -33,6 +33,7 @@ DurianTrust đã có demo Devnet, [public repo](https://github.com/vinhelysia/Du
 2. **Đã xong — Public artifacts:** repo public, commit đã push, Vercel production và ảnh lá mẫu smoke pass. `.keys/` vẫn bị ignore; rà tên file trong lịch sử và pattern secret ở workspace không thấy key được track. Tiếp tục giữ key ngoài Git.
 3. **P0 — Video:** quay màn hình 60–90 giây từ bản production mới. Kịch bản: 0–10s vấn đề/hứa hẹn; 10–35s QR mở batch Devnet, chỉ số đo Cadimi và ngưỡng minh họa; 35–55s timeline/custody và Explorer; 55–75s leaf sample AI với nhãn demo; 75–90s giới hạn và link repo. Tránh thao tác wallet mất thời gian trong video dự phòng.
    [Video giới thiệu 73 giây](../public/DurianTrust_Intro_73s.mp4) là hình dựng bằng code, có thể dùng cho mục Video thuyết trình; không thay thế video quay thao tác thật.
+   [Video hướng dẫn mô phỏng 72 giây](../public/DurianTrust_Guided_Walkthrough_72s.mp4) có con trỏ và highlight theo luồng production, được gắn nhãn hình dựng trong toàn bộ video; cũng không thay thế video quay màn hình thật.
 4. **P1 — Bằng chứng contract:** nếu demo live chuyển custody, cần riêng transaction `AcceptCustody` và người nhận ký; transaction `TransferCustody` hiện được kiểm tra chỉ là đề xuất. Kiểm tra đúng program ID, deployed binary và current source trước khi nói attestation v2 đang live.
 5. **P2 — Sau cuộc thi:** đánh giá ML với tập test độc lập có provenance, calibration/unknown handling; kiểm tra giá trị ngưỡng Cadimi với chuyên gia và tiêu chuẩn thị trường đích trước ứng dụng thực tế.
 

@@ -68,6 +68,8 @@ Pitch deck: [DurianTrust_Pitch_Deck.pptx](DurianTrust_Pitch_Deck.pptx).
 
 Captioned product introduction: [DurianTrust_Intro_73s.mp4](public/DurianTrust_Intro_73s.mp4). This is a code-rendered explainer, not a recording of product interaction; the hackathon backup demo video must show real app use.
 
+Guided UI simulation: [DurianTrust_Guided_Walkthrough_72s.mp4](public/DurianTrust_Guided_Walkthrough_72s.mp4). A cursor and highlights walk through the real product flow using a code-rendered recreation of the interface. It is labeled as a simulation throughout and is not the required screen recording.
+
 1. Open the app and click **"Scan a demo batch"** on the landing page. This lands on `#/unit/demo`, which works with zero setup: no wallet, no devnet SOL, no install step. If devnet happens to be unreachable, the page says so explicitly (a gold "Demo data" badge instead of a green "Live on Solana Devnet" one) and still shows a fully realistic batch record.
 2. Look at the **chain of custody** panel next to the timeline. Inspect the selected batch and its data-source badge. Available records may change over time; use captured transaction evidence for a dated scenario. A pending recipient does not become the recorded holder until acceptance.
 3. Scroll to the **leaf disease scanner** and click one of the sample thumbnails — it runs the real ONNX model and returns a prediction in one click, no file upload needed.
