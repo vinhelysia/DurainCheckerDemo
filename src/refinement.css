@@ -20,6 +20,18 @@
 }
 
 body { background: var(--color-bg); }
+.cloud-portal { display: grid; gap: 24px; }
+.cloud-workspace { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 28px; align-items: start; }
+.cloud-sidebar, .cloud-detail, .cloud-form { display: grid; gap: 18px; min-width: 0; }
+.cloud-form label, .cloud-form fieldset { display: grid; gap: 8px; }
+.cloud-form fieldset { padding: 16px; border: 1px solid var(--color-line); border-radius: 8px; }
+.cloud-form input, .cloud-form textarea { width: 100%; min-width: 0; padding: 12px; border: 1px solid var(--color-line-strong); border-radius: 8px; background: #fff; color: var(--color-ink); font: inherit; }
+.cloud-form > .button, .cloud-actions .button { min-height: 44px; }
+.cloud-form .button[aria-pressed="true"] { border-color: var(--color-emerald); background: var(--color-bg-alt); }
+.cloud-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.cloud-events { padding-left: 24px; display: grid; gap: 24px; overflow-wrap: anywhere; }
+.cloud-detail p { overflow-wrap: anywhere; white-space: pre-wrap; }
+@media (max-width: 760px) { .cloud-workspace { grid-template-columns: 1fr; } }
 .app { background: var(--color-bg); }
 .section-shell, .header-shell { width: min(1240px, calc(100% - 64px)); }
 .section { padding-block: 80px 100px; }
@@ -47,9 +59,9 @@ body { background: var(--color-bg); }
   text-decoration: none;
 }
 .header-nav .nav-link:hover,
-.header-nav .nav-link.active,
-.nav-more[open] > summary { color: var(--color-green-deep); background: var(--color-bg-alt); }
-.header-nav .nav-link.active { box-shadow: inset 0 -2px var(--color-emerald); }
+.nav-more[open] > summary { color: var(--color-green-deep); }
+.header-nav .nav-link.active { color: var(--color-green-deep); background: var(--color-bg-alt); }
+.header-nav .nav-link:focus-visible { outline: 2px solid var(--color-emerald); outline-offset: 3px; }
 .nav-more { position: relative; }
 .nav-more > summary { display: flex; align-items: center; gap: 7px; list-style: none; cursor: pointer; }
 .nav-more > summary::-webkit-details-marker { display: none; }

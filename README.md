@@ -60,6 +60,11 @@ flowchart LR
 
 The React app is the single source of truth for the UI. It reads batch state directly from Solana devnet program accounts, calls three demonstration inference endpoints, and — only when devnet or Phantom is unavailable — falls back to bundled demo data or a localStorage-simulated ledger. The fallback is never hidden: the UI always shows which mode it's in.
 
+An optional [Render + Supabase backend](backend/README.md) provides email sign-in,
+private off-chain batch records, append-only event history, and public QR sharing.
+Enable it only after applying the database migration and configuring both services.
+It does not replace Solana custody or silently upload the local demo ledger.
+
 ## Judge quickstart
 
 **No wallet required to see it work.** Everything below the fold is real, running code — not mocked screenshots.

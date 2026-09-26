@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Compass, Cpu, AlertTriangle, CheckCircle2, RefreshCw, Send } from 'lucide-react'
 import { runRuleAuditor } from '../../lib/ruleAuditor'
 import { useSlowLoading } from '../../hooks/useSlowLoading'
+import { apiFetch } from '../../lib/api'
 
 const PROVINCES = {
   'Lâm Đồng': 'Lam Dong',
@@ -155,7 +156,7 @@ export default function FarmerPanel({
       const priorVal = Number(priorInfection) || 0
 
       try {
-        const response = await fetch('/api/predict_disease', {
+        const response = await apiFetch('/api/predict_disease', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -229,7 +230,7 @@ export default function FarmerPanel({
       const month = Number.isNaN(parsedMonth) ? 6 : parsedMonth
 
       try {
-        const response = await fetch('/api/predict', {
+        const response = await apiFetch('/api/predict', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

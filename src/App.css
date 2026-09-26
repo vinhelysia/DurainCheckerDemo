@@ -2059,20 +2059,6 @@ a.provenance-badge--live:focus-visible {
   }
 }
 
-/* ==========================================================================
-   HEADER ACTIVE STATE RULES
-   ========================================================================== */
-
-/* Active links: ink text with an emerald rule underneath */
-.site-header .nav-link.active,
-.site-header .nav-link.active-red {
-  color: var(--color-ink) !important;
-  text-decoration: underline;
-  text-decoration-color: var(--color-emerald);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 6px;
-}
-
 .mobile-nav-header {
   color: var(--color-green-mid) !important;
   font-family: var(--font-mono);

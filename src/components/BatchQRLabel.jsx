@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import QRCode from 'qrcode'
 import { Printer } from 'lucide-react'
 
-export default function BatchQRLabel({ batchId, language, loading }) {
+export default function BatchQRLabel({ batchId, language, loading, shareUrl }) {
   const canvasRef = useRef(null)
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function BatchQRLabel({ batchId, language, loading }) {
 
     // QR URL formatting: `${window.location.origin}${import.meta.env.BASE_URL}#/unit/demo?batchId=<ID>`
     const baseUrl = import.meta.env.BASE_URL || '/'
-    const qrUrl = `${window.location.origin}${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}#/unit/demo?batchId=${encodeURIComponent(batchId)}`
+    const qrUrl = shareUrl || `${window.location.origin}${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}#/unit/demo?batchId=${encodeURIComponent(batchId)}`
 
     QRCode.toCanvas(
       canvas,
@@ -53,7 +53,7 @@ export default function BatchQRLabel({ batchId, language, loading }) {
         }
       }
     )
-  }, [batchId, loading])
+  }, [batchId, loading, shareUrl])
 
   const handlePrint = (e) => {
     e.preventDefault()

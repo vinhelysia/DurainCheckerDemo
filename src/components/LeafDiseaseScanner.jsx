@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Camera, Sparkles, AlertCircle, RotateCcw } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import { useSlowLoading } from '../hooks/useSlowLoading'
+import { apiFetch } from '../lib/api'
 
 const SAMPLE_IMAGES = [
   { key: 'healthy', src: `${import.meta.env.BASE_URL}samples/healthy.jpg` },
@@ -100,7 +101,7 @@ export default function LeafDiseaseScanner() {
       const formData = new FormData()
       formData.append('image', file)
 
-      const response = await fetch('/api/predict_leaf', {
+      const response = await apiFetch('/api/predict_leaf', {
         method: 'POST',
         body: formData,
         signal: controller.signal,

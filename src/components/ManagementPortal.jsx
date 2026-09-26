@@ -363,6 +363,11 @@ export default function ManagementPortal() {
         </div>
 
         {/* Connection/Wallet Banner */}
+        {import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_API_BASE_URL && (
+          <p className="lookup-notice"><a href="#/manage/cloud">
+            {language === 'vi' ? 'Mở hồ sơ cloud — lưu lô riêng và chia sẻ qua QR' : 'Open cloud records — save private batches and share via QR'}
+          </a></p>
+        )}
         <div className="status-banner manage-status-banner">
           <div className="manage-status-row">
             <div className="status-left">

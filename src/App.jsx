@@ -16,6 +16,7 @@ import '@solana/wallet-adapter-react-ui/styles.css'
 const DemoSection = lazy(() => import('./components/DemoSection'))
 const UnitDetails = lazy(() => import('./components/UnitDetails'))
 const ManagementPortal = lazy(() => import('./components/ManagementPortal'))
+const CloudPortal = lazy(() => import('./components/CloudPortal'))
 
 function App() {
   const { language, copy } = useLanguage()
@@ -132,6 +133,10 @@ function App() {
         return <DemoSection />
       case '#/manage':
         return <ManagementPortal />
+      case '#/manage/cloud':
+        return <CloudPortal />
+      case '#/cloud':
+        return <CloudPortal publicId={new URLSearchParams(currentRoute.split('?')[1]).get('batchId') || ''} publicView />
       default:
         return <Hero />
     }

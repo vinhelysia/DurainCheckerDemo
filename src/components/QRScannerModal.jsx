@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { X, QrCode, ShieldCheck, Camera, Sparkles, AlertCircle, ArrowRight } from 'lucide-react'
 import { Html5Qrcode } from 'html5-qrcode'
 import { useLanguage } from './LanguageContext'
+import { parseBatchQr } from '../lib/batchQr'
 
 export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess }) {
   const { copy } = useLanguage()
@@ -100,33 +101,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
         html5QrCodeRef.current = scannerInstance
 
         const successCallback = async (decodedText) => {
-          let batchId = ''
-          try {
-            // Attempt to parse deep link format: ...?batchId=ID
-            if (decodedText.includes('?')) {
-              const urlParts = decodedText.split('?')
-              const searchParams = new URLSearchParams(urlParts[1].split('#')[0])
-              if (searchParams.has('batchId')) {
-                batchId = searchParams.get('batchId')
-              } else {
-                // Check hash query params
-                const hashParts = decodedText.split('#')
-                if (hashParts.length > 1) {
-                  const hashParams = new URLSearchParams(hashParts[1].split('?')[1] || '')
-                  if (hashParams.has('batchId')) {
-                    batchId = hashParams.get('batchId')
-                  }
-                }
-              }
-            }
-          } catch (e) {
-            console.warn('URL parsing error, using raw decoded text:', e)
-          }
-
-          if (!batchId) {
-            // Tolerate a raw batch ID scanned directly
-            batchId = decodedText.trim()
-          }
+          const { id: batchId, cloud } = parseBatchQr(decodedText)
 
           if (batchId && isMounted) {
             setScannedBatchId(batchId)
@@ -144,7 +119,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
             // Wait brief moment to show success feedback animation
             setTimeout(() => {
               if (isMounted) {
-                onScanSuccess(batchId)
+                onScanSuccess(batchId, cloud)
                 onClose()
               }
             }, 800)
@@ -219,7 +194,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
 
   const handleManualVerify = (e) => {
     e.preventDefault()
-    const trimmed = manualInput.trim()
+    const { id: trimmed, cloud } = parseBatchQr(manualInput)
     if (!trimmed) {
       setManualError(copy.qrScanner.error.empty)
       return
@@ -228,11 +203,11 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
     // Match against known batch IDs case-insensitively; pass original casing through
     const matched = batches.find(b => b.id.toUpperCase() === trimmed.toUpperCase())
     if (matched) {
-      onScanSuccess(matched.id)
+      onScanSuccess(matched.id, cloud)
       handleClose()
     } else {
       // Allow any batch ID to be loaded to support dynamic/unregistered ones
-      onScanSuccess(trimmed)
+      onScanSuccess(trimmed, cloud)
       handleClose()
     }
   }
