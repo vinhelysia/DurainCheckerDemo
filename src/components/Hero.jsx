@@ -1,7 +1,8 @@
-import { ArrowRight, CheckCircle2, FileCheck2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileCheck2, Sprout, Route, FlaskConical, ScanLine } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 
 const base = import.meta.env.BASE_URL
+const recordIcons = [Sprout, Route, FlaskConical, ScanLine]
 
 function asset(file) {
   return `${base}images/${file}`
@@ -31,17 +32,17 @@ function Hero() {
           </div>
 
           <div className="hero-visual">
-            <picture>
-              <source srcSet={asset('hero-durian.webp')} type="image/webp" />
+            <picture className="passport-art">
               <img
                 className="hero-photo"
-                src={asset('hero-durian.jpg')}
+                src={asset('durian-digital-passport.webp')}
                 alt={copy.hero.photoAlt}
-                width={800}
-                height={1000}
+                width={960}
+                height={960}
                 fetchPriority="high"
               />
             </picture>
+            <p className="illustration-caption">{copy.hero.illustrationCaption}</p>
             <div className="hero-ledger-note" aria-label={copy.hero.ariaLabelLedger}>
               <div className="proof-icon" aria-hidden="true">
                 <FileCheck2 size={22} />
@@ -88,6 +89,7 @@ function Hero() {
                     />
                   </picture>
                   <div className="journey-copy">
+                    <span className="journey-step-number" aria-hidden="true">0{index + 1}</span>
                     <h3>
                       {step.title}
                       <ArrowRight size={16} aria-hidden="true" />
@@ -107,13 +109,33 @@ function Hero() {
             <h2 id="records-title">{landing.recordTitle}</h2>
             <p>{landing.recordLead}</p>
           </div>
-          <div className="chain-records">
-            {landing.records.map((record) => (
-              <div key={record.name} className="chain-record">
-                <strong className="chain-record-label">{record.name}</strong>
-                <p>{record.detail}</p>
-              </div>
-            ))}
+          <ol className="record-flow">
+            {landing.records.map((record, index) => {
+              const Icon = recordIcons[index]
+              return (
+                <li key={record.name}>
+                  <div className="record-flow-symbol" aria-hidden="true">
+                    <Icon size={28} strokeWidth={1.7} />
+                    <span>0{index + 1}</span>
+                  </div>
+                  <h3>{record.name}</h3>
+                  <p>{record.detail}</p>
+                </li>
+              )
+            })}
+          </ol>
+          <div className="scan-invitation">
+            <a className="scan-invitation-code" href="#/unit/demo?batchId=DRN-2026-LD-0429" aria-label={landing.scanAction}>
+              <img src={asset('demo-passport-qr.svg')} width={156} height={156} loading="lazy" alt={landing.scanAlt} />
+            </a>
+            <div className="scan-invitation-copy">
+              <p className="section-kicker">DRN-2026-LD-0429</p>
+              <h3>{landing.scanTitle}</h3>
+              <p>{landing.scanLead}</p>
+              <a href="#/unit/demo?batchId=DRN-2026-LD-0429" className="button button-primary">
+                {landing.scanAction}<ArrowRight size={18} aria-hidden="true" />
+              </a>
+            </div>
           </div>
         </div>
       </section>

@@ -259,3 +259,35 @@ body { background: var(--color-bg); }
   .journey-card, .button { transition: none; }
   .journey-card:hover { transform: none; }
 }
+
+/* A visual explanation of the batch record, with a working QR entry point. */
+.hero-visual .passport-art { width: 100%; height: auto; border-radius: 20px; }
+.passport-art .hero-photo { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
+.illustration-caption { margin: 9px 0 0; color: var(--color-ink-faint); font-size: .72rem; text-align: right; }
+.hero-visual .hero-ledger-note { width: 100%; margin: 16px 0 0; box-shadow: var(--shadow-card); }
+.journey-step-number { display: block; margin-bottom: 10px; color: var(--color-emerald); font-family: var(--font-mono); font-size: .76rem; }
+.record-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; margin: 40px 0 0; padding: 0; list-style: none; }
+.record-flow li { position: relative; }
+.record-flow li:not(:last-child)::after { content: ''; position: absolute; top: 32px; left: 80px; right: -16px; border-top: 2px dashed var(--color-line-strong); }
+.record-flow-symbol { position: relative; display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: 22px; border: 1px solid #cbdcce; border-radius: 18px; background: #e5eee4; color: var(--color-green-deep); }
+.record-flow-symbol span { position: absolute; right: -7px; bottom: -7px; display: grid; place-items: center; width: 26px; height: 26px; border: 3px solid var(--color-bg); border-radius: 50%; background: var(--color-green-deep); color: #fff; font-family: var(--font-mono); font-size: .6rem; }
+.record-flow h3 { margin-bottom: 9px; font-size: 1.08rem; }
+.record-flow p { color: var(--color-ink-soft); font-size: .9rem; line-height: 1.65; }
+.scan-invitation { display: flex; align-items: center; gap: 40px; margin-top: 56px; padding: 36px 40px; border: 1px solid #cfddcc; border-radius: 18px; background: #eaf0e5; }
+.scan-invitation-code { flex: 0 0 auto; display: block; padding: 12px; border: 1px solid var(--color-line); border-radius: 12px; background: white; }
+.scan-invitation-code img { display: block; width: 156px; height: 156px; }
+.scan-invitation-copy h3 { margin: 8px 0 12px; font-size: clamp(1.5rem, 2.5vw, 2.1rem); line-height: 1.2; letter-spacing: -.025em; }
+.scan-invitation-copy > p:not(.section-kicker) { max-width: 62ch; color: var(--color-ink-soft); line-height: 1.65; }
+.scan-invitation-copy .button { margin-top: 20px; }
+@media (max-width: 800px) {
+  .record-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
+  .record-flow li:nth-child(2)::after { display: none; }
+  .scan-invitation { gap: 24px; padding: 28px; }
+}
+@media (max-width: 540px) {
+  .record-flow { grid-template-columns: 1fr; gap: 26px; }
+  .record-flow li { display: grid; grid-template-columns: 64px 1fr; column-gap: 22px; }
+  .record-flow-symbol { grid-row: 1 / 3; margin-bottom: 0; }
+  .record-flow li:not(:last-child)::after { display: block; top: 76px; bottom: -12px; left: 32px; right: auto; border-top: 0; border-left: 2px dashed var(--color-line-strong); }
+  .scan-invitation { flex-direction: column; align-items: flex-start; padding: 24px; }
+}

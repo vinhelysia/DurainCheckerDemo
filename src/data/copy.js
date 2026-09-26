@@ -51,7 +51,8 @@ export const copyData = {
       verified: 'Dữ liệu minh họa',
       ariaLabelLedger: 'Mẫu trạng thái lô hàng',
       ariaLabelActions: 'Hành động chính',
-      photoAlt: 'Sầu riêng chín trên bàn gỗ, ảnh tư liệu',
+      photoAlt: 'Minh họa thùng sầu riêng, nhãn lô và hồ sơ hành trình trên điện thoại',
+      illustrationCaption: 'Minh họa AI · hồ sơ số theo lô',
     },
     landing: {
       journeyTitle: 'Đường đi của một lô xuất khẩu',
@@ -89,6 +90,10 @@ export const copyData = {
       ],
       recordTitle: 'Trên sổ ghi những gì?',
       recordLead: 'Bốn việc chính — từ lúc mở lô đến lúc ai cũng đối chiếu được.',
+      scanTitle: 'Từ nhãn trên thùng đến hồ sơ trên tay.',
+      scanLead: 'Quét QR bằng điện thoại hoặc mở lô mẫu để xem nguồn dữ liệu, timeline và số đo đối chiếu. Không cần ví để xem.',
+      scanAction: 'Mở hồ sơ lô mẫu',
+      scanAlt: 'QR mở hồ sơ lô demo DRN-2026-LD-0429',
       records: [
         { name: 'Đăng ký lô', detail: 'Mã lô, vùng trồng, ngày thu hoạch.' },
         { name: 'Ghi mốc hành trình', detail: 'Canh tác, đóng gói, chặng lạnh.' },
@@ -633,7 +638,8 @@ export const copyData = {
       verified: 'Illustrative data',
       ariaLabelLedger: 'Sample batch status',
       ariaLabelActions: 'Primary actions',
-      photoAlt: 'Ripe durian fruit on a wooden table (stock photo)',
+      photoAlt: 'Illustration of a durian crate, batch tag and a digital journey on a phone',
+      illustrationCaption: 'AI illustration · a digital batch record',
     },
     landing: {
       journeyTitle: 'How an export batch actually moves',
@@ -671,6 +677,10 @@ export const copyData = {
       ],
       recordTitle: 'What goes on the ledger?',
       recordLead: 'Four practical steps — from opening a batch to letting anyone verify it.',
+      scanTitle: 'From the crate label to a record in your hand.',
+      scanLead: 'Scan with your phone or open the sample batch to see its data source, timeline and measurement comparison. No wallet needed to view.',
+      scanAction: 'Open the sample batch',
+      scanAlt: 'QR linking to demo batch DRN-2026-LD-0429',
       records: [
         { name: 'Register batch', detail: 'Batch ID, growing area, harvest date.' },
         { name: 'Log milestone', detail: 'Farm work, packing, cold-chain stops.' },
