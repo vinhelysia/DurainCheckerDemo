@@ -4,6 +4,19 @@ The Vercel frontend can call the Render API for all three ONNX endpoints and
 authenticated cloud records. Existing Vercel inference stays available when
 `VITE_API_BASE_URL` is unset. Solana and the local demo ledger remain separate.
 
+## Current deployment
+
+- Render Free, Singapore: `https://duriantrust-api.onrender.com`
+- Service ID: `srv-dars44vavr4c73fvgt20`
+- Verified live: health, all three ONNX endpoints, and production-origin CORS.
+- `.env.production` contains only the public Render URL so Git deployments use it.
+  Hosting environment variables can override that value. Local Vite development
+  continues to use its own environment configuration.
+- Supabase setup is still pending. Cloud records remain disabled until its URL and
+  publishable key are configured and the migration is applied.
+- This service uses the public Git repository connection. Deploy later backend
+  commits with Render's Manual Deploy control; do not assume automatic deploys.
+
 ## 1. Supabase (Free)
 
 1. Create a project in your account. Keep its database password in your password
