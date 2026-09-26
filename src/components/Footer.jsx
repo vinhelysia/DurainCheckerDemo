@@ -36,41 +36,34 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="section-shell footer-shell">
-        <div>
+        <div className="footer-intro">
           <strong>DurianTrust</strong>
           <p>
             {copy.footer.demoText}
           </p>
         </div>
 
-        <div className="source-links" aria-label={copy.footer.sourcesLabel}>
-          <span>{copy.footer.sourcesLabel}</span>
-          {sources.map((source) => (
-            <a
-              key={source.label}
-              href={source.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {source.label}
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
-          ))}
-        </div>
-
-        <div className="source-links footer-credits" aria-label={copy.footer.photosLabel}>
-          <span>{copy.footer.photosLabel}</span>
-          {photoCredits.map((credit) => (
-            <a
-              key={credit.label}
-              href={credit.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {credit.label}
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
-          ))}
+        <div className="footer-details">
+          <details className="footer-disclosure">
+            <summary>{copy.footer.sourcesLabel}</summary>
+            <div className="footer-link-list">
+              {sources.map((source) => (
+                <a key={source.label} href={source.href} target="_blank" rel="noreferrer">
+                  {source.label}<ExternalLink size={13} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          </details>
+          <details className="footer-disclosure">
+            <summary>{copy.footer.photosLabel}</summary>
+            <div className="footer-link-list">
+              {photoCredits.map((credit) => (
+                <a key={credit.label} href={credit.href} target="_blank" rel="noreferrer">
+                  {credit.label}<ExternalLink size={13} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          </details>
         </div>
       </div>
     </footer>

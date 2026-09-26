@@ -156,6 +156,10 @@ function DemoSection() {
           </div>
         )}
 
+        {loading && <p className="demo-loading" role="status">
+          {language === 'vi' ? 'Đang tải hồ sơ lô và kiểm tra nguồn dữ liệu…' : 'Loading the batch record and checking its data source…'}
+        </p>}
+
         {(loading || activeBatch) && <>
         <ProvenanceBadge source={source} hash={currentBatch.blockchainHash} loading={loading} />
 
