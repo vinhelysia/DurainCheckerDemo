@@ -261,6 +261,25 @@ body { background: var(--color-bg); }
 }
 
 /* A visual explanation of the batch record, with a working QR entry point. */
+.landing-features { padding: 36px 0 12px; }
+.feature-stories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.feature-story { overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--color-line); border-radius: 18px; background: var(--color-surface); }
+.feature-story figure { margin: 0; }
+.feature-story figure img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; }
+.feature-story figcaption { padding: 9px 24px; background: #f0f3ed; color: var(--color-ink-faint); font-size: .7rem; }
+.feature-story-body { flex: 1; display: flex; flex-direction: column; align-items: flex-start; padding: 28px; }
+.feature-story h3 { margin: 10px 0 15px; font-size: clamp(1.5rem, 2.6vw, 2rem); line-height: 1.2; letter-spacing: -.025em; }
+.feature-story-body > p:not(.section-kicker) { color: var(--color-ink-soft); font-size: .94rem; line-height: 1.65; }
+.feature-steps { align-self: stretch; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 24px 0 18px; padding: 20px 0 0; list-style: none; counter-reset: feature-step; border-top: 1px solid var(--color-line); }
+.feature-steps li { counter-increment: feature-step; font-size: .8rem; line-height: 1.5; font-weight: 600; }
+.feature-steps li::before { content: '0' counter(feature-step); display: block; margin-bottom: 7px; font-family: var(--font-mono); font-size: .7rem; color: var(--color-emerald); }
+.feature-story-body > .feature-limit { margin-bottom: 24px; font-size: .78rem; }
+.feature-story .button { margin-top: auto; }
+@media (max-width: 700px) {
+  .feature-stories { grid-template-columns: 1fr; }
+  .feature-story-body { padding: 22px; }
+  .feature-steps { gap: 10px; }
+}
 .hero-visual .passport-art { width: 100%; height: auto; border-radius: 20px; }
 .passport-art .hero-photo { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
 .illustration-caption { margin: 9px 0 0; color: var(--color-ink-faint); font-size: .72rem; text-align: right; }

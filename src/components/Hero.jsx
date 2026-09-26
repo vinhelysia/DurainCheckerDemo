@@ -61,6 +61,37 @@ function Hero() {
         </div>
       </section>
 
+      <section className="landing-features" aria-labelledby="features-title">
+        <div className="section-shell">
+          <div className="section-heading">
+            <h2 id="features-title">{landing.featureTitle}</h2>
+            <p>{landing.featureLead}</p>
+          </div>
+          <div className="feature-stories">
+            {landing.features.map((feature) => (
+              <article className="feature-story" key={feature.image}>
+                <figure>
+                  <img src={asset(feature.image)} alt={feature.alt} width={960} height={640} loading="lazy" />
+                  <figcaption>{landing.featureIllustration}</figcaption>
+                </figure>
+                <div className="feature-story-body">
+                  <p className="section-kicker">{feature.kicker}</p>
+                  <h3>{feature.title}</h3>
+                  <p>{feature.description}</p>
+                  <ol className="feature-steps">
+                    {feature.steps.map((step) => <li key={step}>{step}</li>)}
+                  </ol>
+                  <p className="feature-limit">{feature.note}</p>
+                  <a className="button button-secondary" href={feature.href}>
+                    {feature.action}<ArrowRight size={18} aria-hidden="true" />
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="landing-journey" aria-labelledby="journey-title">
         <div className="section-shell">
           <div className="section-heading">
