@@ -102,6 +102,24 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
 
   useEffect(() => {
     let active = true
+    let chainTimedOut = false
+
+    async function withinDeadline<T>(promise: Promise<T>): Promise<T> {
+      let timer: ReturnType<typeof setTimeout> | undefined
+      try {
+        return await Promise.race([
+          promise,
+          new Promise<T>((_, reject) => {
+            timer = setTimeout(() => {
+              chainTimedOut = true
+              reject(new Error('Solana RPC timed out'))
+            }, 10_000)
+          }),
+        ])
+      } finally {
+        clearTimeout(timer)
+      }
+    }
 
     async function init() {
       try {
@@ -130,7 +148,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
 
         const program = new Program(idlData, provider) as unknown as DurianTrustProgram
 
-        const { allBatches, targetId } = await withRetry(async () => {
+        const { allBatches, targetId } = await withinDeadline(withRetry(async () => {
           // Fetch only the first 64 bytes per account (discriminator + id string)
           // to avoid transferring full account data for every batch on-chain.
           const rawAccounts = await connection.getProgramAccounts(program.programId, {
@@ -152,7 +170,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
             .filter(b => b.id.length > 0)
           const tId = selectedBatchId || (mapped[0] ? mapped[0].id : null)
           return { allBatches: mapped, targetId: tId }
-        }, 1)
+        }, 1))
 
         if (!active) return
 
@@ -160,7 +178,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
         setSource('chain')
 
         if (targetId) {
-          await withRetry(() => loadBatchDetails(program, connection, targetId), 1)
+          await withinDeadline(withRetry(() => loadBatchDetails(program, connection, targetId), 1))
         } else {
           setLoading(false)
         }
@@ -352,7 +370,7 @@ export function useBlockchainBatches(selectedBatchId: string | null | undefined)
           labReports,
         }
 
-        if (!active) return
+        if (!active || chainTimedOut) return
         setBatches(previous => previous.map(batch => batch.id === id
           ? { ...batch, riskLevel: formattedBatch.riskLevel } : batch))
         setActiveBatch(formattedBatch)

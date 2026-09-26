@@ -142,7 +142,7 @@ describe('useBlockchainBatches data provenance and missing results', () => {
     mocks.decode.mockReturnValue({ ...mocks.decode(), labCount: 1 })
     mocks.reports.mockResolvedValue([lowReport])
     useStart(chainId)
-    await vi.runAllTimersAsync()
+    await vi.advanceTimersByTimeAsync(0)
 
     expect(currentState()).toMatchObject({
       batches: [{ id: chainId, riskLevel: 'unknown' }],
@@ -167,6 +167,17 @@ describe('useBlockchainBatches data provenance and missing results', () => {
       loading: false, source: 'chain',
     })
     expect(mocks.reports).not.toHaveBeenCalled()
+  })
+
+  it('shows demo data when the RPC never responds', async () => {
+    mocks.getProgramAccounts.mockReturnValue(new Promise(() => {}))
+    useStart(demoId)
+    await vi.advanceTimersByTimeAsync(10_000)
+
+    expect(currentState()).toMatchObject({
+      activeBatch: { id: demoId, blockchainHash: 'simulated, not on-chain' },
+      loading: false, source: 'fallback',
+    })
   })
 
   it('does not repeat unsupported claims from an old on-chain report', async () => {
