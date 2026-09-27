@@ -12,9 +12,10 @@ authenticated cloud records. Existing Vercel inference stays available when
 - `.env.production` contains the public Render URL, Supabase URL and publishable key.
   Hosting environment variables can override that value. Local Vite development
   continues to use its own environment configuration.
-- Supabase project: `yexeietfcpucxvtpcflr`. The cloud migration was applied through
-  SQL Editor on 2026-09-27. Both tables have RLS enabled (3 batch policies, 2 event
-  policies). Render has its URL/publishable key and reports `cloud_configured: true`.
+- Supabase project: `yexeietfcpucxvtpcflr`. Both cloud migrations were applied through
+  SQL Editor on 2026-09-27. Batches, events and evidence have RLS enabled.
+  The `batch-evidence` bucket is private and accepts JPG/PNG/PDF up to 5 MB.
+  Render has its URL/publishable key and reports `cloud_configured: true`.
 - Verified live: anonymous Data API reads return empty lists; Render rejects an
   unauthenticated owner-list request with 401 and an unknown public record with 404.
   These checks do not prove authenticated creation or account isolation in production.
@@ -29,7 +30,7 @@ authenticated cloud records. Existing Vercel inference stays available when
 
 1. Create a project in your account. Keep its database password in your password
    manager; do not put it in the repository or chat.
-2. Run `supabase/migrations/202609260001_cloud_ledger.sql` once in SQL Editor.
+2. Run each SQL file in `supabase/migrations/` once, in filename order, in SQL Editor.
    **Do not run `supabase/test_rls.sql` there**; that file creates fake Auth tables
    and is only for an empty disposable database.
 3. Enable Email Auth and keep the default **Magic link or OTP** email template.
@@ -75,24 +76,37 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 `VITE_*` values are public in the browser bundle. No `service_role`, secret key,
 database password, wallet secret, or Render API token belongs here.
 
-The management portal then links to `#/manage/cloud`. Public QR records use
+The management portal is `#/manage` (`#/manage/cloud` remains an alias).
+`#/records/example` is a clearly labeled read-only sample with no database writes.
+Public QR records use
 `#/cloud?batchId=<uuid>` and are read anonymously. Their immutable UUIDs keep
 records distinct even when different users choose the same batch code.
 
 ## Security and data boundaries
 
 - New cloud batches are private. The owner explicitly publishes all batch details
-  and event history together. Making a record private revokes future anonymous
+  and event history plus attached evidence together. Making a record private revokes future anonymous
   reads; it cannot erase copies or screenshots already taken.
 - Render forwards the user's Supabase JWT to PostgREST. It does not use a service
   key that bypasses RLS. Direct Data API access is subject to the same policies.
-- Owners append events and change visibility. Column grants prevent choosing a
+- Owners edit declared batch details (including variety and weight), append events
+  and attach evidence with a declared source/date. This presence checklist does not
+  verify the issuing lab, authenticity, quality or export eligibility.
+  Column grants prevent choosing a
   different owner, backdating `created_at`, rewriting events, or deleting history.
 - Input dates are declared event dates; server `created_at` is the time recorded.
   All measurements remain user-entered. Database administrators can change data;
   this is not a tamper-proof blockchain ledger or an authenticated lab report.
 - Cloud ownership grants no Solana wallet role. Custody transfers still require
   the existing on-chain signatures. No local demo data is uploaded automatically.
+  Experimental Solana and AI tools are at `#/manage/solana`; cloud batches do not
+  automatically sync to them. Cloud delivery events are one-sided declarations.
+- File bytes go directly to Supabase Storage using the user's JWT. Evidence
+  metadata is append-only, and attached files cannot be replaced or deleted by
+  clients. Unlinked uploads remain owner-only even if a batch is public. A narrow
+  security-definer helper checks object existence and caller ownership to avoid
+  recursive Storage/evidence RLS. Uploaded documents are downloaded as bytes,
+  never rendered as active content in the app. Review/redact files before upload.
 - No images are persisted by the AI endpoints. CORS restricts browser origins,
   but is not authentication or a general abuse defense. AI remains public like
   the existing demo, with bounded request sizes and one concurrent inference.
@@ -100,11 +114,13 @@ records distinct even when different users choose the same batch code.
 
 ## Verify before announcing cloud is live
 
-1. Sign in as A via magic link. Create a private batch and append an event.
+1. Sign in as A via magic link. Create a private batch, append an event and attach
+   a JPG/PNG/PDF with its declared source/date. Download it and compare the bytes.
 2. Sign in on a second device as A; confirm both are visible.
 3. Signed out and as B: the private QR must show not found/private.
-4. Publish as A: anonymous QR opens the record and history; B cannot edit either.
-5. Make private as A: anonymous access must fail again.
+4. Publish as A: anonymous QR opens the record, history and attached files;
+   B cannot edit any of them. An unlinked upload must remain inaccessible.
+5. Make private as A: anonymous record and file access must fail again.
 6. Call all three AI endpoints through the deployed frontend and inspect results.
 7. Restart Render: records must remain in Supabase.
 
@@ -123,6 +139,9 @@ Use `ALLOWED_ORIGIN=http://127.0.0.1:5173` for a frontend at that origin.
 CI runs real ONNX inference and database isolation checks in disposable PostgreSQL.
 Cloud transport tests use mocks; live Auth/PostgREST still require the deployment
 checks above.
+The disposable database tests stub only Storage's tables to check SQL policies;
+they do not test the hosted Storage upload service or its MIME/size enforcement.
+The sign-in cooldown reduces retries; it does not increase Supabase's email quota.
 
 References: [Render Free](https://render.com/docs/free),
 [Blueprint schema](https://render.com/docs/blueprint-spec),

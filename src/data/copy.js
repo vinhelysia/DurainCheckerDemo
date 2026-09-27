@@ -55,8 +55,8 @@ export const copyData = {
       illustrationCaption: 'Minh họa AI · hồ sơ số theo lô',
     },
     landing: {
-      featureTitle: 'Khám phá chức năng',
-      featureLead: 'Nhìn tình trạng lá. Theo dõi ai đang giữ lô.',
+      featureTitle: 'Khu thử nghiệm Solana & AI',
+      featureLead: 'Khám phá các nguyên mẫu nghiên cứu. Dữ liệu ở đây chưa tự đồng bộ với hồ sơ lô của bạn.',
       featureIllustration: 'Minh họa AI · không phải ảnh chụp ứng dụng',
       features: [
         {
@@ -72,7 +72,7 @@ export const copyData = {
           description: 'Một lần đề xuất chưa đổi người giữ lô. Trên Devnet, bên nhận cần ký chấp nhận để hoàn tất bản ghi bàn giao.',
           steps: ['Đề xuất người nhận', 'Chờ chữ ký', 'Ghi nhận bàn giao'],
           note: 'Luồng on-chain cần ví và quyền phù hợp. Chế độ offline được gắn nhãn mô phỏng.',
-          action: 'Mở cổng quản lý', href: '#/manage',
+          action: 'Mở thử nghiệm Solana', href: '#/manage/solana',
           image: 'custody-handoff-illustration.webp', alt: 'Minh họa một thùng sầu riêng nằm giữa hai điện thoại đại diện bên gửi và bên nhận',
         },
       ],
@@ -663,8 +663,8 @@ export const copyData = {
       illustrationCaption: 'AI illustration · a digital batch record',
     },
     landing: {
-      featureTitle: 'Explore the features',
-      featureLead: 'Look at leaf health. Follow who holds the batch.',
+      featureTitle: 'Solana & AI experiments',
+      featureLead: 'Explore research prototypes. Their data does not automatically sync with your batch records.',
       featureIllustration: 'AI illustration · not an app screenshot',
       features: [
         {
@@ -680,7 +680,7 @@ export const copyData = {
           description: 'A proposal alone does not change the batch holder. On Devnet, the recipient must sign acceptance to complete the handoff record.',
           steps: ['Propose a recipient', 'Await signature', 'Record the handoff'],
           note: 'On-chain actions require a wallet and appropriate permissions. Offline mode is labeled as simulated.',
-          action: 'Open operator portal', href: '#/manage',
+          action: 'Open Solana experiment', href: '#/manage/solana',
           image: 'custody-handoff-illustration.webp', alt: 'Illustration of a durian crate between two phones representing sender and recipient',
         },
       ],

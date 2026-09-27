@@ -5,7 +5,7 @@ import json
 import logging
 import os
 from threading import Lock
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 import httpx
@@ -39,6 +39,14 @@ app.add_middleware(
     allow_methods=['GET', 'POST', 'PATCH'],
     allow_headers=['Authorization', 'Content-Type'],
 )
+
+
+@app.middleware('http')
+async def private_record_cache(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith('/api/cloud/'):
+        response.headers['Cache-Control'] = 'no-store'
+    return response
 
 
 @app.exception_handler(HTTPException)
@@ -130,12 +138,26 @@ async def leaf_prediction(request: Request):
 Text = Annotated[str, Field(min_length=1, max_length=160)]
 
 
-class BatchInput(BaseModel):
+class BatchDetailsInput(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
-    code: Annotated[str, Field(pattern=r'^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$')]
     farm: Text
     province: Text
     harvest_date: date
+    variety: Annotated[str, Field(min_length=1, max_length=100)]
+    weight_kg: Annotated[float, Field(gt=0, le=1000000, allow_inf_nan=False, strict=True)]
+
+
+class BatchInput(BatchDetailsInput):
+    code: Annotated[str, Field(pattern=r'^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$')]
+
+
+class EvidenceInput(BaseModel):
+    model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
+    id: UUID
+    kind: Literal['photo', 'lab_report', 'other']
+    source: Text
+    document_date: date
+    filename: Annotated[str, Field(min_length=1, max_length=180)]
 
 
 class EventInput(BaseModel):
@@ -188,8 +210,9 @@ def supabase(method, path, auth='', *, params=None, payload=None):
     return response.json()
 
 
-BATCH_FIELDS = 'id,code,farm,province,harvest_date,is_public,created_at'
+BATCH_FIELDS = 'id,code,farm,province,harvest_date,variety,weight_kg,is_public,created_at'
 EVENT_FIELDS = 'id,batch_id,stage,location,occurred_on,notes,cadmium_ppm,threshold_ppm,created_at'
+EVIDENCE_FIELDS = 'id,batch_id,kind,source,document_date,filename,file_path,created_at'
 
 
 @app.get('/api/cloud/batches')
@@ -243,6 +266,38 @@ async def publish_batch(batch_id: UUID, request: Request):
                                   params={'id': f'eq.{batch_id}', 'select': BATCH_FIELDS}, payload=data)
     if not rows:
         raise HTTPException(404, 'Batch not found or not owned by you.')
+    return rows[0]
+
+
+@app.patch('/api/cloud/batches/{batch_id}/details')
+async def update_details(batch_id: UUID, request: Request):
+    auth = authorization(request, required=True)
+    data = BatchDetailsInput.model_validate(await json_body(request)).model_dump(mode='json')
+    rows = await run_in_threadpool(supabase, 'PATCH', '/rest/v1/cloud_batches', auth,
+                                  params={'id': f'eq.{batch_id}', 'select': BATCH_FIELDS}, payload=data)
+    if not rows:
+        raise HTTPException(404, 'Batch not found or not owned by you.')
+    return rows[0]
+
+
+@app.get('/api/cloud/batches/{batch_id}/evidence')
+def get_evidence(batch_id: UUID, request: Request, offset: int = 0):
+    if offset < 0 or offset > 100000:
+        raise HTTPException(400, 'Invalid page.')
+    get_batch(batch_id, request)
+    return supabase('GET', '/rest/v1/cloud_evidence', authorization(request), params={
+        'select': EVIDENCE_FIELDS, 'batch_id': f'eq.{batch_id}',
+        'order': 'created_at.desc,id.desc', 'limit': '50', 'offset': str(offset),
+    })
+
+
+@app.post('/api/cloud/batches/{batch_id}/evidence', status_code=201)
+async def attach_evidence(batch_id: UUID, request: Request):
+    auth = authorization(request, required=True)
+    data = EvidenceInput.model_validate(await json_body(request)).model_dump(mode='json')
+    data.update(batch_id=str(batch_id), file_path=f'{batch_id}/{data["id"]}')
+    rows = await run_in_threadpool(supabase, 'POST', '/rest/v1/cloud_evidence', auth,
+                                  payload=data, params={'select': EVIDENCE_FIELDS})
     return rows[0]
 
 

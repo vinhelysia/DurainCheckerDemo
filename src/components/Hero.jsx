@@ -9,7 +9,7 @@ function asset(file) {
 }
 
 function Hero() {
-  const { copy } = useLanguage()
+  const { copy, language } = useLanguage()
   const landing = copy.landing
 
   return (
@@ -17,16 +17,16 @@ function Hero() {
       <section className="hero-section" id="top" aria-labelledby="hero-title">
         <div className="section-shell hero-shell">
           <div className="hero-copy">
-            <p className="eyebrow">{copy.hero.eyebrow}</p>
-            <h1 id="hero-title">{copy.hero.title}</h1>
-            <p className="hero-lead">{copy.hero.lead}</p>
+            <p className="eyebrow">{language === 'vi' ? 'Dành cho chủ vườn & hợp tác xã' : 'For growers & cooperatives'}</p>
+            <h1 id="hero-title">{language === 'vi' ? 'Mỗi lô hàng, một hồ sơ rõ ràng.' : 'A clear record for every batch.'}</h1>
+            <p className="hero-lead">{language === 'vi' ? 'Ghi thông tin lô, đính kèm ảnh và phiếu kiểm nghiệm, rồi chia sẻ QR để bên mua tự đối chiếu bằng chứng.' : 'Record batch details, attach photos and lab documents, then share a QR so buyers can review the evidence.'}</p>
             <div className="hero-actions" aria-label={copy.hero.ariaLabelActions}>
-              <a className="button button-primary" href="#/unit/demo">
-                <span>{copy.hero.ctaDemo}</span>
+              <a className="button button-primary" href="#/manage">
+                <span>{language === 'vi' ? 'Quản lý lô của tôi' : 'Manage my batches'}</span>
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <a className="button button-secondary" href="#/intro/problem">
-                {copy.hero.ctaProblem}
+              <a className="button button-secondary" href="#/records/example">
+                {language === 'vi' ? 'Xem hồ sơ mẫu' : 'View a sample record'}
               </a>
             </div>
           </div>

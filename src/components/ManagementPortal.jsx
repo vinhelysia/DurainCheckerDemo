@@ -355,7 +355,7 @@ export default function ManagementPortal() {
             <Compass size={32} className="text-green-mid" />
           </div>
           <div>
-            <h1>{copy.managePortal.title}</h1>
+            <h1>{language === 'vi' ? 'Solana & AI · khu thử nghiệm' : 'Solana & AI · experiments'}</h1>
             <p className="unit-subtitle">
               {copy.managePortal.subtitle}
             </p>
@@ -365,7 +365,7 @@ export default function ManagementPortal() {
         {/* Connection/Wallet Banner */}
         {import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_API_BASE_URL && (
           <p className="lookup-notice"><a href="#/manage/cloud">
-            {language === 'vi' ? 'Mở hồ sơ cloud — lưu lô riêng và chia sẻ qua QR' : 'Open cloud records — save private batches and share via QR'}
+            {language === 'vi' ? 'Về quản lý lô hàng — hồ sơ, bằng chứng và QR cho bên mua' : 'Back to batch management — records, evidence and buyer QR'}
           </a></p>
         )}
         <div className="status-banner manage-status-banner">

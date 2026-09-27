@@ -1,8 +1,8 @@
 import { afterEach, expect, it, vi } from 'vitest'
 
-const { exchangeCodeForSession } = vi.hoisted(() => ({ exchangeCodeForSession: vi.fn() }))
+const { exchangeCodeForSession, upload, getSession } = vi.hoisted(() => ({ exchangeCodeForSession: vi.fn(), upload: vi.fn(), getSession: vi.fn() }))
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ auth: { exchangeCodeForSession } }),
+  createClient: () => ({ auth: { exchangeCodeForSession, getSession }, storage: { from: () => ({ upload }) } }),
 }))
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.resetModules(); vi.clearAllMocks() })
@@ -14,6 +14,7 @@ it('exchanges a callback once, removes its code, and rejects invalid links witho
   vi.stubGlobal('window', {
     location: { href: 'https://durian.test/?auth=callback&code=single-use#/unexpected' },
     history: { state: null, replaceState },
+    dispatchEvent: vi.fn(),
   })
   exchangeCodeForSession.mockResolvedValue({ error: null })
   let { completeCloudSignIn } = await import('./cloudClient')
@@ -21,6 +22,7 @@ it('exchanges a callback once, removes its code, and rejects invalid links witho
   expect(exchangeCodeForSession).toHaveBeenCalledTimes(1)
   expect(exchangeCodeForSession).toHaveBeenCalledWith('single-use')
   expect(replaceState).toHaveBeenCalledWith(null, '', '/#/manage/cloud')
+  expect(window.dispatchEvent).toHaveBeenCalledTimes(1)
 
   for (const suffix of ['?auth=callback#error=access_denied', '?auth=callback', '?auth=callback&code=bad']) {
     vi.resetModules()
@@ -30,4 +32,34 @@ it('exchanges a callback once, removes its code, and rejects invalid links witho
     await expect(completeCloudSignIn()).rejects.toThrow(/link/i)
   }
   expect(exchangeCodeForSession).toHaveBeenCalledTimes(2)
+})
+
+it('rejects empty, oversized and active content uploads, and explains email quota errors', async () => {
+  const { validateEvidenceFile, cloudError } = await import('./cloudClient')
+  for (const file of [null, {type: 'image/svg+xml', size: 120}, {type: 'text/html', size: 100}, {type: 'image/png', size: 0}, {type: 'application/pdf', size: 5242881}]) {
+    expect(() => validateEvidenceFile(file)).toThrow()
+  }
+  expect(() => validateEvidenceFile({type: 'application/pdf', size: 5242880})).not.toThrow()
+  expect(cloudError({code: 'over_email_send_rate_limit', message: 'email rate limit exceeded'})).toContain('quota')
+})
+
+it('never attaches metadata after a failed file upload and never overwrites existing evidence', async () => {
+  vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+  vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'public-test-key')
+  const fetch = vi.fn().mockResolvedValue(new Response('{}', {status: 201}))
+  vi.stubGlobal('fetch', fetch)
+  getSession.mockResolvedValue({data: {session: {access_token: 'owner-token'}}})
+  const { uploadEvidence } = await import('./cloudClient')
+  const file = {type: 'image/png', size: 10, name: 'batch.png'}
+  upload.mockResolvedValueOnce({error: new Error('Upload failed')})
+  await expect(uploadEvidence('batch', file, {})).rejects.toThrow('Upload failed')
+  expect(fetch).not.toHaveBeenCalled()
+  upload.mockResolvedValueOnce({error: null})
+  await uploadEvidence('batch', file, {kind: 'photo', source: 'Grower', document_date: '2026-09-27'})
+  const [path, , options] = upload.mock.calls[1]
+  expect(options.upsert).toBe(false)
+  const body = JSON.parse(fetch.mock.calls[0][1].body)
+  expect(path).toBe(`batch/${body.id}`)
+  expect(body.filename).toBe('batch.png')
+  expect(fetch.mock.calls[0][1].headers.get('Authorization')).toBe('Bearer owner-token')
 })

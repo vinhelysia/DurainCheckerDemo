@@ -53,7 +53,7 @@ class ApiTests(unittest.TestCase):
         self.assertNotIn('access-control-allow-origin', response.headers)
         self.assertEqual(self.client.post('/api/cloud/batches', json={}).status_code, 401)
         auth = {'Authorization': 'Bearer test-jwt'}
-        payload = {'code': 'TEST-1', 'farm': 'Farm', 'province': 'Region', 'harvest_date': '2026-09-26'}
+        payload = {'code': 'TEST-1', 'farm': 'Farm', 'province': 'Region', 'harvest_date': '2026-09-26', 'variety': 'Ri6', 'weight_kg': 850}
         with patch.object(module, 'supabase') as database:
             for extra in ({'owner_id': 'spoof'}, {'is_public': True}, {'created_at': '2020-01-01'}, {'farm': '   '}):
                 response = self.client.post('/api/cloud/batches', headers=auth, json={**payload, **extra})
@@ -91,6 +91,29 @@ class ApiTests(unittest.TestCase):
         with patch.object(module, 'supabase', return_value=[]):
             self.assertEqual(self.client.get(path).status_code, 404)
             self.assertEqual(self.client.patch(path, headers=auth, json={'is_public': True}).status_code, 404)
+
+    def test_practical_fields_and_evidence_ownership_boundary(self):
+        batch_id = '11111111-1111-4111-8111-111111111111'
+        evidence_id = '33333333-3333-4333-8333-333333333333'
+        path = f'/api/cloud/batches/{batch_id}'
+        auth = {'Authorization': 'Bearer owner-token'}
+        details = {'farm': 'Farm', 'province': 'Region', 'harvest_date': '2026-09-27', 'variety': 'Ri6', 'weight_kg': 850}
+        evidence = {'id': evidence_id, 'kind': 'photo', 'source': 'Grower', 'document_date': '2026-09-27', 'filename': 'batch.png'}
+        with patch.object(module, 'supabase', return_value=[{'id': batch_id}]) as database:
+            for weight in (0, -1, True, '850', 1000001):
+                self.assertEqual(self.client.patch(path + '/details', headers=auth, json={**details, 'weight_kg': weight}).status_code, 422)
+            self.assertEqual(self.client.post(path + '/evidence', headers=auth, json={**evidence, 'file_path': 'other/file'}).status_code, 422)
+            self.assertEqual(self.client.post(path + '/evidence', json=evidence).status_code, 401)
+            database.assert_not_called()
+            self.assertEqual(self.client.patch(path + '/details', headers=auth, json=details).status_code, 200)
+            self.assertEqual(self.client.post(path + '/evidence', headers=auth, json=evidence).status_code, 201)
+            self.assertEqual(database.call_args.kwargs['payload']['file_path'], f'{batch_id}/{evidence_id}')
+            self.assertEqual(database.call_args.args[2], 'Bearer owner-token')
+        with patch.object(module, 'supabase', return_value=[]):
+            response = self.client.get(path + '/evidence')
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.headers['cache-control'], 'no-store')
+            self.assertEqual(self.client.patch(path + '/details', headers=auth, json=details).status_code, 404)
 
 
 if __name__ == '__main__':

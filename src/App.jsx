@@ -135,9 +135,12 @@ function App() {
       case '#/unit/demo':
         return <DemoSection />
       case '#/manage':
-        return <ManagementPortal />
       case '#/manage/cloud':
         return <CloudPortal />
+      case '#/manage/solana':
+        return <ManagementPortal />
+      case '#/records/example':
+        return <CloudPortal publicView example />
       case '#/cloud':
         return <CloudPortal publicId={new URLSearchParams(route.split('?')[1]).get('batchId') || ''} publicView />
       default:

@@ -31,7 +31,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           setup, assertions = Path('supabase/test_rls.sql').read_text().split('-- ASSERTIONS')
-          migration = Path('supabase/migrations/202609260001_cloud_ledger.sql').read_text()
+          migration = '\n'.join(p.read_text() for p in sorted(Path('supabase/migrations').glob('*.sql')))
           Path('/tmp/check.sql').write_text(setup + migration + assertions)
           PY
           psql -h localhost -U postgres -d durian_test -v ON_ERROR_STOP=1 -f /tmp/check.sql

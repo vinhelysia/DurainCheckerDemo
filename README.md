@@ -1,8 +1,10 @@
 # DurianTrust
 
-**Durian Checker — an academic prototype for batch records and receiver-confirmed custody on Solana Devnet.**
+**DurianTrust — batch records, declared evidence and buyer QR sharing, with separate Solana Devnet and AI experiments.**
 
-Durian Checker is the product name; DurianTrust is the technical program name. The prototype links user-entered batch records, measurements and signed custody actions. QR links open the record; they do not authenticate the physical fruit, official laboratory certificates or export eligibility.
+The practical workflow is for a grower or cooperative: create a private batch, record variety and weight, attach photos/documents with a source and date, add journey events, then publish a buyer QR. Files and statements are supplied by the owner; neither a QR nor the completeness checklist authenticates physical fruit, laboratory certificates or export eligibility.
+
+`#/manage` is the cloud workspace. `#/records/example` is a read-only sample, clearly labeled and never uploaded. `#/manage/solana` contains the separate custody and AI experiments; cloud batches do not sync to them. SMTP is still required before opening email sign-in to arbitrary users; the live authenticated workflow is not yet verified.
 
 ## The problem
 
@@ -12,7 +14,7 @@ Sources: [VietnamPlus](https://en.vietnamplus.vn/vietnam-steps-up-quality-contro
 
 ## The solution
 
-DurianTrust gives every export batch a digital trust layer:
+The cloud workspace provides private records, append-only evidence metadata and event history, and explicit QR publication using [Render + Supabase](backend/README.md). The following capabilities are separate research/demo tools:
 
 - **An append-only blockchain ledger.** Authorized users can record batch, lab and journey data through Solana transactions; those records preserve what was submitted, not whether physical claims were independently verified.
 - **A transferable custody record.** Each batch has an on-chain holder that can move along the supply chain. A handoff takes two signatures: the current holder nominates the next one, and *the recipient must sign to accept*. The program does not let its authority unilaterally change the recorded holder. This digital state does not establish legal title or physical delivery.
@@ -60,10 +62,10 @@ flowchart LR
 
 The React app is the single source of truth for the UI. It reads batch state directly from Solana devnet program accounts, calls three demonstration inference endpoints, and — only when devnet or Phantom is unavailable — falls back to bundled demo data or a localStorage-simulated ledger. The fallback is never hidden: the UI always shows which mode it's in.
 
-An optional [Render + Supabase backend](backend/README.md) provides email sign-in,
-private off-chain batch records, append-only event history, and public QR sharing.
-Enable it only after applying the database migration and configuring both services.
-It does not replace Solana custody or silently upload the local demo ledger.
+The [Render + Supabase backend](backend/README.md) supports the primary workspace:
+email sign-in, private off-chain batch records, evidence files, append-only event
+history, and public QR sharing. It does not replace Solana custody or silently
+upload the local demo ledger. The diagram above describes the experimental path.
 
 ## Judge quickstart
 
@@ -75,10 +77,10 @@ Captioned product introduction: [DurianTrust_Intro_73s.mp4](public/DurianTrust_I
 
 Guided UI simulation: [DurianTrust_Guided_Walkthrough_72s.mp4](public/DurianTrust_Guided_Walkthrough_72s.mp4). A cursor and highlights walk through the real product flow using a code-rendered recreation of the interface. It is labeled as a simulation throughout and is not the required screen recording.
 
-1. Open the app and click **"Scan a demo batch"** on the landing page. This lands on `#/unit/demo`, which works with zero setup: no wallet, no devnet SOL, no install step. If devnet happens to be unreachable, the page says so explicitly (a gold "Demo data" badge instead of a green "Live on Solana Devnet" one) and still shows a fully realistic batch record.
+1. Open `#/records/example` to inspect the sample buyer record without signing in. Use `#/manage` for your own batches once email sign-in is available. To inspect the independent Solana demo, open `#/unit/demo`; its source badge distinguishes chain data from bundled samples.
 2. Look at the **chain of custody** panel next to the timeline. Inspect the selected batch and its data-source badge. Available records may change over time; use captured transaction evidence for a dated scenario. A pending recipient does not become the recorded holder until acceptance.
 3. Scroll to the **leaf disease scanner** and click one of the sample thumbnails — it runs the real ONNX model and returns a prediction in one click, no file upload needed.
-4. To take custody yourself, open `#/manage` with [Phantom](https://phantom.app/) on **Devnet**. Select a batch for which your wallet is the nominated recipient; only that recipient can sign **Accept custody**. Accepting moves `Batch.owner` and appends a permanent `CustodyRecord`.
+4. To take custody yourself, open `#/manage/solana` with [Phantom](https://phantom.app/) on **Devnet**. Select a batch for which your wallet is the nominated recipient; only that recipient can sign **Accept custody**. Accepting moves `Batch.owner` and appends a permanent `CustodyRecord`.
 5. To try the rest of the **write path** (registering a batch, submitting a lab report, logging a timeline event), grab free devnet SOL from **[faucet.solana.com](https://faucet.solana.com)**. The app detects a missing wallet or an empty devnet balance and tells you what to do. Every submitted form has a **"Fill sample data"** button so you don't have to invent realistic values by hand.
 
 **The rules worth testing.** Try to transfer a batch your wallet doesn't hold — the program rejects it. Current custody instructions do not grant the `config.authority` a unilateral reassignment path. Role administration, program upgrade authority, key compromise and future code changes remain separate governance risks.
