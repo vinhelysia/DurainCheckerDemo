@@ -9,11 +9,19 @@ authenticated cloud records. Existing Vercel inference stays available when
 - Render Free, Singapore: `https://duriantrust-api.onrender.com`
 - Service ID: `srv-dars44vavr4c73fvgt20`
 - Verified live: health, all three ONNX endpoints, and production-origin CORS.
-- `.env.production` contains only the public Render URL so Git deployments use it.
+- `.env.production` contains the public Render URL, Supabase URL and publishable key.
   Hosting environment variables can override that value. Local Vite development
   continues to use its own environment configuration.
-- Supabase setup is still pending. Cloud records remain disabled until its URL and
-  publishable key are configured and the migration is applied.
+- Supabase project: `yexeietfcpucxvtpcflr`. The cloud migration was applied through
+  SQL Editor on 2026-09-27. Both tables have RLS enabled (3 batch policies, 2 event
+  policies). Render has its URL/publishable key and reports `cloud_configured: true`.
+- Verified live: anonymous Data API reads return empty lists; Render rejects an
+  unauthenticated owner-list request with 401 and an unknown public record with 404.
+  These checks do not prove authenticated creation or account isolation in production.
+- Authentication uses the default magic-link email with PKCE. Site URL is
+  `https://durian-web3.vercel.app/?auth=callback`. Open the link in the same browser
+  that requested it. SMTP is not configured; team-email login and the full live
+  private/publish/revoke workflow still need verification.
 - This service uses the public Git repository connection. Deploy later backend
   commits with Render's Manual Deploy control; do not assume automatic deploys.
 
@@ -24,9 +32,12 @@ authenticated cloud records. Existing Vercel inference stays available when
 2. Run `supabase/migrations/202609260001_cloud_ledger.sql` once in SQL Editor.
    **Do not run `supabase/test_rls.sql` there**; that file creates fake Auth tables
    and is only for an empty disposable database.
-3. Enable Email Auth. In the **Magic Link** email template include
-   `Your DurianTrust sign-in code: {{ .Token }}`. The UI accepts email codes, not
-   redirect links, so the hash router cannot consume an authentication fragment.
+3. Enable Email Auth and keep the default **Magic link or OTP** email template.
+   Set Site URL to `https://durian-web3.vercel.app/?auth=callback` (or your own
+   deployment's equivalent). The app exchanges the PKCE code once, removes it
+   from the URL, and opens the cloud portal. No tokens are routed through the hash.
+   Use the same browser for requesting and opening the link. Local development
+   needs its own exact callback URL in Supabase's redirect allowlist.
 4. Configure a real SMTP provider before inviting arbitrary users. Supabase's
    default email service restricts recipients/rate; initially test with an allowed
    team email. Do not disable verification to work around mail delivery.
@@ -89,7 +100,7 @@ records distinct even when different users choose the same batch code.
 
 ## Verify before announcing cloud is live
 
-1. Sign in as A via email code. Create a private batch and append an event.
+1. Sign in as A via magic link. Create a private batch and append an event.
 2. Sign in on a second device as A; confirm both are visible.
 3. Signed out and as B: the private QR must show not found/private.
 4. Publish as A: anonymous QR opens the record and history; B cannot edit either.
@@ -115,5 +126,5 @@ checks above.
 
 References: [Render Free](https://render.com/docs/free),
 [Blueprint schema](https://render.com/docs/blueprint-spec),
-[Supabase Email OTP](https://supabase.com/docs/guides/auth/auth-email-passwordless),
+[Supabase passwordless email](https://supabase.com/docs/guides/auth/auth-email-passwordless),
 [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security).

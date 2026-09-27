@@ -18,12 +18,15 @@ const UnitDetails = lazy(() => import('./components/UnitDetails'))
 const ManagementPortal = lazy(() => import('./components/ManagementPortal'))
 const CloudPortal = lazy(() => import('./components/CloudPortal'))
 
+function currentRoute() {
+  return new URLSearchParams(window.location.search).get('auth') === 'callback'
+    ? '#/manage/cloud' : window.location.hash || '#/'
+}
+
 function App() {
   const { language, copy } = useLanguage()
 
-  const [currentRoute, setCurrentRoute] = useState(() => {
-    return window.location.hash || '#/'
-  })
+  const [route, setCurrentRoute] = useState(currentRoute)
 
   // Mount once for the whole app so #/manage remounts do not re-fire autoConnect.
   const endpoint = useMemo(() => import.meta.env.VITE_RPC_URL || clusterApiUrl('devnet'), [])
@@ -69,7 +72,7 @@ function App() {
 
   useEffect(() => {
     const handleHashChange = () => {
-      const newHash = window.location.hash || '#/'
+      const newHash = currentRoute()
       
       // Redirect legacy anchor hashes to clean routed views
       if (newHash === '#problem') {
@@ -110,7 +113,7 @@ function App() {
   }, [])
 
   const renderRouteView = () => {
-    const routePath = currentRoute.split('?')[0]
+    const routePath = route.split('?')[0]
     switch (routePath) {
       case '#/':
       case '#/home':
@@ -136,7 +139,7 @@ function App() {
       case '#/manage/cloud':
         return <CloudPortal />
       case '#/cloud':
-        return <CloudPortal publicId={new URLSearchParams(currentRoute.split('?')[1]).get('batchId') || ''} publicView />
+        return <CloudPortal publicId={new URLSearchParams(route.split('?')[1]).get('batchId') || ''} publicView />
       default:
         return <Hero />
     }

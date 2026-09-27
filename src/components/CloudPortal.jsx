@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLanguage } from './LanguageContext'
-import { cloudRequest, supabase } from '../lib/cloudClient'
+import { cloudRequest, completeCloudSignIn, supabase } from '../lib/cloudClient'
 import { API_BASE_URL } from '../lib/api'
 import BatchQRLabel from './BatchQRLabel'
 
@@ -12,7 +12,6 @@ function errorMessage(error) {
 
 function SignIn({ t }) {
   const [email, setEmail] = useState('')
-  const [token, setToken] = useState('')
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -22,9 +21,10 @@ function SignIn({ t }) {
     setBusy(true)
     setError('')
     try {
-      const result = sent
-        ? await supabase.auth.verifyOtp({ email: email.trim(), token: token.trim(), type: 'email' })
-        : await supabase.auth.signInWithOtp({ email: email.trim() })
+      const result = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: { emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}?auth=callback` },
+      })
       if (result.error) throw result.error
       setSent(true)
     } catch (err) { setError(errorMessage(err)) }
@@ -35,11 +35,10 @@ function SignIn({ t }) {
     <h2>{t('Đăng nhập bằng email', 'Sign in by email')}</h2>
     <p>{t('Lô mới chỉ bạn xem được. Bạn chọn thời điểm công khai hồ sơ.', 'New batches are private. You choose when to publish a record.')}</p>
     <label>Email<input type="email" autoComplete="email" required maxLength={254} value={email} disabled={sent || busy} onChange={e => setEmail(e.target.value)} /></label>
-    {sent && <label>{t('Mã xác nhận trong email', 'Code from your email')}<input autoComplete="one-time-code" inputMode="numeric" required pattern="[0-9]{6,10}" value={token} onChange={e => setToken(e.target.value)} /></label>}
     {error && <p role="alert">{error}</p>}
-    {sent && <p role="status">{t('Đã yêu cầu gửi mã. Kiểm tra cả thư mục spam.', 'Code requested. Check your inbox and spam folder.')}</p>}
-    <button className="button button-primary" disabled={busy}>{busy ? t('Đang xử lý…', 'Working…') : sent ? t('Xác nhận', 'Verify') : t('Gửi mã đăng nhập', 'Send sign-in code')}</button>
-    {sent && <button type="button" className="button button-secondary" disabled={busy} onClick={() => { setSent(false); setToken('') }}>{t('Đổi email / gửi lại', 'Change email / resend')}</button>}
+    {sent && <p role="status">{t('Đã yêu cầu gửi link. Kiểm tra email và spam, rồi mở link bằng chính trình duyệt này. Nếu gửi lại, hãy chờ ít nhất 60 giây.', 'Link requested. Check your inbox and spam, then open the link in this same browser. Wait at least 60 seconds before requesting another.')}</p>}
+    <button className="button button-primary" disabled={busy || sent}>{busy ? t('Đang xử lý…', 'Working…') : t('Gửi link đăng nhập', 'Send sign-in link')}</button>
+    {sent && <button type="button" className="button button-secondary" disabled={busy} onClick={() => setSent(false)}>{t('Đổi email / gửi lại', 'Change email / resend')}</button>}
   </form>
 }
 
@@ -239,11 +238,13 @@ export default function CloudPortal({ publicView = false, publicId }) {
   const [error, setError] = useState('')
   useEffect(() => {
     if (!supabase || publicView) return
+    let active = true
+    completeCloudSignIn().catch(err => { if (active) setError(errorMessage(err)) })
     const { data } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next)
       setReady(true)
     })
-    return () => data.subscription.unsubscribe()
+    return () => { active = false; data.subscription.unsubscribe() }
   }, [publicView])
   async function signOut() {
     const { error: err } = await supabase.auth.signOut({ scope: 'local' })
