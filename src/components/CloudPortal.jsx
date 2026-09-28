@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight, Check, Circle, ClipboardList, FileUp, LockKeyhole, LogIn, QrCode, Sprout } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Circle, ClipboardList, FileUp, LockKeyhole, QrCode, Sprout } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import LanguageSwitch from './LanguageSwitch'
 import { cloudRequest, cloudError, completeCloudSignIn, googleLoginEnabled, signInWithGoogle, supabase } from '../lib/cloudClient'
@@ -85,7 +85,13 @@ function SignIn({ t }) {
         <h1 id="cloud-signin-title">{t('Chào mừng bạn', 'Welcome to your workspace')}</h1>
         <p>{t('Quản lý hồ sơ lô hàng, tài liệu và lịch sử trong một nơi.', 'Keep batch records, documents and history together in one place.')}</p>
       </div>
-    {googleLoginEnabled && <div className="cloud-google-entry"><button type="button" className="button button-primary" disabled={busy} onClick={googleSignIn}><LogIn size={20} aria-hidden="true" />{busy ? t('Đang xử lý…', 'Working…') : t('Tiếp tục với Google', 'Continue with Google')}<ArrowRight size={18} aria-hidden="true" /></button><p>{t('Lần đầu đăng nhập sẽ tạo tài khoản. Không cần mật khẩu riêng.', 'Your first sign-in creates an account. No separate password needed.')}</p></div>}
+      {googleLoginEnabled && <div className="cloud-google-entry">
+        <button type="button" className="button" disabled={busy} onClick={googleSignIn}>
+          <img src={`${import.meta.env.BASE_URL}google-g.png`} alt="" width="20" height="20" />
+          {busy ? t('Đang xử lý…', 'Working…') : t('Tiếp tục với Google', 'Continue with Google')}
+        </button>
+        <p>{t('Lần đầu đăng nhập sẽ tạo tài khoản. Không cần mật khẩu riêng.', 'Your first sign-in creates an account. No separate password needed.')}</p>
+      </div>}
     {error && <p className="cloud-auth-message cloud-auth-error" role="alert">{error}</p>}
     <details className="cloud-email-entry" open={!googleLoginEnabled || undefined}>
       <summary>{t('Đăng nhập bằng liên kết email', 'Sign in with an email link')}</summary>
