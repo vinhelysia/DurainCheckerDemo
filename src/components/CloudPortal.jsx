@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { ArrowRight, Check, Circle, ClipboardList, FileUp, LockKeyhole, LogIn, QrCode, Sprout } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Circle, ClipboardList, FileUp, LockKeyhole, LogIn, QrCode, Sprout } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
+import LanguageSwitch from './LanguageSwitch'
 import { cloudRequest, cloudError, completeCloudSignIn, googleLoginEnabled, signInWithGoogle, supabase } from '../lib/cloudClient'
 import { API_BASE_URL } from '../lib/api'
 import BatchQRLabel from './BatchQRLabel'
@@ -71,8 +72,19 @@ function SignIn({ t }) {
   }
 
   return <section className="cloud-signin" aria-labelledby="cloud-signin-title" aria-busy={busy}>
-    <span className="cloud-auth-symbol"><LockKeyhole size={24} aria-hidden="true" /></span>
-    <div className="cloud-auth-heading"><h2 id="cloud-signin-title">{t('Chào mừng đến DurianTrust', 'Welcome to DurianTrust')}</h2><p>{t('Tạo tài khoản hoặc đăng nhập để quản lý hồ sơ lô của bạn.', 'Create an account or sign in to manage your batch records.')}</p></div>
+    <div className="cloud-auth-toolbar">
+      <a className="cloud-auth-back" href="#/"><ArrowLeft size={16} aria-hidden="true" />{t('Trang chủ', 'Home')}</a>
+      <LanguageSwitch />
+    </div>
+    <div className="cloud-auth-content">
+      <a className="cloud-auth-brand" href="#/" aria-label="DurianTrust">
+        <img src={`${import.meta.env.BASE_URL}durian-logo.svg`} alt="" width="40" height="40" />
+        <strong>DurianTrust</strong>
+      </a>
+      <div className="cloud-auth-heading">
+        <h1 id="cloud-signin-title">{t('Chào mừng bạn', 'Welcome to your workspace')}</h1>
+        <p>{t('Quản lý hồ sơ lô hàng, tài liệu và lịch sử trong một nơi.', 'Keep batch records, documents and history together in one place.')}</p>
+      </div>
     {googleLoginEnabled && <div className="cloud-google-entry"><button type="button" className="button button-primary" disabled={busy} onClick={googleSignIn}><LogIn size={20} aria-hidden="true" />{busy ? t('Đang xử lý…', 'Working…') : t('Tiếp tục với Google', 'Continue with Google')}<ArrowRight size={18} aria-hidden="true" /></button><p>{t('Lần đầu đăng nhập sẽ tạo tài khoản. Không cần mật khẩu riêng.', 'Your first sign-in creates an account. No separate password needed.')}</p></div>}
     {error && <p className="cloud-auth-message cloud-auth-error" role="alert">{error}</p>}
     <details className="cloud-email-entry" open={!googleLoginEnabled || undefined}>
@@ -88,6 +100,8 @@ function SignIn({ t }) {
     </details>
     <p className="cloud-auth-privacy"><LockKeyhole size={15} aria-hidden="true" /><span>{t('Hồ sơ mới mặc định riêng tư. Bạn quyết định khi nào chia sẻ cho bên mua.', 'New records are private by default. You decide when to share them with a buyer.')}</span></p>
     <a className="cloud-auth-sample" href="#/records/example">{t('Xem hồ sơ mẫu trước khi bắt đầu', 'Explore a sample record first')}<ArrowRight size={16} aria-hidden="true" /></a>
+    </div>
+    <footer className="cloud-auth-footer"><span>{t('DurianTrust · Bản thử nghiệm', 'DurianTrust · Prototype')}</span><a href="#/intro/problem">{t('Về dự án', 'About the project')}</a></footer>
   </section>
 }
 
@@ -343,14 +357,25 @@ export default function CloudPortal({ publicView = false, publicId, example = fa
     if (err) setError(cloudError(err))
   }
   const signedOut = !publicView && ready && !session && supabase && API_BASE_URL
-  return <section className="section"><div className="section-shell cloud-portal">
+  return <section className={`section${signedOut ? ' cloud-auth-page' : ''}`}><div className="section-shell cloud-portal">
     {!signedOut && <header className="cloud-page-heading"><div><p className="section-kicker">DurianTrust / {t('Hồ sơ lô hàng', 'Batch records')}</p><h1>{publicView ? t('Hồ sơ cho bên mua', 'Buyer record') : t('Quản lý lô hàng', 'Manage your batches')}</h1><p>{t('Từ vườn đến bên mua: thông tin lô, bằng chứng và lịch sử trong một hồ sơ.', 'From farm to buyer: batch details, evidence and history in one record.')}</p></div><a className="button button-secondary" href={publicView ? '#/manage' : '#/records/example'}>{publicView ? t('Quản lý lô của tôi', 'Manage my batches') : t('Xem hồ sơ mẫu', 'View sample record')}<ArrowRight size={16} aria-hidden="true" /></a></header>}
     {example && <p className="lookup-notice" role="status">{t('Hồ sơ minh họa, chỉ để xem. Không phải lô thật; chưa có ảnh hoặc phiếu kiểm nghiệm. Dữ liệu này không được lưu lên cloud.', 'Read-only example, not a real batch. No photos or lab documents are attached. This sample is not saved to the cloud.')}</p>}
     {error && <p role="alert">{error}</p>}
     {example ? <BatchDetails id="example" publicView example t={t} language={language} /> : !supabase || !API_BASE_URL ? <p role="status">{t('Tính năng cloud chưa được bật. Bạn vẫn có thể xem hồ sơ mẫu.', 'Cloud records are not enabled yet. You can still view the sample record.')}</p>
       : publicView ? <BatchDetails key={publicId} id={publicId} publicView t={t} language={language} />
         : !ready ? <p role="status">{t('Đang kiểm tra đăng nhập…', 'Checking sign-in…')}</p>
-          : !session ? <div className="cloud-onboarding"><div className="cloud-intro"><p className="section-kicker">{t('Dành cho nhà vườn & hợp tác xã', 'For growers & cooperatives')}</p><h1>{t('Hồ sơ mỗi lô.\nSẵn sàng chia sẻ.', 'Every batch recorded.\nReady to share.')}</h1><p className="cloud-auth-lead">{t('Lưu thông tin và tài liệu theo từng lô, để bên mua tìm đúng hồ sơ qua một mã QR.', 'Keep details and documents together for each batch, so buyers can find the right record through a QR code.')}</p><ul className="cloud-auth-benefits"><li><Check size={18} aria-hidden="true" />{t('Hồ sơ riêng theo tài khoản', 'Private records for your account')}</li><li><Check size={18} aria-hidden="true" />{t('Chia sẻ khi bạn đã sẵn sàng', 'Share when you are ready')}</li><li><Check size={18} aria-hidden="true" />{t('Bắt đầu với Google, không cần ví', 'Start with Google, no wallet needed')}</li></ul><figure className="cloud-auth-photo"><img src={`${import.meta.env.BASE_URL}images/orchard.webp`} alt={t('Minh họa vườn sầu riêng', 'Durian orchard illustration')} width="640" height="360" /><figcaption>{t('Hình minh họa', 'Illustration')}</figcaption></figure></div><SignIn t={t} /></div> : <>
+          : !session ? <div className="cloud-onboarding">
+            <figure className="cloud-intro">
+              <img className="cloud-auth-image" src={`${import.meta.env.BASE_URL}images/hero-durian.webp`} alt={t('Sầu riêng trên mặt bàn gỗ', 'A durian on a wooden table')} width="1600" height="1067" />
+              <figcaption className="cloud-auth-story">
+                <p className="cloud-auth-eyebrow">{t('Từ vườn đến bên mua', 'From farm to buyer')}</p>
+                <h2>{t('Mỗi lô hàng,\nmột hồ sơ rõ ràng.', 'Every batch,\none clear record.')}</h2>
+                <p>{t('Giữ tài liệu đúng lô. Chia sẻ khi bạn sẵn sàng.', 'Keep documents with the right batch. Share when you are ready.')}</p>
+                <div className="cloud-auth-credit"><a href="https://commons.wikimedia.org/wiki/File:Durian_(8425934020).jpg" target="_blank" rel="noreferrer">{t('Ảnh', 'Photo')}: Sodanie Chea</a><a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noreferrer">CC BY 2.0</a><span>{t('Cắt khung hiển thị', 'Cropped for display')}</span></div>
+              </figcaption>
+            </figure>
+            <SignIn t={t} />
+          </div> : <>
             <div className="cloud-account"><span className="cloud-account-avatar" aria-hidden="true">{(session.user.email || 'D').slice(0, 1).toUpperCase()}</span><div><strong>{t('Workspace cá nhân', 'Personal workspace')}</strong><span>{session.user.email}</span></div><button className="button button-secondary" onClick={signOut}>{t('Đăng xuất', 'Sign out')}</button></div>
             <Workspace key={session.user.id} t={t} language={language} />
           </>}
