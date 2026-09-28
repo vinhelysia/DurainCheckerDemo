@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowRight, Check, Circle, ClipboardList, LockKeyhole, Sprout } from 'lucide-react'
+import { ArrowRight, Check, Circle, ClipboardList, FileUp, LockKeyhole, LogIn, QrCode, Sprout } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import { cloudRequest, cloudError, completeCloudSignIn, googleLoginEnabled, signInWithGoogle, supabase } from '../lib/cloudClient'
 import { API_BASE_URL } from '../lib/api'
@@ -70,17 +70,25 @@ function SignIn({ t }) {
     finally { setBusy(false) }
   }
 
-  return <form className="dashboard-card cloud-form" onSubmit={submit}>
-    <LockKeyhole size={26} aria-hidden="true" /><h2>{t('Bắt đầu với lô của bạn', 'Start with your batch')}</h2>
-    <p>{t('Lô mới chỉ bạn xem được. Bạn chọn thời điểm công khai hồ sơ.', 'New batches are private. You choose when to publish a record.')}</p>
-    {googleLoginEnabled && <><button type="button" className="button button-primary" disabled={busy} onClick={googleSignIn}>{busy ? t('Đang xử lý…', 'Working…') : t('Tiếp tục với Google', 'Continue with Google')}</button><p className="cloud-muted">{t('Hoặc dùng link qua email nếu địa chỉ của bạn được hỗ trợ.', 'Or use an email link if your address is supported.')}</p></>}
-    <label>Email<input type="email" autoComplete="email" required maxLength={254} value={email} disabled={sent || busy} onChange={e => setEmail(e.target.value)} /></label>
-    {error && <p role="alert">{error}</p>}
-    {sent && <p role="status">{t('Đã yêu cầu gửi link. Kiểm tra email và spam, rồi mở link bằng chính trình duyệt này. Nếu gửi lại, hãy chờ ít nhất 60 giây.', 'Link requested. Check your inbox and spam, then open the link in this same browser. Wait at least 60 seconds before requesting another.')}</p>}
-    {remaining > 0 && <p className="cloud-muted">{t('Có thể thử gửi lại sau', 'Try requesting again in')} {Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2, '0')}. {t('Đây là thời gian chờ của ứng dụng, không bảo đảm quota đã được khôi phục.', 'This app cooldown does not guarantee the server quota has reset.')}</p>}
-    <button className="button button-primary" disabled={busy || sent || remaining > 0}>{busy ? t('Đang xử lý…', 'Working…') : t('Gửi link đăng nhập', 'Send sign-in link')}</button>
-    {sent && <button type="button" className="button button-secondary" disabled={busy} onClick={() => setSent(false)}>{t('Đổi email / gửi lại', 'Change email / resend')}</button>}
-  </form>
+  return <section className="cloud-signin" aria-labelledby="cloud-signin-title" aria-busy={busy}>
+    <span className="cloud-auth-symbol"><LockKeyhole size={24} aria-hidden="true" /></span>
+    <div className="cloud-auth-heading"><h2 id="cloud-signin-title">{t('Chào mừng đến DurianTrust', 'Welcome to DurianTrust')}</h2><p>{t('Tạo tài khoản hoặc đăng nhập để quản lý hồ sơ lô của bạn.', 'Create an account or sign in to manage your batch records.')}</p></div>
+    {googleLoginEnabled && <div className="cloud-google-entry"><button type="button" className="button button-primary" disabled={busy} onClick={googleSignIn}><LogIn size={20} aria-hidden="true" />{busy ? t('Đang xử lý…', 'Working…') : t('Tiếp tục với Google', 'Continue with Google')}<ArrowRight size={18} aria-hidden="true" /></button><p>{t('Lần đầu đăng nhập sẽ tạo tài khoản. Không cần mật khẩu riêng.', 'Your first sign-in creates an account. No separate password needed.')}</p></div>}
+    {error && <p className="cloud-auth-message cloud-auth-error" role="alert">{error}</p>}
+    <details className="cloud-email-entry" open={!googleLoginEnabled || undefined}>
+      <summary>{t('Đăng nhập bằng liên kết email', 'Sign in with an email link')}</summary>
+      <form className="cloud-form" onSubmit={submit}>
+        <p className="cloud-muted">{googleLoginEnabled ? t('Hiện chỉ hỗ trợ email thành viên project. Nếu bạn mới bắt đầu, hãy dùng Google.', 'Currently available to project members only. New users should use Google.') : t('Hiện chỉ hỗ trợ email thành viên project. Đăng nhập cho người dùng bên ngoài chưa được bật.', 'Currently available to project members only. External sign-in is not enabled yet.')}</p>
+        <label>{t('Địa chỉ email', 'Email address')}<input type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com" value={email} disabled={sent || busy} onChange={e => setEmail(e.target.value)} /></label>
+        {sent && <p className="cloud-auth-message" role="status">{t('Đã yêu cầu gửi link đến', 'Link requested for')} <strong>{email.trim()}</strong>. {t('Kiểm tra hộp thư và spam, rồi mở link bằng chính trình duyệt này.', 'Check your inbox and spam, then open the link in this same browser.')}</p>}
+        {remaining > 0 && <p className="cloud-muted">{t('Có thể thử gửi lại sau', 'Try requesting again in')} {Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2, '0')}. {t('Quota máy chủ có thể cần chờ lâu hơn.', 'The server quota may take longer to reset.')}</p>}
+        <button className="button button-secondary" disabled={busy || sent || remaining > 0}>{busy ? t('Đang xử lý…', 'Working…') : t('Gửi link đăng nhập', 'Send sign-in link')}</button>
+        {sent && <button type="button" className="button button-secondary" disabled={busy} onClick={() => setSent(false)}>{t('Đổi email / gửi lại', 'Change email / resend')}</button>}
+      </form>
+    </details>
+    <p className="cloud-auth-privacy"><LockKeyhole size={15} aria-hidden="true" /><span>{t('Hồ sơ mới mặc định riêng tư. Bạn quyết định khi nào chia sẻ cho bên mua.', 'New records are private by default. You decide when to share them with a buyer.')}</span></p>
+    <a className="cloud-auth-sample" href="#/records/example">{t('Xem hồ sơ mẫu trước khi bắt đầu', 'Explore a sample record first')}<ArrowRight size={16} aria-hidden="true" /></a>
+  </section>
 }
 
 function BatchDetails({ id, publicView, t, language, example = false, onChange }) {
@@ -295,21 +303,21 @@ function Workspace({ t, language }) {
         <section className="dashboard-card cloud-form">
           <h2>{t('Lô của bạn', 'Your batches')}</h2>
           {loading ? <p role="status">{t('Đang tải… Máy chủ Free có thể cần thời gian khởi động.', 'Loading… The free server may need time to start.')}</p> : batches.length ?
-            batches.map(batch => <button key={batch.id} className="button button-secondary cloud-batch-choice" aria-pressed={selected === batch.id} onClick={() => setSelected(batch.id)}><strong>{batch.code}</strong><small>{batch.farm} · {batch.is_public ? t('Công khai', 'Public') : t('Riêng tư', 'Private')}</small></button>) : <p>{t('Chưa có lô ở trang này.', 'No batches on this page.')}</p>}
+            batches.map(batch => <button key={batch.id} className="button button-secondary cloud-batch-choice" aria-pressed={selected === batch.id} onClick={() => setSelected(batch.id)}><strong>{batch.code}</strong><small>{batch.farm} · {batch.is_public ? t('Công khai', 'Public') : t('Riêng tư', 'Private')}</small></button>) : <p>{offset ? t('Chưa có lô ở trang này.', 'No batches on this page.') : t('Bạn chưa tạo lô nào.', 'You have not created a batch yet.')}</p>}
           <div className="cloud-actions">
-            <button className="button button-secondary" disabled={!offset || loading} onClick={() => setOffset(v => v - 50)}>{t('Trước', 'Previous')}</button>
-            <button className="button button-secondary" disabled={batches.length < 50 || loading} onClick={() => setOffset(v => v + 50)}>{t('Sau', 'Next')}</button>
+            {(offset > 0 || batches.length >= 50) && <><button className="button button-secondary" disabled={!offset || loading} onClick={() => setOffset(v => v - 50)}>{t('Trước', 'Previous')}</button>
+            <button className="button button-secondary" disabled={batches.length < 50 || loading} onClick={() => setOffset(v => v + 50)}>{t('Sau', 'Next')}</button></>}
             <button className="button button-secondary" disabled={loading} onClick={() => setRevision(v => v + 1)}>{t('Tải lại', 'Reload')}</button>
           </div>
         </section>
         <form className="dashboard-card cloud-form" onSubmit={create}>
           <h2>{t('Tạo lô riêng tư', 'Create private batch')}</h2>
-          <label>{t('Mã lô (chữ, số, - hoặc _)', 'Batch code (letters, numbers, - or _)')}<input name="code" required maxLength={64} pattern="[A-Za-z0-9][A-Za-z0-9_\-]{0,63}" /></label>
+          <label>{t('Mã lô (chữ, số, - hoặc _)', 'Batch code (letters, numbers, - or _)')}<input id="cloud-batch-code" name="code" required maxLength={64} pattern="[A-Za-z0-9][A-Za-z0-9_\-]{0,63}" /></label>
           <BatchFields t={t} />
           <button className="button button-primary" disabled={busy}>{busy ? t('Đang lưu…', 'Saving…') : t('Tạo hồ sơ lô', 'Create batch record')}</button>
         </form>
       </aside>
-      {selected ? <BatchDetails key={selected} id={selected} publicView={false} t={t} language={language} onChange={updated => setBatches(rows => rows.map(row => row.id === updated.id ? updated : row))} /> : <div className="dashboard-card cloud-empty"><Sprout size={40} aria-hidden="true" /><h2>{t('Mỗi lô, một hồ sơ rõ ràng', 'One clear record for every batch')}</h2><p>{t('Tạo lô bên cạnh, sau đó đính kèm ảnh hoặc phiếu kiểm nghiệm và ghi lại hành trình trước khi chia sẻ cho bên mua.', 'Create a batch, attach photos or lab documents, and record its journey before sharing with a buyer.')}</p></div>}
+      {selected ? <BatchDetails key={selected} id={selected} publicView={false} t={t} language={language} onChange={updated => setBatches(rows => rows.map(row => row.id === updated.id ? updated : row))} /> : <div className="dashboard-card cloud-empty"><Sprout size={40} aria-hidden="true" /><p className="section-kicker">{t('Workspace của bạn', 'Your workspace')}</p><h2>{loading ? t('Đang mở workspace…', 'Opening your workspace…') : batches.length ? t('Chọn lô để xem hồ sơ', 'Select a batch to open its record') : t('Tạo hồ sơ lô đầu tiên', 'Create your first batch record')}</h2><p role={loading ? 'status' : undefined}>{t('Bắt đầu từ thông tin lô, sau đó thêm tài liệu và chia sẻ khi hồ sơ đã sẵn sàng.', 'Start with batch details, add documents, then share when the record is ready.')}</p><ol className="cloud-start-steps"><li><ClipboardList size={20} aria-hidden="true" /><span>{t('Nhập thông tin vườn và thu hoạch', 'Enter farm and harvest details')}</span></li><li><FileUp size={20} aria-hidden="true" /><span>{t('Đính kèm ảnh hoặc phiếu kiểm nghiệm', 'Attach photos or lab documents')}</span></li><li><QrCode size={20} aria-hidden="true" /><span>{t('Kiểm tra hồ sơ rồi chia sẻ QR', 'Review the record and share its QR')}</span></li></ol>{!loading && !batches.length && <button type="button" className="button button-primary" onClick={() => document.getElementById('cloud-batch-code')?.focus()}>{t('Bắt đầu tạo lô', 'Create a batch')}<ArrowRight size={18} aria-hidden="true" /></button>}</div>}
     </div>
   </>
 }
@@ -334,17 +342,18 @@ export default function CloudPortal({ publicView = false, publicId, example = fa
     const { error: err } = await supabase.auth.signOut({ scope: 'local' })
     if (err) setError(cloudError(err))
   }
+  const signedOut = !publicView && ready && !session && supabase && API_BASE_URL
   return <section className="section"><div className="section-shell cloud-portal">
-    <header className="cloud-page-heading"><div><p className="section-kicker">DurianTrust / {t('Hồ sơ lô hàng', 'Batch records')}</p><h1>{publicView ? t('Hồ sơ cho bên mua', 'Buyer record') : t('Quản lý lô hàng', 'Manage your batches')}</h1><p>{t('Từ vườn đến bên mua: thông tin lô, bằng chứng và lịch sử trong một hồ sơ.', 'From farm to buyer: batch details, evidence and history in one record.')}</p></div><a className="button button-secondary" href={publicView ? '#/manage' : '#/records/example'}>{publicView ? t('Quản lý lô của tôi', 'Manage my batches') : t('Xem hồ sơ mẫu', 'View sample record')}<ArrowRight size={16} aria-hidden="true" /></a></header>
+    {!signedOut && <header className="cloud-page-heading"><div><p className="section-kicker">DurianTrust / {t('Hồ sơ lô hàng', 'Batch records')}</p><h1>{publicView ? t('Hồ sơ cho bên mua', 'Buyer record') : t('Quản lý lô hàng', 'Manage your batches')}</h1><p>{t('Từ vườn đến bên mua: thông tin lô, bằng chứng và lịch sử trong một hồ sơ.', 'From farm to buyer: batch details, evidence and history in one record.')}</p></div><a className="button button-secondary" href={publicView ? '#/manage' : '#/records/example'}>{publicView ? t('Quản lý lô của tôi', 'Manage my batches') : t('Xem hồ sơ mẫu', 'View sample record')}<ArrowRight size={16} aria-hidden="true" /></a></header>}
     {example && <p className="lookup-notice" role="status">{t('Hồ sơ minh họa, chỉ để xem. Không phải lô thật; chưa có ảnh hoặc phiếu kiểm nghiệm. Dữ liệu này không được lưu lên cloud.', 'Read-only example, not a real batch. No photos or lab documents are attached. This sample is not saved to the cloud.')}</p>}
     {error && <p role="alert">{error}</p>}
     {example ? <BatchDetails id="example" publicView example t={t} language={language} /> : !supabase || !API_BASE_URL ? <p role="status">{t('Tính năng cloud chưa được bật. Bạn vẫn có thể xem hồ sơ mẫu.', 'Cloud records are not enabled yet. You can still view the sample record.')}</p>
       : publicView ? <BatchDetails key={publicId} id={publicId} publicView t={t} language={language} />
         : !ready ? <p role="status">{t('Đang kiểm tra đăng nhập…', 'Checking sign-in…')}</p>
-          : !session ? <div className="cloud-onboarding"><div className="cloud-intro"><ClipboardList size={34} aria-hidden="true" /><h2>{t('Chuẩn bị hồ sơ trước khi giao lô', 'Prepare your record before handing over a batch')}</h2><ol><li>{t('Ghi thông tin vườn, giống và khối lượng.', 'Record the farm, variety and weight.')}</li><li>{t('Đính kèm bằng chứng, ghi nguồn và ngày.', 'Attach evidence with its source and date.')}</li><li>{t('Kiểm tra rồi công khai QR cho bên mua.', 'Review, then publish a QR for your buyer.')}</li></ol><p>{googleLoginEnabled ? t('Không cần ví để quản lý hồ sơ. Tiếp tục với Google; email đăng nhập hiện chỉ hỗ trợ thành viên project.', 'No wallet needed. Continue with Google; email sign-in currently supports project members only.') : t('Không cần ví để quản lý hồ sơ. Bản dùng thử hiện chỉ gửi email tới thành viên project; đang chờ cấu hình dịch vụ email cho người dùng bên ngoài.', 'No wallet is needed to manage records. This pilot currently sends email only to project members; external access requires an email provider.')}</p></div><SignIn t={t} /></div> : <>
-            <div className="cloud-actions"><span>{session.user.email}</span><button className="button button-secondary" onClick={signOut}>{t('Đăng xuất', 'Sign out')}</button></div>
+          : !session ? <div className="cloud-onboarding"><div className="cloud-intro"><p className="section-kicker">{t('Dành cho nhà vườn & hợp tác xã', 'For growers & cooperatives')}</p><h1>{t('Hồ sơ mỗi lô.\nSẵn sàng chia sẻ.', 'Every batch recorded.\nReady to share.')}</h1><p className="cloud-auth-lead">{t('Lưu thông tin và tài liệu theo từng lô, để bên mua tìm đúng hồ sơ qua một mã QR.', 'Keep details and documents together for each batch, so buyers can find the right record through a QR code.')}</p><ul className="cloud-auth-benefits"><li><Check size={18} aria-hidden="true" />{t('Hồ sơ riêng theo tài khoản', 'Private records for your account')}</li><li><Check size={18} aria-hidden="true" />{t('Chia sẻ khi bạn đã sẵn sàng', 'Share when you are ready')}</li><li><Check size={18} aria-hidden="true" />{t('Bắt đầu với Google, không cần ví', 'Start with Google, no wallet needed')}</li></ul><figure className="cloud-auth-photo"><img src={`${import.meta.env.BASE_URL}images/orchard.webp`} alt={t('Minh họa vườn sầu riêng', 'Durian orchard illustration')} width="640" height="360" /><figcaption>{t('Hình minh họa', 'Illustration')}</figcaption></figure></div><SignIn t={t} /></div> : <>
+            <div className="cloud-account"><span className="cloud-account-avatar" aria-hidden="true">{(session.user.email || 'D').slice(0, 1).toUpperCase()}</span><div><strong>{t('Workspace cá nhân', 'Personal workspace')}</strong><span>{session.user.email}</span></div><button className="button button-secondary" onClick={signOut}>{t('Đăng xuất', 'Sign out')}</button></div>
             <Workspace key={session.user.id} t={t} language={language} />
           </>}
-    {!publicView && <aside className="cloud-tools"><strong>{t('Công cụ thử nghiệm', 'Experimental tools')}</strong><p>{t('Hồ sơ trên đây lưu trong database. Xác nhận bàn giao bằng ví Solana và model AI nằm trong khu vực riêng; chưa tự đồng bộ với lô của bạn.', 'These records are stored in a database. Solana wallet handoffs and AI models are separate experiments and do not automatically sync with your batches.')}</p><a href="#/manage/solana">{t('Mở công cụ Solana & AI', 'Open Solana & AI tools')}</a></aside>}
+    {!publicView && session && <aside className="cloud-tools"><strong>{t('Công cụ thử nghiệm', 'Experimental tools')}</strong><p>{t('Hồ sơ trên đây lưu trong database. Xác nhận bàn giao bằng ví Solana và model AI nằm trong khu vực riêng; chưa tự đồng bộ với lô của bạn.', 'These records are stored in a database. Solana wallet handoffs and AI models are separate experiments and do not automatically sync with your batches.')}</p><a href="#/manage/solana">{t('Mở công cụ Solana & AI', 'Open Solana & AI tools')}</a></aside>}
   </div></section>
 }
