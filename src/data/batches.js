@@ -244,6 +244,7 @@ export function formatDate(dateStr, language) {
   if (isNaN(date.getTime())) return dateStr
   const locale = language === 'vi' ? 'vi-VN' : 'en-US'
   return new Intl.DateTimeFormat(locale, {
+    timeZone: 'UTC', // Date-only harvest/event fields must keep their calendar day.
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',

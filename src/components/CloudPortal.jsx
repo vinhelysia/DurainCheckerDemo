@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight, Check, Circle, ClipboardList, FileUp, Globe, LockKeyhole, Plus, QrCode, Sprout } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Circle, ClipboardList, FileText, FileUp, Globe, LockKeyhole, Plus, QrCode, Sprout } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import LanguageSwitch from './LanguageSwitch'
 import { cloudRequest, cloudError, completeCloudSignIn, googleLoginEnabled, signInWithGoogle, supabase } from '../lib/cloudClient'
 import { API_BASE_URL } from '../lib/api'
 import BatchQRLabel from './BatchQRLabel'
 import BatchEvidence from './BatchEvidence'
-
-const exampleBatch = { id: 'example', code: 'MAU-2026-01', farm: 'Vườn minh họa', province: 'Lâm Đồng', harvest_date: '2026-09-27', variety: 'Ri6', weight_kg: 850, is_public: false }
+import { exampleBatch } from '../data/recordExample'
+import { formatDate } from '../data/batches'
 
 function BatchFields({ batch = {}, t }) {
   return <>
@@ -242,9 +242,18 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
         </div>
         <p className="cloud-visibility-note">{publicView ? t('Bạn đang xem hồ sơ chỉ đọc. Tài liệu và thông tin do chủ hồ sơ cung cấp.', 'You are viewing a read-only record. Documents and details are supplied by the record owner.') : batch.is_public ? t('Bên mua có thể mở hồ sơ và tải tài liệu qua QR.', 'Buyers can open this record and download documents through its QR.') : t('Chỉ tài khoản của bạn có quyền truy cập. QR chỉ được chia sẻ khi bạn công khai hồ sơ.', 'Only your account can access this record. Share the QR after publishing it.')}</p>
         <dl className="cloud-facts">
-          {[[t('Tỉnh / vùng', 'Region'), batch.province], [t('Giống', 'Variety'), batch.variety || '—'], [t('Khối lượng', 'Weight'), batch.weight_kg ? `${Number(batch.weight_kg).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-GB')} kg` : '—'], [t('Thu hoạch', 'Harvested'), batch.harvest_date]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
+          {[[t('Tỉnh / vùng', 'Region'), batch.province], [t('Giống', 'Variety'), batch.variety || '—'], [t('Khối lượng', 'Weight'), batch.weight_kg ? `${Number(batch.weight_kg).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-GB')} kg` : '—'], [t('Thu hoạch', 'Harvested'), formatDate(batch.harvest_date, language)]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
         </dl>
         <p className="cloud-muted">{t('Thông tin hiện tại do chủ hồ sơ khai báo và có thể cập nhật. Chưa xác minh thực địa, phiếu lab hoặc quyền sở hữu hàng hóa.', 'Current details are declared by the owner and may be updated. Physical origin, lab documents and ownership of goods have not been verified.')}</p>
+        {publicView && <details className="buyer-evidence-guide">
+          <summary>{t('Hiểu nguồn dữ liệu & giới hạn', 'Data sources & limitations')}</summary>
+          <ul>
+            <li><Sprout size={20} aria-hidden="true" /><div><strong>{t('Thông tin khai báo', 'Declared information')}</strong><p>{t('Tên vườn, vùng, giống và ngày thu hoạch do chủ hồ sơ nhập.', 'Farm, region, variety and harvest date entered by the owner.')}</p></div></li>
+            <li><FileText size={20} aria-hidden="true" /><div><strong>{t('Tài liệu của lô', 'Batch documents')}</strong><p>{evidence.length ? t('Xem nguồn khai báo, ngày tài liệu và tải tệp để đối chiếu. Đính kèm chưa đồng nghĩa với xác thực.', 'Review the declared source, document date and download the file. An attachment is not an authentication.') : t('Chưa có tệp đính kèm để đối chiếu.', 'No files have been attached for review.')}</p></div></li>
+            <li><QrCode size={20} aria-hidden="true" /><div><strong>{t('Đường dẫn hồ sơ', 'Record link')}</strong><p>{t('QR mở đúng đường dẫn; nhãn vẫn có thể bị sao chép.', 'The QR opens this record’s link; labels can still be copied.')}</p></div></li>
+          </ul>
+          <p>{example ? t('Hồ sơ mẫu hiển thị trong ứng dụng, không được lưu lên cloud hoặc blockchain.', 'This sample is displayed in the app and is not stored in the cloud or on a blockchain.') : t('Hồ sơ này lưu trong database. Thông tin hiện tại có thể cập nhật; mốc hành trình được thêm qua ứng dụng. Hồ sơ chưa tự neo lên Solana.', 'This record is stored in a database. Current details may be updated; journey events are appended through the app. This record is not automatically anchored to Solana.')}</p>
+        </details>}
         {!publicView && <><button className="button button-secondary" disabled={busy} onClick={() => setEditing(!editing)}>{editing ? t('Hủy chỉnh sửa', 'Cancel editing') : t('Sửa thông tin lô', 'Edit batch details')}</button>
           {editing && <form className="cloud-form" onSubmit={saveDetails}><BatchFields batch={batch} t={t} /><button className="button button-primary" disabled={busy}>{t('Lưu thông tin', 'Save details')}</button></form>}
         </>}
@@ -256,7 +265,7 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
         <h2>{t('Lịch sử ghi nhận', 'Recorded history')}</h2>
         {!events.length && <p>{t('Chưa có mốc nào.', 'No events yet.')}</p>}
         <ol className="cloud-events">{events.map(item => <li key={item.id}>
-          <h3>{item.stage}</h3><p>{item.occurred_on} · {item.location}</p>
+          <h3>{item.stage}</h3><p>{formatDate(item.occurred_on, language)} · {item.location}</p>
           {item.notes && <p>{item.notes}</p>}
           {item.cadmium_ppm != null && <p>{t('Cadimi đã nhập', 'Entered cadmium')}: {item.cadmium_ppm} ppm · {t('Ngưỡng đối chiếu đã nhập', 'Entered reference threshold')}: {item.threshold_ppm} ppm</p>}
           <small>{t('Ghi lúc', 'Recorded at')}: {new Date(item.created_at).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-GB')}</small>
@@ -372,8 +381,8 @@ export default function CloudPortal({ publicView = false, publicId, example = fa
     if (err) setError(cloudError(err))
   }
   const signedOut = !publicView && ready && !session && supabase && API_BASE_URL
-  return <section className={`section${signedOut ? ' cloud-auth-page' : ''}`}><div className="section-shell cloud-portal">
-    {!signedOut && <header className="cloud-page-heading"><div><p className="section-kicker">DurianTrust / {t('Hồ sơ lô hàng', 'Batch records')}</p><h1>{publicView ? t('Hồ sơ cho bên mua', 'Buyer record') : t('Quản lý lô hàng', 'Manage your batches')}</h1><p>{t('Từ vườn đến bên mua: thông tin lô, bằng chứng và lịch sử trong một hồ sơ.', 'From farm to buyer: batch details, evidence and history in one record.')}</p></div><a className="button button-secondary" href={publicView ? '#/manage' : '#/records/example'}>{publicView ? t('Quản lý lô của tôi', 'Manage my batches') : t('Xem hồ sơ mẫu', 'View sample record')}<ArrowRight size={16} aria-hidden="true" /></a></header>}
+  return <section className={`section${signedOut ? ' cloud-auth-page' : publicView ? ' cloud-public-page' : ''}`}><div className="section-shell cloud-portal">
+    {!signedOut && <header className="cloud-page-heading"><div><p className="section-kicker">DurianTrust / {t('Hồ sơ lô hàng', 'Batch records')}</p><h1>{publicView ? t('Hồ sơ lô sầu riêng', 'Durian batch record') : t('Quản lý lô hàng', 'Manage your batches')}</h1><p>{t('Từ vườn đến bên mua: thông tin lô, bằng chứng và lịch sử trong một hồ sơ.', 'From farm to buyer: batch details, evidence and history in one record.')}</p></div><a className="button button-secondary" href={publicView ? '#/' : '#/records/example'}>{publicView ? t('Về trang chủ', 'Back to home') : t('Xem hồ sơ mẫu', 'View sample record')}<ArrowRight size={16} aria-hidden="true" /></a></header>}
     {example && <p className="lookup-notice" role="status">{t('Hồ sơ minh họa, chỉ để xem. Không phải lô thật; chưa có ảnh hoặc phiếu kiểm nghiệm. Dữ liệu này không được lưu lên cloud.', 'Read-only example, not a real batch. No photos or lab documents are attached. This sample is not saved to the cloud.')}</p>}
     {error && <p role="alert">{error}</p>}
     {example ? <BatchDetails id="example" publicView example t={t} language={language} /> : !supabase || !API_BASE_URL ? <p role="status">{t('Tính năng cloud chưa được bật. Bạn vẫn có thể xem hồ sơ mẫu.', 'Cloud records are not enabled yet. You can still view the sample record.')}</p>

@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, QrCode, ShieldCheck, Camera, Sparkles, AlertCircle, ArrowRight } from 'lucide-react'
+import { X, QrCode, Camera, Sparkles, AlertCircle, ArrowRight } from 'lucide-react'
 import { Html5Qrcode } from 'html5-qrcode'
 import { useLanguage } from './LanguageContext'
 import { parseBatchQr } from '../lib/batchQr'
 
 export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess }) {
-  const { copy } = useLanguage()
+  const { copy, language } = useLanguage()
   const [scanState, setScanState] = useState('idle') // 'idle' | 'scanning' | 'success' | 'failed'
   const [scannedBatchId, setScannedBatchId] = useState('')
   const [hasCamera, setHasCamera] = useState(null) // null = checking, true = has camera + permission, false = no camera or denied
@@ -62,10 +62,9 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
           closeButtonRef.current.focus()
         }
       }, 50)
-      return () => clearTimeout(timer)
-    } else {
-      if (previousFocusRef.current) {
-        previousFocusRef.current.focus()
+      return () => {
+        clearTimeout(timer)
+        if (previousFocusRef.current?.isConnected) previousFocusRef.current.focus()
         previousFocusRef.current = null
       }
     }
@@ -77,6 +76,12 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         handleClose()
+      }
+      if (e.key === 'Tab') {
+        const controls = [...closeButtonRef.current.closest('[role="dialog"]').querySelectorAll('button:not(:disabled), input:not(:disabled), a[href]')]
+        const first = controls[0], last = controls.at(-1)
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+        if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -101,7 +106,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
         html5QrCodeRef.current = scannerInstance
 
         const successCallback = async (decodedText) => {
-          const { id: batchId, cloud } = parseBatchQr(decodedText)
+          const { id: batchId, cloud, example } = parseBatchQr(decodedText)
 
           if (batchId && isMounted) {
             setScannedBatchId(batchId)
@@ -119,7 +124,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
             // Wait brief moment to show success feedback animation
             setTimeout(() => {
               if (isMounted) {
-                onScanSuccess(batchId, cloud)
+                onScanSuccess(batchId, cloud, example)
                 onClose()
               }
             }, 800)
@@ -143,6 +148,11 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
           }
         )
 
+        if (!isMounted) {
+          await scannerInstance.stop()
+          scannerInstance.clear()
+          return
+        }
         isScanning = true
         if (isMounted) {
           setHasCamera(true)
@@ -194,7 +204,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
 
   const handleManualVerify = (e) => {
     e.preventDefault()
-    const { id: trimmed, cloud } = parseBatchQr(manualInput)
+    const { id: trimmed, cloud, example } = parseBatchQr(manualInput)
     if (!trimmed) {
       setManualError(copy.qrScanner.error.empty)
       return
@@ -203,11 +213,11 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
     // Match against known batch IDs case-insensitively; pass original casing through
     const matched = batches.find(b => b.id.toUpperCase() === trimmed.toUpperCase())
     if (matched) {
-      onScanSuccess(matched.id, cloud)
+      onScanSuccess(matched.id, cloud, example)
       handleClose()
     } else {
       // Allow any batch ID to be loaded to support dynamic/unregistered ones
-      onScanSuccess(trimmed, cloud)
+      onScanSuccess(trimmed, cloud, example)
       handleClose()
     }
   }
@@ -233,13 +243,13 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
   }
 
   return (
-    <div className="scanner-modal-overlay" role="dialog" aria-modal="true" data-lenis-prevent>
+    <div className="scanner-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="qr-scanner-title" data-lenis-prevent>
       <div className="scanner-modal-card">
         {/* Header */}
         <div className="scanner-modal-header">
           <div className="flex items-center gap-2">
             <QrCode className="text-green-mid" size={20} />
-            <h2 className="text-lg font-bold">
+            <h2 className="text-lg font-bold" id="qr-scanner-title">
               {copy.qrScanner.title}
             </h2>
           </div>
@@ -248,7 +258,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
             type="button"
             className="close-button"
             onClick={handleClose}
-            aria-label="Close scanner"
+            aria-label={language === 'vi' ? 'Đóng trình quét' : 'Close scanner'}
           >
             <X size={20} />
           </button>
@@ -307,7 +317,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
               )}
               {scanState === 'success' && (
                 <div className="feed-instruction success-text text-green-mid" style={{ zIndex: 10 }}>
-                  <ShieldCheck size={40} className="mb-2" />
+                  <QrCode size={40} className="mb-2" />
                   <p className="font-bold">{copy.qrScanner.verified}</p>
                   <code style={{ fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{scannedBatchId}</code>
                 </div>
@@ -320,7 +330,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
         <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(31,71,52,0.08)' }}>
           <form onSubmit={handleManualVerify} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label htmlFor="manual-batch-input" style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--color-ink)' }}>
-              {copy.qrScanner.manualLabel}
+              {language === 'vi' ? 'Dán đường dẫn QR hoặc nhập mã lô thử nghiệm' : 'Paste a QR link or enter an experimental batch code'}
             </label>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
@@ -331,9 +341,11 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
                   setManualInput(e.target.value)
                   setManualError('')
                 }}
-                placeholder="Ví dụ: DRN-2026-TG-0115"
+                placeholder={language === 'vi' ? 'Đường dẫn hồ sơ hoặc mã lô' : 'Record link or batch code'}
+                maxLength={2048}
                 style={{
                   flex: 1,
+                  minWidth: 0,
                   padding: '8px 12px',
                   borderRadius: 'var(--radius-card)',
                   border: '1px solid rgba(31,71,52,0.2)',
@@ -343,7 +355,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
               <button
                 className="button button-primary"
                 type="submit"
-                style={{ minHeight: '38px', padding: '0 16px', fontSize: '0.85rem' }}
+                style={{ minHeight: '38px', padding: '0 16px', fontSize: '0.85rem', flexShrink: 0, width: 'auto' }}
               >
                 <span>{copy.qrScanner.verifyBtn}</span>
                 <ArrowRight size={14} />
@@ -356,7 +368,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
         </div>
 
         {/* Fallback Selection Panel */}
-        <div className="scanner-labels-panel">
+        {batches.length > 0 && <div className="scanner-labels-panel">
           <h3>
             {copy.qrScanner.selectDemo}
           </h3>
@@ -381,7 +393,7 @@ export default function QRScannerModal({ isOpen, onClose, batches, onScanSuccess
               </button>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* Footer */}
         <div className="scanner-modal-footer">

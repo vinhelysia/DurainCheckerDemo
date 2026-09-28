@@ -9,5 +9,7 @@ describe('QR destinations', () => {
     expect(parseBatchQr(`https://demo.test/#/cloud?batchId=${id}`)).toEqual({ id, cloud: true })
     expect(parseBatchQr('https://demo.test/#/cloud?batchId=not-a-uuid').cloud).toBe(false)
     expect(parseBatchQr(`https://untrusted.test/?batchId=${id}`).cloud).toBe(false)
+    expect(parseBatchQr('https://demo.test/#/records/example')).toEqual({ id: 'example', cloud: false, example: true })
+    expect(parseBatchQr('example')).toEqual({ id: 'example', cloud: false })
   })
 })

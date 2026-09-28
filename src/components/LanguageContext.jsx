@@ -31,8 +31,8 @@ export function LanguageProvider({ children }) {
     // Update page title
     document.title =
       language === 'vi'
-        ? 'DurianTrust - Minh bạch chuỗi cung ứng sầu riêng'
-        : 'DurianTrust - Blockchain & Rule-Based Durian Traceability'
+        ? 'DurianTrust - Hồ sơ lô sầu riêng từ vườn đến bên mua'
+        : 'DurianTrust - Durian batch records from farm to buyer'
 
     // Update meta description
     const metaDesc = document.querySelector('meta[name="description"]')
@@ -40,8 +40,8 @@ export function LanguageProvider({ children }) {
       metaDesc.setAttribute(
         'content',
         language === 'vi'
-          ? 'DurianTrust demo: truy xuất nguồn gốc sầu riêng bằng blockchain và phân loại chất lượng bằng Quy tắc.'
-          : 'DurianTrust demo: blockchain traceability and Rule-Based quality classification for durian supply chain.'
+          ? 'Tập hợp thông tin lô sầu riêng, tài liệu và hành trình. Chủ vườn chọn chia sẻ QR để bên mua và người xem đối chiếu hồ sơ.'
+          : 'Keep durian batch details, documents and journey together. Growers choose when to share a QR for buyers and consumers to review the record.'
       )
     }
   }, [language])

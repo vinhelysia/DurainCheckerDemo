@@ -32,7 +32,7 @@ function Header() {
   const nav = copy.header.nav
   const primary = [
     { href: '#/', label: nav.home, active: path === '#/' || path === '#/home' },
-    { href: '#/unit/demo', label: nav.demo, active: path.startsWith('#/unit/demo') },
+    { href: '#/records/example', label: language === 'vi' ? 'Hồ sơ mẫu' : 'Sample record', active: path.startsWith('#/records/') || path.startsWith('#/cloud') },
     { href: '#/manage', label: language === 'vi' ? 'Quản lý lô' : 'My batches', active: path.startsWith('#/manage') },
   ]
 
@@ -65,7 +65,7 @@ function Header() {
             </summary>
             <div className="nav-more-panel">
               <p>{language === 'vi' ? 'Giới thiệu dự án' : 'About the project'}</p>
-              <a href="#/records/example">{language === 'vi' ? 'Hồ sơ mẫu cho bên mua' : 'Sample buyer record'}</a>
+              <a href="#/unit/demo">{language === 'vi' ? 'Tra cứu Solana · thử nghiệm' : 'Solana lookup · experiment'}</a>
               <a href="#/manage/solana">{language === 'vi' ? 'Solana & AI · thử nghiệm' : 'Solana & AI · experiments'}</a>
               {pages.slice(0, 3).map((item) => (
                 <a key={item.href} href={item.href} onClick={(event) => { event.currentTarget.closest('details').open = false; setMenuOpen(false) }}>

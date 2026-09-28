@@ -69,7 +69,11 @@ function DemoSection() {
     blockchainHash: ''
   }
 
-  function handleSelect(batchId, cloud = false) {
+  function handleSelect(batchId, cloud = false, example = false) {
+    if (example) {
+      window.location.assign('#/records/example')
+      return
+    }
     if (cloud) {
       window.location.assign(`#/cloud?batchId=${encodeURIComponent(batchId)}`)
       return
