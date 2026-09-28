@@ -1,11 +1,30 @@
 import { afterEach, expect, it, vi } from 'vitest'
 
-const { exchangeCodeForSession, upload, getSession } = vi.hoisted(() => ({ exchangeCodeForSession: vi.fn(), upload: vi.fn(), getSession: vi.fn() }))
+const { exchangeCodeForSession, upload, getSession, signInWithOAuth } = vi.hoisted(() => ({ exchangeCodeForSession: vi.fn(), upload: vi.fn(), getSession: vi.fn(), signInWithOAuth: vi.fn() }))
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ auth: { exchangeCodeForSession, getSession }, storage: { from: () => ({ upload }) } }),
+  createClient: () => ({ auth: { exchangeCodeForSession, getSession, signInWithOAuth }, storage: { from: () => ({ upload }) } }),
 }))
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.resetModules(); vi.clearAllMocks() })
+
+it('gates Google login and uses the same-origin PKCE callback without additional scopes', async () => {
+  vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+  vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'public-test-key')
+  vi.stubEnv('VITE_GOOGLE_AUTH_ENABLED', 'false')
+  vi.stubEnv('BASE_URL', '/DurainCheckerDemo/')
+  vi.stubGlobal('window', {location: {origin: 'https://durian.test'}})
+  let client = await import('./cloudClient')
+  await expect(client.signInWithGoogle()).rejects.toThrow(/not enabled/)
+  expect(signInWithOAuth).not.toHaveBeenCalled()
+  vi.resetModules()
+  vi.stubEnv('VITE_GOOGLE_AUTH_ENABLED', 'true')
+  client = await import('./cloudClient')
+  signInWithOAuth.mockResolvedValueOnce({error: null})
+  await client.signInWithGoogle()
+  expect(signInWithOAuth).toHaveBeenCalledWith({provider: 'google', options: {redirectTo: 'https://durian.test/DurainCheckerDemo/?auth=callback'}})
+  signInWithOAuth.mockResolvedValueOnce({error: new Error('Provider unavailable')})
+  await expect(client.signInWithGoogle()).rejects.toThrow('Provider unavailable')
+})
 
 it('exchanges a callback once, removes its code, and rejects invalid links without accepting a session', async () => {
   vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')

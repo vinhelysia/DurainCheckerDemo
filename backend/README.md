@@ -44,6 +44,30 @@ authenticated cloud records. Existing Vercel inference stays available when
    team email. Do not disable verification to work around mail delivery.
 5. Copy the project URL and **publishable** key from project settings.
 
+### Google sign-in (no SMTP)
+
+The frontend supports Google OAuth using the existing PKCE callback. Keep
+`VITE_GOOGLE_AUTH_ENABLED` unset until the provider is configured; then set it to
+`true` and redeploy the frontend. No Google secret belongs in `VITE_*` variables.
+
+1. In Google Auth Platform, configure the consent screen and a **Web application**
+   OAuth client. Use only `openid`, email and profile scopes.
+2. Set the JavaScript origin to `https://durian-web3.vercel.app` and the authorized
+   redirect URI to `https://yexeietfcpucxvtpcflr.supabase.co/auth/v1/callback`.
+3. Enter the Client ID and Client Secret in Supabase's **Google provider** settings
+   and enable it. Keep the secret out of source control and chat.
+4. Keep the Supabase Site URL as `https://durian-web3.vercel.app/?auth=callback`.
+   Add that exact callback to the redirect allowlist if needed. Do not add a wildcard.
+5. If Google's audience is in Testing, add the intended test accounts there.
+   Complete the applicable Google publishing requirements before inviting others.
+6. Enable the frontend flag, sign in with Google, then test private creation,
+   evidence upload/download and publish/revoke from a signed-out browser.
+
+Google login does not use the email resend cooldown. Cancelled OAuth callbacks
+show a retry message and never create a local substitute session.
+
+Reference: [Supabase Google OAuth](https://supabase.com/docs/guides/auth/social-login/auth-google).
+
 ## 2. Render (Free)
 
 Create a Blueprint from `https://github.com/vinhelysia/DurainCheckerDemo` using

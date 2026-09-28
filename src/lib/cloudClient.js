@@ -3,6 +3,7 @@ import { apiFetch } from './api'
 
 const url = import.meta.env.VITE_SUPABASE_URL
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+export const googleLoginEnabled = import.meta.env.VITE_GOOGLE_AUTH_ENABLED === 'true'
 export const supabase = url && key ? createClient(url, key, {
   auth: { flowType: 'pkce', detectSessionInUrl: false },
 }) : null
@@ -51,6 +52,15 @@ export async function downloadEvidence(record, publicRead) {
   setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000)
 }
 
+export async function signInWithGoogle() {
+  if (!googleLoginEnabled || !supabase) throw new Error('Google login chưa được bật. / Google login is not enabled.')
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}?auth=callback` },
+  })
+  if (error) throw error
+}
+
 let signInCompletion
 export function completeCloudSignIn() {
   // Share the exchange across React StrictMode mounts: a code is single-use.
@@ -62,10 +72,10 @@ export function completeCloudSignIn() {
   signInCompletion = (async () => {
     const code = callback.searchParams.get('code')
     if (!code || callback.searchParams.has('error') || new URLSearchParams(callback.hash.slice(1)).has('error')) {
-      throw new Error('Sign-in link expired or invalid. Request a new link. / Link hết hạn hoặc không hợp lệ. Hãy yêu cầu link mới.')
+      throw new Error('Đăng nhập đã bị hủy hoặc phiên xác thực hết hạn. Hãy bắt đầu đăng nhập lại. / Sign-in was cancelled or expired. Start sign-in again; email links must be opened in the same browser.')
     }
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (error) throw new Error('Could not sign in. Request a new link and open it in the same browser. / Hãy gửi lại link và mở bằng trình duyệt đã yêu cầu đăng nhập.')
+    if (error) throw new Error('Không thể hoàn tất đăng nhập. Hãy thử lại trong cùng trình duyệt. / Could not complete sign-in. Try again in the same browser; request a new email link if needed.')
   })()
   return signInCompletion
 }

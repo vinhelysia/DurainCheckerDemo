@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowRight, Check, Circle, ClipboardList, LockKeyhole, Sprout } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
-import { cloudRequest, cloudError, completeCloudSignIn, supabase } from '../lib/cloudClient'
+import { cloudRequest, cloudError, completeCloudSignIn, googleLoginEnabled, signInWithGoogle, supabase } from '../lib/cloudClient'
 import { API_BASE_URL } from '../lib/api'
 import BatchQRLabel from './BatchQRLabel'
 import BatchEvidence from './BatchEvidence'
@@ -62,9 +62,18 @@ function SignIn({ t }) {
     finally { setBusy(false) }
   }
 
+  async function googleSignIn() {
+    if (busy) return
+    setBusy(true); setError('')
+    try { await signInWithGoogle() }
+    catch (err) { setError(cloudError(err)) }
+    finally { setBusy(false) }
+  }
+
   return <form className="dashboard-card cloud-form" onSubmit={submit}>
     <LockKeyhole size={26} aria-hidden="true" /><h2>{t('Bắt đầu với lô của bạn', 'Start with your batch')}</h2>
     <p>{t('Lô mới chỉ bạn xem được. Bạn chọn thời điểm công khai hồ sơ.', 'New batches are private. You choose when to publish a record.')}</p>
+    {googleLoginEnabled && <><button type="button" className="button button-primary" disabled={busy} onClick={googleSignIn}>{busy ? t('Đang xử lý…', 'Working…') : t('Tiếp tục với Google', 'Continue with Google')}</button><p className="cloud-muted">{t('Hoặc dùng link qua email nếu địa chỉ của bạn được hỗ trợ.', 'Or use an email link if your address is supported.')}</p></>}
     <label>Email<input type="email" autoComplete="email" required maxLength={254} value={email} disabled={sent || busy} onChange={e => setEmail(e.target.value)} /></label>
     {error && <p role="alert">{error}</p>}
     {sent && <p role="status">{t('Đã yêu cầu gửi link. Kiểm tra email và spam, rồi mở link bằng chính trình duyệt này. Nếu gửi lại, hãy chờ ít nhất 60 giây.', 'Link requested. Check your inbox and spam, then open the link in this same browser. Wait at least 60 seconds before requesting another.')}</p>}
@@ -332,7 +341,7 @@ export default function CloudPortal({ publicView = false, publicId, example = fa
     {example ? <BatchDetails id="example" publicView example t={t} language={language} /> : !supabase || !API_BASE_URL ? <p role="status">{t('Tính năng cloud chưa được bật. Bạn vẫn có thể xem hồ sơ mẫu.', 'Cloud records are not enabled yet. You can still view the sample record.')}</p>
       : publicView ? <BatchDetails key={publicId} id={publicId} publicView t={t} language={language} />
         : !ready ? <p role="status">{t('Đang kiểm tra đăng nhập…', 'Checking sign-in…')}</p>
-          : !session ? <div className="cloud-onboarding"><div className="cloud-intro"><ClipboardList size={34} aria-hidden="true" /><h2>{t('Chuẩn bị hồ sơ trước khi giao lô', 'Prepare your record before handing over a batch')}</h2><ol><li>{t('Ghi thông tin vườn, giống và khối lượng.', 'Record the farm, variety and weight.')}</li><li>{t('Đính kèm bằng chứng, ghi nguồn và ngày.', 'Attach evidence with its source and date.')}</li><li>{t('Kiểm tra rồi công khai QR cho bên mua.', 'Review, then publish a QR for your buyer.')}</li></ol><p>{t('Không cần ví để quản lý hồ sơ. Bản dùng thử hiện chỉ gửi email tới thành viên project; đang chờ cấu hình dịch vụ email cho người dùng bên ngoài.', 'No wallet is needed to manage records. This pilot currently sends email only to project members; external access requires an email provider.')}</p></div><SignIn t={t} /></div> : <>
+          : !session ? <div className="cloud-onboarding"><div className="cloud-intro"><ClipboardList size={34} aria-hidden="true" /><h2>{t('Chuẩn bị hồ sơ trước khi giao lô', 'Prepare your record before handing over a batch')}</h2><ol><li>{t('Ghi thông tin vườn, giống và khối lượng.', 'Record the farm, variety and weight.')}</li><li>{t('Đính kèm bằng chứng, ghi nguồn và ngày.', 'Attach evidence with its source and date.')}</li><li>{t('Kiểm tra rồi công khai QR cho bên mua.', 'Review, then publish a QR for your buyer.')}</li></ol><p>{googleLoginEnabled ? t('Không cần ví để quản lý hồ sơ. Tiếp tục với Google; email đăng nhập hiện chỉ hỗ trợ thành viên project.', 'No wallet needed. Continue with Google; email sign-in currently supports project members only.') : t('Không cần ví để quản lý hồ sơ. Bản dùng thử hiện chỉ gửi email tới thành viên project; đang chờ cấu hình dịch vụ email cho người dùng bên ngoài.', 'No wallet is needed to manage records. This pilot currently sends email only to project members; external access requires an email provider.')}</p></div><SignIn t={t} /></div> : <>
             <div className="cloud-actions"><span>{session.user.email}</span><button className="button button-secondary" onClick={signOut}>{t('Đăng xuất', 'Sign out')}</button></div>
             <Workspace key={session.user.id} t={t} language={language} />
           </>}
