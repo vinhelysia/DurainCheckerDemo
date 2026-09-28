@@ -6,7 +6,9 @@ export default function BatchEvidence({ batchId, records, more, onMore, onSaved,
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [kind, setKind] = useState('all')
   const kindName = kind => kind === 'photo' ? t('Ảnh lô hàng', 'Batch photo') : kind === 'lab_report' ? t('Phiếu kiểm nghiệm', 'Lab document') : t('Tài liệu khác', 'Other document')
+  const visibleRecords = kind === 'all' ? records : records.filter(record => record.kind === kind)
 
   async function upload(event) {
     event.preventDefault()
@@ -31,15 +33,18 @@ export default function BatchEvidence({ batchId, records, more, onMore, onSaved,
     finally { setBusy(false) }
   }
 
-  return <section className="dashboard-card cloud-form" aria-labelledby="evidence-title">
-    <div><p className="section-kicker">02 / {t('Bằng chứng', 'Evidence')}</p><h2 id="evidence-title">{t('Ảnh & tài liệu của lô', 'Batch photos & documents')}</h2></div>
+  return <section id="cloud-evidence" className="dashboard-card cloud-form cloud-evidence" aria-labelledby="evidence-title">
+    <div className="cloud-evidence-heading"><div><p className="section-kicker">02 / {t('Bằng chứng', 'Evidence')}</p><h2 id="evidence-title">{t('Ảnh & tài liệu của lô', 'Batch photos & documents')}</h2></div><span>{records.length}{more ? '+' : ''} {t('tệp', 'files')}</span></div>
     <p className="cloud-muted">{t('Tệp do chủ hồ sơ cung cấp. Nguồn và ngày là thông tin khai báo; chưa được xác minh với đơn vị phát hành.', 'Files supplied by the record owner. Sources and dates are declared and have not been verified with the issuer.')}</p>
     {error && <p role="alert" className="lookup-notice">{error}</p>}
     {notice && <p role="status">{notice}</p>}
-    {!records.length ? <div className="cloud-empty"><FileText size={28} aria-hidden="true" /><p>{t('Chưa có bằng chứng đính kèm.', 'No evidence attached yet.')}</p><small>{t('Chưa thể đối chiếu hồ sơ với ảnh lô hoặc phiếu kiểm nghiệm.', 'The record cannot yet be compared with batch photos or lab documents.')}</small></div> :
-      <ul className="evidence-list">{records.map(record => <li key={record.id}>
-        {record.kind === 'photo' ? <Image size={22} aria-hidden="true" /> : <FileText size={22} aria-hidden="true" />}
-        <div><strong>{kindName(record.kind)}</strong><p>{record.filename}</p><small>{record.source} · {record.document_date}</small></div>
+    {records.length > 0 && <div className="evidence-filters" role="group" aria-label={t('Lọc tệp đã tải', 'Filter loaded files')}>
+      {['all', 'photo', 'lab_report', 'other'].map(value => <button type="button" key={value} aria-pressed={kind === value} onClick={() => setKind(value)}>{value === 'all' ? t('Tất cả', 'All') : kindName(value)}</button>)}
+    </div>}
+    {!records.length ? <div className="cloud-empty"><FileText size={28} aria-hidden="true" /><p>{t('Chưa có bằng chứng đính kèm.', 'No evidence attached yet.')}</p><small>{t('Chưa thể đối chiếu hồ sơ với ảnh lô hoặc phiếu kiểm nghiệm.', 'The record cannot yet be compared with batch photos or lab documents.')}</small></div> : !visibleRecords.length ? <p className="cloud-muted" role="status">{t('Chưa có tệp thuộc loại này trong danh sách đã tải.', 'No files of this type in the loaded list.')}</p> :
+      <ul className="evidence-list">{visibleRecords.map(record => <li key={record.id}>
+        <span className="evidence-file-icon">{record.kind === 'photo' ? <Image size={22} aria-hidden="true" /> : <FileText size={22} aria-hidden="true" />}</span>
+        <div><strong>{record.filename}</strong><p className="evidence-file-meta">{kindName(record.kind)} · {record.document_date}</p><small>{t('Nguồn khai báo', 'Declared source')}: {record.source}</small></div>
         <button type="button" className="button button-secondary" disabled={busy} onClick={() => download(record)} aria-label={`${t('Tải', 'Download')} ${record.filename}`}><Download size={16} aria-hidden="true" />{t('Tải tệp', 'Download')}</button>
       </li>)}</ul>}
     {more && <button className="button button-secondary" disabled={busy} onClick={async () => { setBusy(true); try { await onMore() } finally { setBusy(false) } }}>{t('Xem thêm tài liệu', 'Load more documents')}</button>}

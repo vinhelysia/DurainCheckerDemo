@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight, Check, Circle, ClipboardList, FileUp, LockKeyhole, QrCode, Sprout } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Circle, ClipboardList, FileUp, Globe, LockKeyhole, Plus, QrCode, Sprout } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import LanguageSwitch from './LanguageSwitch'
 import { cloudRequest, cloudError, completeCloudSignIn, googleLoginEnabled, signInWithGoogle, supabase } from '../lib/cloudClient'
@@ -223,25 +223,35 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
     [evidence.length > 0, t('Bằng chứng đính kèm', 'Attached evidence')],
     [events.length > 0, t('Mốc hành trình', 'Journey events')],
   ] : []
-  return <div className="cloud-detail">
+  return <div className={`cloud-detail${publicView ? ' cloud-buyer-record' : ''}`}>
     {error && <p className="lookup-notice" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     {loading && <p role="status">{t('Đang tải hồ sơ… Lần đầu có thể cần chờ máy chủ khởi động.', 'Loading… The server may need time to wake up on the first request.')}</p>}
     {!example && <button type="button" className="button button-secondary cloud-reload" disabled={busy || loading} onClick={() => setRevision(v => v + 1)}>{t('Tải lại hồ sơ', 'Reload record')}</button>}
     {!loading && batch && <>
-      <article className="dashboard-card cloud-form">
-        <div className="cloud-record-heading"><div><p className="section-kicker">01 / {t('Hồ sơ lô', 'Batch record')}</p><h2>{batch.code}</h2></div><span className="cloud-status">{example ? t('Dữ liệu mẫu', 'Sample data') : batch.is_public ? t('Đang công khai', 'Public') : t('Riêng tư', 'Private')}</span></div>
+      <nav className="cloud-record-nav" aria-label={t('Các phần của hồ sơ', 'Record sections')}>
+        {[["cloud-overview", t('Thông tin lô', 'Batch details')], ["cloud-evidence", t('Ảnh & tài liệu', 'Photos & documents')], ["cloud-journey", t('Hành trình', 'Journey')], ...(!publicView ? [["cloud-share", t('Chia sẻ QR', 'Share QR')]] : [])].map(([target, label]) => <button type="button" key={target} onClick={() => document.getElementById(target)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' })}>{label}</button>)}
+      </nav>
+      <article id="cloud-overview" className="dashboard-card cloud-form cloud-overview">
+        <div className="cloud-record-heading">
+          <div><p className="section-kicker">{t('Hồ sơ lô hàng', 'Batch record')}</p><h2>{batch.code}</h2><p className="cloud-record-farm">{batch.farm}</p></div>
+          <span className={`cloud-status cloud-status--${example ? 'sample' : batch.is_public ? 'public' : 'private'}`}>
+            {batch.is_public && !example ? <Globe size={15} aria-hidden="true" /> : <LockKeyhole size={15} aria-hidden="true" />}
+            {example ? t('Dữ liệu mẫu', 'Sample data') : batch.is_public ? t('Đang công khai', 'Public') : t('Riêng tư', 'Private')}
+          </span>
+        </div>
+        <p className="cloud-visibility-note">{publicView ? t('Bạn đang xem hồ sơ chỉ đọc. Tài liệu và thông tin do chủ hồ sơ cung cấp.', 'You are viewing a read-only record. Documents and details are supplied by the record owner.') : batch.is_public ? t('Bên mua có thể mở hồ sơ và tải tài liệu qua QR.', 'Buyers can open this record and download documents through its QR.') : t('Chỉ tài khoản của bạn có quyền truy cập. QR chỉ được chia sẻ khi bạn công khai hồ sơ.', 'Only your account can access this record. Share the QR after publishing it.')}</p>
         <dl className="cloud-facts">
-          {[[t('Vườn / HTX', 'Farm'), batch.farm], [t('Tỉnh / vùng', 'Region'), batch.province], [t('Giống', 'Variety'), batch.variety || '—'], [t('Khối lượng', 'Weight'), batch.weight_kg ? `${Number(batch.weight_kg).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-GB')} kg` : '—'], [t('Thu hoạch', 'Harvested'), batch.harvest_date]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
+          {[[t('Tỉnh / vùng', 'Region'), batch.province], [t('Giống', 'Variety'), batch.variety || '—'], [t('Khối lượng', 'Weight'), batch.weight_kg ? `${Number(batch.weight_kg).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-GB')} kg` : '—'], [t('Thu hoạch', 'Harvested'), batch.harvest_date]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
         </dl>
         <p className="cloud-muted">{t('Thông tin hiện tại do chủ hồ sơ khai báo và có thể cập nhật. Chưa xác minh thực địa, phiếu lab hoặc quyền sở hữu hàng hóa.', 'Current details are declared by the owner and may be updated. Physical origin, lab documents and ownership of goods have not been verified.')}</p>
         {!publicView && <><button className="button button-secondary" disabled={busy} onClick={() => setEditing(!editing)}>{editing ? t('Hủy chỉnh sửa', 'Cancel editing') : t('Sửa thông tin lô', 'Edit batch details')}</button>
           {editing && <form className="cloud-form" onSubmit={saveDetails}><BatchFields batch={batch} t={t} /><button className="button button-primary" disabled={busy}>{t('Lưu thông tin', 'Save details')}</button></form>}
         </>}
-        <div className="cloud-checklist"><h3>{t('Mức đầy đủ của hồ sơ', 'Record completeness')}</h3><ul>{checks.map(([done, label]) => <li key={label}>{done ? <Check size={18} aria-hidden="true" /> : <Circle size={18} aria-hidden="true" />}<span>{label}</span><small>{done ? t('Đã có', 'Present') : t('Còn thiếu', 'Missing')}</small></li>)}</ul><p>{t('Chỉ kiểm tra có thông tin; không đánh giá độ thật, chất lượng hoặc điều kiện xuất khẩu.', 'Checks presence only, not authenticity, quality or export eligibility.')}</p></div>
+        <div className="cloud-checklist"><div className="cloud-checklist-heading"><h3>{t('Mức đầy đủ của hồ sơ', 'Record completeness')}</h3><span>{checks.filter(([done]) => done).length}/3 {t('mục đã có', 'items present')}</span></div><ul>{checks.map(([done, label]) => <li key={label} className={done ? 'is-complete' : ''}>{done ? <Check size={18} aria-hidden="true" /> : <Circle size={18} aria-hidden="true" />}<span>{label}</span><small>{done ? t('Đã có', 'Present') : t('Còn thiếu', 'Missing')}</small></li>)}</ul><p>{t('Chỉ kiểm tra có thông tin; không đánh giá độ thật, chất lượng hoặc điều kiện xuất khẩu.', 'Checks presence only, not authenticity, quality or export eligibility.')}</p></div>
       </article>
       <BatchEvidence batchId={id} records={evidence} more={moreEvidence} onMore={loadMoreEvidence} onSaved={() => { setNotice(t('Đã đính kèm bằng chứng.', 'Evidence attached.')); setRevision(v => v + 1) }} publicView={publicView} t={t} />
-      <section className="dashboard-card cloud-form">
+      <section id="cloud-journey" className="dashboard-card cloud-form">
         <p className="section-kicker">03 / {t('Hành trình', 'Journey')}</p>
         <h2>{t('Lịch sử ghi nhận', 'Recorded history')}</h2>
         {!events.length && <p>{t('Chưa có mốc nào.', 'No events yet.')}</p>}
@@ -253,24 +263,24 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
         </li>)}</ol>
         {more && <button className="button button-secondary" disabled={busy} onClick={loadMore}>{t('Xem thêm', 'Load more')}</button>}
       </section>
-      {!publicView && <form className="dashboard-card cloud-form" onSubmit={append}>
-        <h2>{t('Ghi nhận một mốc mới', 'Record a new event')}</h2>
+      {!publicView && <details className="dashboard-card cloud-disclosure cloud-event-entry"><summary><Plus size={18} aria-hidden="true" />{t('Ghi nhận một mốc mới', 'Record a new event')}</summary><form className="cloud-form" onSubmit={append}>
         <p>{t('Mốc đã lưu không sửa hoặc xóa được trong ứng dụng. Để đính chính, thêm mốc mới.', 'Saved events cannot be edited or deleted in the app. Add a new event to record a correction.')}</p>
         <label>{t('Tên mốc', 'Stage')}<input name="stage" required maxLength={160} list="batch-stages" /><datalist id="batch-stages">{['Thu hoạch', 'Phân loại', 'Gửi mẫu kiểm nghiệm', 'Đóng gói', 'Đề nghị bàn giao', 'Ghi nhận giao hàng'].map(stage => <option key={stage} value={stage} />)}</datalist></label>
         <p className="cloud-muted">{t('Mốc giao hàng là ghi nhận một phía, chưa phải xác nhận của bên nhận.', 'A delivery event is a one-sided statement, not a recipient confirmation.')}</p>
         <label>{t('Địa điểm', 'Location')}<input name="location" required maxLength={160} /></label>
         <label>{t('Ngày diễn ra', 'Event date')}<input name="occurred_on" type="date" required /></label>
         <label>{t('Ghi chú', 'Notes')}<textarea name="notes" maxLength={2000} rows={3} /></label>
-        <fieldset><legend>{t('Số đo tùy chọn — nhập đủ cả hai trường', 'Optional measurement — fill both fields')}</legend>
+        <details className="cloud-measurements"><summary>{t('Thêm số đo Cadimi (tùy chọn)', 'Add a cadmium measurement (optional)')}</summary><fieldset><legend>{t('Nhập đủ cả hai trường', 'Fill both fields')}</legend>
           <label>{t('Cadimi đã nhập (ppm)', 'Entered cadmium (ppm)')}<input name="cadmium_ppm" type="number" step="0.0001" min="0" max="100" /></label>
           <label>{t('Ngưỡng đối chiếu (ppm)', 'Reference threshold (ppm)')}<input name="threshold_ppm" type="number" step="0.0001" min="0.0001" max="100" /></label>
-        </fieldset>
+        </fieldset></details>
         <button className="button button-primary" disabled={busy || loading}>{busy ? t('Đang lưu…', 'Saving…') : t('Lưu mốc vào cloud', 'Save event to cloud')}</button>
-      </form>}
-      {!example && <section className="dashboard-card cloud-form">
-        <p className="section-kicker">04 / {t('Chia sẻ', 'Share')}</p><h2>{t('Hồ sơ cho bên mua', 'Buyer record')}</h2>
-        {!publicView && <><p>{t('Công khai sẽ cho phép mọi người đọc toàn bộ thông tin, lịch sử và tải bằng chứng. Kiểm tra và che thông tin cá nhân trong tệp trước khi chia sẻ.', 'Publishing lets anyone read the details, history and download evidence. Review and redact personal information before sharing.')}</p><button className="button button-primary" disabled={busy} onClick={changeVisibility}>{batch.is_public ? t('Chuyển về riêng tư', 'Make private') : t('Công khai hồ sơ & bằng chứng', 'Publish record & evidence')}</button></>}
-        {batch.is_public && <><a href={shareUrl}>{t('Mở hồ sơ bên mua', 'Open buyer record')}</a><BatchQRLabel batchId={batch.code} language={language} shareUrl={shareUrl} /><p className="cloud-muted">{t('QR dẫn đến hồ sơ, không chống sao chép nhãn. Chuyển riêng tư chặn lượt đọc mới nhưng không thu hồi bản đã tải.', 'The QR opens a record; it cannot prevent label copying. Making it private blocks new reads, not previously downloaded copies.')}</p></>}
+      </form></details>}
+      {!example && <section id="cloud-share" className={`dashboard-card cloud-form cloud-share-panel${batch.is_public ? ' is-public' : ''}`}>
+        <div className="cloud-share-heading">{batch.is_public ? <Globe size={24} aria-hidden="true" /> : <LockKeyhole size={24} aria-hidden="true" />}<div><p className="section-kicker">04 / {t('Chia sẻ', 'Share')}</p><h2>{batch.is_public ? t('Hồ sơ đang được chia sẻ', 'Your record is shared') : t('Hồ sơ vẫn riêng tư', 'Your record is private')}</h2></div></div>
+        {!publicView && <><p>{batch.is_public ? t('Mọi người có đường dẫn hoặc QR có thể đọc hồ sơ và tải tài liệu. Bạn có thể chặn lượt đọc mới bằng cách chuyển về riêng tư.', 'Anyone with the link or QR can read this record and download files. Make it private to block new reads.') : t('Công khai sẽ cho phép mọi người đọc toàn bộ thông tin, lịch sử và tải bằng chứng. Kiểm tra và che thông tin cá nhân trong tệp trước khi chia sẻ.', 'Publishing lets anyone read the details, history and download evidence. Review and redact personal information before sharing.')}</p>
+        <button className={`button ${batch.is_public ? 'button-secondary' : 'button-primary'}`} disabled={busy} onClick={changeVisibility}>{batch.is_public ? t('Chuyển về riêng tư', 'Make private') : t('Công khai hồ sơ & bằng chứng', 'Publish record & evidence')}</button></>}
+        {batch.is_public && <div className="cloud-qr-sharing"><div><h3>{t('Đường dẫn đến hồ sơ này', 'Link to this record')}</h3><a href={shareUrl}>{t('Mở hồ sơ bên mua', 'Open buyer record')}<ArrowRight size={16} aria-hidden="true" /></a><p className="cloud-muted">{t('Gửi đường dẫn hoặc in nhãn QR để bên mua mở đúng hồ sơ.', 'Send the link or print a QR label so buyers can open the right record.')}</p><p className="cloud-muted">{t('QR dẫn đến hồ sơ, không chống sao chép nhãn. Chuyển riêng tư chặn lượt đọc mới nhưng không thu hồi bản đã tải.', 'The QR opens a record; it cannot prevent label copying. Making it private blocks new reads, not previously downloaded copies.')}</p></div><BatchQRLabel batchId={batch.code} language={language} shareUrl={shareUrl} /></div>}
       </section>}
     </>}
   </div>
@@ -321,21 +331,20 @@ function Workspace({ t, language }) {
     <div className="cloud-workspace">
       <aside className="cloud-sidebar">
         <section className="dashboard-card cloud-form">
-          <h2>{t('Lô của bạn', 'Your batches')}</h2>
+          <div className="cloud-sidebar-heading"><h2>{t('Lô của bạn', 'Your batches')}</h2><span>{batches.length}{batches.length >= 50 ? '+' : ''}</span></div>
           {loading ? <p role="status">{t('Đang tải… Máy chủ Free có thể cần thời gian khởi động.', 'Loading… The free server may need time to start.')}</p> : batches.length ?
-            batches.map(batch => <button key={batch.id} className="button button-secondary cloud-batch-choice" aria-pressed={selected === batch.id} onClick={() => setSelected(batch.id)}><strong>{batch.code}</strong><small>{batch.farm} · {batch.is_public ? t('Công khai', 'Public') : t('Riêng tư', 'Private')}</small></button>) : <p>{offset ? t('Chưa có lô ở trang này.', 'No batches on this page.') : t('Bạn chưa tạo lô nào.', 'You have not created a batch yet.')}</p>}
+            batches.map(batch => <button key={batch.id} className="button button-secondary cloud-batch-choice" aria-pressed={selected === batch.id} onClick={() => setSelected(batch.id)}><strong>{batch.code}</strong><small>{batch.farm}</small><span className={`cloud-batch-visibility${batch.is_public ? ' is-public' : ''}`}>{batch.is_public ? <Globe size={13} aria-hidden="true" /> : <LockKeyhole size={13} aria-hidden="true" />}{batch.is_public ? t('Công khai', 'Public') : t('Riêng tư', 'Private')}</span></button>) : <p>{offset ? t('Chưa có lô ở trang này.', 'No batches on this page.') : t('Bạn chưa tạo lô nào.', 'You have not created a batch yet.')}</p>}
           <div className="cloud-actions">
             {(offset > 0 || batches.length >= 50) && <><button className="button button-secondary" disabled={!offset || loading} onClick={() => setOffset(v => v - 50)}>{t('Trước', 'Previous')}</button>
             <button className="button button-secondary" disabled={batches.length < 50 || loading} onClick={() => setOffset(v => v + 50)}>{t('Sau', 'Next')}</button></>}
             <button className="button button-secondary" disabled={loading} onClick={() => setRevision(v => v + 1)}>{t('Tải lại', 'Reload')}</button>
           </div>
         </section>
-        <form className="dashboard-card cloud-form" onSubmit={create}>
-          <h2>{t('Tạo lô riêng tư', 'Create private batch')}</h2>
+        <details className="dashboard-card cloud-disclosure cloud-new-batch" open={!batches.length || undefined}><summary><Plus size={18} aria-hidden="true" />{t('Tạo lô riêng tư', 'Create private batch')}</summary><form className="cloud-form" onSubmit={create}>
           <label>{t('Mã lô (chữ, số, - hoặc _)', 'Batch code (letters, numbers, - or _)')}<input id="cloud-batch-code" name="code" required maxLength={64} pattern="[A-Za-z0-9][A-Za-z0-9_\-]{0,63}" /></label>
           <BatchFields t={t} />
           <button className="button button-primary" disabled={busy}>{busy ? t('Đang lưu…', 'Saving…') : t('Tạo hồ sơ lô', 'Create batch record')}</button>
-        </form>
+        </form></details>
       </aside>
       {selected ? <BatchDetails key={selected} id={selected} publicView={false} t={t} language={language} onChange={updated => setBatches(rows => rows.map(row => row.id === updated.id ? updated : row))} /> : <div className="dashboard-card cloud-empty"><Sprout size={40} aria-hidden="true" /><p className="section-kicker">{t('Workspace của bạn', 'Your workspace')}</p><h2>{loading ? t('Đang mở workspace…', 'Opening your workspace…') : batches.length ? t('Chọn lô để xem hồ sơ', 'Select a batch to open its record') : t('Tạo hồ sơ lô đầu tiên', 'Create your first batch record')}</h2><p role={loading ? 'status' : undefined}>{t('Bắt đầu từ thông tin lô, sau đó thêm tài liệu và chia sẻ khi hồ sơ đã sẵn sàng.', 'Start with batch details, add documents, then share when the record is ready.')}</p><ol className="cloud-start-steps"><li><ClipboardList size={20} aria-hidden="true" /><span>{t('Nhập thông tin vườn và thu hoạch', 'Enter farm and harvest details')}</span></li><li><FileUp size={20} aria-hidden="true" /><span>{t('Đính kèm ảnh hoặc phiếu kiểm nghiệm', 'Attach photos or lab documents')}</span></li><li><QrCode size={20} aria-hidden="true" /><span>{t('Kiểm tra hồ sơ rồi chia sẻ QR', 'Review the record and share its QR')}</span></li></ol>{!loading && !batches.length && <button type="button" className="button button-primary" onClick={() => document.getElementById('cloud-batch-code')?.focus()}>{t('Bắt đầu tạo lô', 'Create a batch')}<ArrowRight size={18} aria-hidden="true" /></button>}</div>}
     </div>
