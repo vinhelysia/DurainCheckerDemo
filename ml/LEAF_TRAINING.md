@@ -36,3 +36,5 @@ Cấu hình: tối đa **24 epochs**, seed 1337, batch 64, giới hạn 30 phút
 Test cũ đã được xem ở lượt 12 epochs; lượt này chỉ là tuning trên validation, không phải bằng chứng accuracy mới trên dữ liệu độc lập. Cần holdout mới trước khi quyết định thay model production. Notebook kiểm protocol và không có test/baseline metrics trước khi tải artifacts.
 
 Lượt Colab 29/09/2026 đã hoàn tất trên Tesla T4: dừng sau 23 epochs, chọn epoch 19, validation accuracy 85,33% và macro-F1 0,8499 trên 443 ảnh. [Báo cáo và artifact checks](../submission/review/ai-training/colab-validation-24/README.md). Candidate ONNX chưa được đưa vào production.
+
+[External check trên Mendeley Data v2](../submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md): 72/202 ảnh đúng (35,6%) trong ba class đối chiếu sau sàng lọc ảnh gần trùng. Kết quả này không đủ để promote candidate; cần dữ liệu thực địa có nhãn xác nhận và holdout mới theo vườn/cây.

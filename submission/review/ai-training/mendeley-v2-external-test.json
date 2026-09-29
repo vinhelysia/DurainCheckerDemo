@@ -1,0 +1,61 @@
+{
+  "source": "https://data.mendeley.com/datasets/pxzvksbwnj/2",
+  "source_version": 2,
+  "license": "CC BY 4.0",
+  "source_archive_sha256": "5e271cfd89e8a738ef760aa48bb1081e68e0f6f2c53e689566a7920a09be8dce",
+  "candidate_onnx_sha256": "35ba652c6e88232819387b6c9757cc4e6db97a3ea58f00259fe5aa764f361e21",
+  "scope": "Mendeley source test split; three conservatively matched classes only",
+  "excluded_classes": [
+    "Leaf_Colletotrichum",
+    "Leaf_Rhizoctonia",
+    "Leaf_Blight"
+  ],
+  "overlap_screen": {
+    "exact_original": 0,
+    "exact_external": 0,
+    "possible_near_original": 4,
+    "possible_near_external": 1,
+    "dhash_distance": 4
+  },
+  "n": 202,
+  "mapped_class_accuracy": 0.3564356435643564,
+  "per_class": {
+    "HEALTHY_LEAF": {
+      "n": 73,
+      "correct": 24,
+      "predicted": {
+        "HEALTHY_LEAF": 24,
+        "ALGAL_LEAF_SPOT": 3,
+        "LEAF_BLIGHT": 2,
+        "PHOMOPSIS_LEAF_SPOT": 31,
+        "ALLOCARIDARA_ATTACK": 13
+      },
+      "recall": 0.3287671232876712
+    },
+    "ALGAL_LEAF_SPOT": {
+      "n": 70,
+      "correct": 31,
+      "predicted": {
+        "HEALTHY_LEAF": 0,
+        "ALGAL_LEAF_SPOT": 31,
+        "LEAF_BLIGHT": 3,
+        "PHOMOPSIS_LEAF_SPOT": 13,
+        "ALLOCARIDARA_ATTACK": 23
+      },
+      "recall": 0.44285714285714284
+    },
+    "PHOMOPSIS_LEAF_SPOT": {
+      "n": 59,
+      "correct": 17,
+      "predicted": {
+        "HEALTHY_LEAF": 0,
+        "ALGAL_LEAF_SPOT": 16,
+        "LEAF_BLIGHT": 16,
+        "PHOMOPSIS_LEAF_SPOT": 17,
+        "ALLOCARIDARA_ATTACK": 10
+      },
+      "recall": 0.288135593220339
+    }
+  },
+  "limitations": "No tree/orchard IDs; dHash may miss near duplicates or flag lookalikes. Not a full five-class field estimate."
+}
