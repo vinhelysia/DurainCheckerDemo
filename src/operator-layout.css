@@ -1,0 +1,254 @@
+/* Batch workspaces keep the record separate from its status and sharing controls. */
+.cloud-workspace-page,
+.cloud-public-page { padding-block: 54px 88px; }
+.cloud-workspace-page .cloud-portal { max-width: 1440px; gap: 30px; }
+.cloud-public-page .cloud-portal { max-width: 1240px; gap: 30px; }
+.cloud-portal .cloud-page-heading { align-items: end; padding-bottom: 28px; border-bottom: 1px solid var(--color-line); }
+.cloud-portal .cloud-page-heading h1 { margin-block: 10px 14px; font-size: clamp(2rem, 3.5vw, 3.15rem); }
+.cloud-portal .cloud-page-heading > div > p:last-child { max-width: 58ch; font-size: .94rem; }
+.cloud-workspace-page .cloud-account { padding-block: 0 22px; border-top: 0; }
+.cloud-workspace-page .cloud-account-avatar { width: 36px; height: 36px; border-radius: 10px; font-size: .85rem; }
+.cloud-workspace-page .cloud-workspace { grid-template-columns: 232px minmax(0, 1fr); gap: 30px; }
+.cloud-workspace-page .cloud-sidebar { position: sticky; top: 108px; gap: 14px; }
+.cloud-workspace-page .cloud-sidebar .dashboard-card { padding: 20px; border-radius: 10px; box-shadow: none; }
+.cloud-workspace-page .cloud-batch-index { gap: 16px; }
+.cloud-workspace-page .cloud-sidebar-heading h2 { font-size: 1.06rem; }
+.cloud-workspace-page .cloud-batch-list { display: grid; gap: 6px; max-height: 420px; overflow-y: auto; padding: 2px; margin-inline: -2px; }
+.cloud-workspace-page .cloud-batch-list > p { font-size: .86rem; line-height: 1.7; }
+.cloud-workspace-page .cloud-batch-choice { padding: 12px; gap: 5px; border-radius: 6px; border-color: transparent; font-size: .83rem; }
+.cloud-workspace-page .cloud-batch-choice strong { font-family: var(--font-mono); font-size: .83rem; font-weight: 600; }
+.cloud-workspace-page .cloud-batch-choice small { color: var(--color-ink-soft); font-size: .75rem; line-height: 1.5; }
+.cloud-workspace-page .cloud-batch-choice:hover { background: var(--color-bg-alt); border-color: var(--color-line); }
+.cloud-workspace-page .cloud-batch-choice[aria-pressed="true"] { border-color: var(--color-line-strong); background: var(--color-bg-alt); }
+.cloud-workspace-page .cloud-sidebar .cloud-actions { gap: 8px; padding-top: 14px; border-top: 1px solid var(--color-line); }
+.cloud-workspace-page .cloud-sidebar .cloud-actions .button { flex: 1; padding: 8px 10px; font-size: .75rem; }
+.cloud-workspace-page .cloud-new-batch { font-size: .84rem; }
+.cloud-workspace-page .cloud-new-batch .cloud-form { gap: 15px; }
+.cloud-workspace-page .cloud-new-batch label { font-size: .78rem; }
+.cloud-workspace-page .cloud-new-batch input { padding: 10px; }
+.cloud-workspace-page .cloud-new-batch .cloud-field-pair { grid-template-columns: 1fr; }
+.cloud-workspace-page .cloud-empty { min-height: 390px; padding: 38px; border: 0; background: var(--color-bg-alt); }
+.cloud-workspace-page .cloud-empty .cloud-start-steps { max-width: 560px; gap: 20px; }
+
+.cloud-portal .cloud-detail { gap: 20px; min-width: 0; }
+.cloud-portal .cloud-record-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; min-width: 0; }
+.cloud-portal .cloud-record-toolbar:empty { display: none; }
+.cloud-portal .cloud-record-nav { gap: 4px; padding-bottom: 0; border-bottom: 0; }
+.cloud-portal .cloud-record-nav button { min-height: 44px; padding: 9px 13px; border: 1px solid var(--color-line); background: var(--color-surface); border-radius: 6px; font-size: .77rem; }
+.cloud-portal .cloud-record-nav button:hover { border-color: var(--color-line-strong); background: var(--color-bg-alt); }
+.cloud-portal .cloud-reload { flex-shrink: 0; margin-left: auto; font-size: .76rem; padding: 9px 12px; }
+.cloud-portal .cloud-record-layout { display: grid; grid-template-columns: minmax(0, 1fr) 248px; align-items: start; gap: 24px; }
+.cloud-portal .cloud-record-main,
+.cloud-portal .cloud-record-rail,
+.cloud-portal .cloud-record-activity,
+.cloud-portal .cloud-journey-block { display: grid; align-items: start; gap: 24px; min-width: 0; }
+.cloud-portal :is(#cloud-overview, #cloud-evidence, #cloud-journey, #cloud-share) { scroll-margin-top: 108px; }
+.cloud-portal .cloud-record-main .dashboard-card { padding: clamp(24px, 2.6vw, 36px); box-shadow: none; border-radius: 12px; }
+.cloud-portal .cloud-overview { gap: 22px; }
+.cloud-portal .cloud-record-heading { flex-wrap: wrap; gap: 18px; }
+.cloud-portal .cloud-record-heading h2 { font-size: clamp(1.65rem, 2.8vw, 2.3rem); }
+.cloud-portal .cloud-record-farm { font-size: 1.06rem; }
+.cloud-portal .cloud-status { padding: 6px 9px; border-radius: 5px; font-size: .72rem; }
+.cloud-portal .cloud-visibility-note { max-width: 63ch; padding-left: 14px; border-left: 2px solid var(--color-line-strong); line-height: 1.7; }
+.cloud-portal .cloud-overview .cloud-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 28px; padding-block: 24px; }
+.cloud-portal .cloud-facts dt { font-size: .75rem; }
+.cloud-portal .cloud-facts dd { font-size: 1.05rem; }
+.cloud-portal .cloud-record-main .cloud-muted { font-size: .8rem; line-height: 1.75; }
+.cloud-portal .cloud-record-main .cloud-overview > form { padding-top: 22px; border-top: 1px solid var(--color-line); }
+.cloud-portal .cloud-record-rail > .dashboard-card { padding: 22px; border-radius: 10px; box-shadow: none; }
+.cloud-portal .cloud-record-rail .cloud-checklist { border: 1px solid var(--color-line); background: var(--color-bg-alt); }
+.cloud-portal .cloud-checklist-heading { display: grid; gap: 7px; }
+.cloud-portal .cloud-checklist-heading h3 { font-size: .92rem; }
+.cloud-portal .cloud-checklist-heading > span { font-size: .72rem; }
+.cloud-portal .cloud-checklist ul { margin-block: 20px 18px; gap: 16px; }
+.cloud-portal .cloud-checklist li { flex-wrap: wrap; gap: 7px; font-size: .77rem; line-height: 1.5; }
+.cloud-portal .cloud-checklist li > span { flex: 1; }
+.cloud-portal .cloud-checklist li small { width: 100%; padding-left: 25px; font-size: .7rem; }
+.cloud-portal .cloud-checklist > p { font-size: .72rem; line-height: 1.75; }
+.cloud-portal .cloud-share-panel { gap: 18px; background: var(--color-surface); }
+.cloud-portal .cloud-share-panel.is-public { border-top: 3px solid var(--color-emerald); }
+.cloud-portal .cloud-share-heading { align-items: start; gap: 10px; }
+.cloud-portal .cloud-share-heading > svg { width: 20px; height: 20px; }
+.cloud-portal .cloud-share-heading h2 { margin-top: 6px; font-size: 1.08rem; }
+.cloud-portal .cloud-share-panel p { font-size: .78rem; line-height: 1.75; }
+.cloud-portal .cloud-share-panel > .button { justify-self: stretch; padding: 11px 12px; font-size: .76rem; white-space: normal; }
+.cloud-portal .cloud-qr-sharing { grid-template-columns: 1fr; gap: 20px; padding-top: 18px; }
+.cloud-portal .cloud-qr-sharing > div { gap: 13px; }
+.cloud-portal .cloud-qr-sharing h3 { font-size: .88rem; }
+.cloud-portal .cloud-qr-sharing a { font-size: .78rem; }
+.cloud-portal .cloud-qr-sharing .qr-label-card-display { width: 100%; min-width: 0; padding: 14px; }
+.cloud-portal .cloud-qr-sharing .qr-label-text code { max-width: 100%; overflow-wrap: anywhere; }
+.cloud-portal .cloud-qr-sharing .qr-label-card-display .button { width: 100%; white-space: normal; font-size: .7rem; }
+.cloud-portal .cloud-record-activity .cloud-evidence,
+.cloud-portal .cloud-record-activity .cloud-journey { gap: 18px; }
+.cloud-portal .cloud-record-activity h2 { margin-top: 7px; font-size: 1.28rem; }
+.cloud-portal .cloud-evidence-heading { align-items: start; flex-wrap: wrap; gap: 10px; }
+.cloud-portal .cloud-evidence-heading > span { font-size: .73rem; }
+.cloud-portal .cloud-evidence .cloud-empty { min-height: 0; padding: 24px; gap: 12px; }
+.cloud-portal .cloud-evidence .cloud-empty p { font-size: .88rem; }
+.cloud-portal .cloud-evidence .cloud-empty small { font-size: .76rem; line-height: 1.7; }
+.cloud-portal .evidence-list { gap: 6px; }
+.cloud-portal .evidence-list li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; padding-block: 17px; }
+.cloud-portal .evidence-file-icon { width: 36px; height: 42px; }
+.cloud-portal .evidence-list .button { grid-column: 2; width: fit-content; min-height: 40px; font-size: .74rem; }
+.cloud-portal .evidence-list strong { font-size: .83rem; }
+.cloud-portal .evidence-list small,
+.cloud-portal .evidence-file-meta { font-size: .72rem; line-height: 1.7; }
+.cloud-portal .cloud-events { margin-top: 8px; }
+.cloud-portal .cloud-events li { padding-left: 22px; padding-bottom: 28px; }
+.cloud-portal .cloud-events h3 { font-size: .96rem; }
+.cloud-portal .cloud-events p { font-size: .81rem; line-height: 1.75; }
+.cloud-portal .cloud-events small { font-size: .68rem; }
+.cloud-portal .cloud-event-entry { padding: 22px; background: var(--color-bg-alt); box-shadow: none; border-radius: 10px; }
+.cloud-portal .cloud-event-entry > summary { font-size: .86rem; }
+.cloud-portal .cloud-event-entry .cloud-form { font-size: .82rem; }
+.cloud-portal .cloud-event-entry .cloud-form > p { line-height: 1.75; }
+.cloud-public-page .cloud-buyer-record { max-width: none; margin: 0; }
+.cloud-public-page .cloud-record-layout { grid-template-columns: minmax(0, 1fr) 300px; gap: 36px; }
+.cloud-public-page .cloud-record-main .dashboard-card { padding: 34px; }
+.cloud-public-page .cloud-record-rail { position: static; }
+.cloud-public-page .cloud-overview { border-top-width: 3px; }
+.cloud-public-page .buyer-evidence-guide { padding: 22px; border: 1px solid var(--color-line); background: var(--color-surface); }
+.cloud-public-page .buyer-evidence-guide ul { gap: 24px; }
+.cloud-public-page .buyer-evidence-guide p { font-size: .75rem; line-height: 1.8; }
+.cloud-workspace-page .cloud-tools { padding-top: 26px; margin-top: 6px; font-size: .8rem; }
+.cloud-workspace-page .cloud-tools p { max-width: 85ch; line-height: 1.75; }
+
+/* Solana experiments share a compact connection rail and a focused working area. */
+.manage-operator-page { padding-block: 44px 88px; }
+.manage-operator-page .section-shell { max-width: 1440px; }
+.manage-operator-page .back-link { margin-bottom: 24px; font-size: .8rem; }
+.manage-operator-page .unit-header-block { align-items: start; gap: 18px; margin-bottom: 32px; }
+.manage-operator-page .unit-header-block h1 { font-size: clamp(1.9rem, 3.3vw, 2.8rem); letter-spacing: -.04em; line-height: 1.2; }
+.manage-operator-page .unit-subtitle { max-width: 72ch; margin-top: 12px; font-size: .9rem; line-height: 1.7; }
+.manage-operator-page .unit-icon-wrapper { width: 48px; height: 48px; border-radius: 12px; }
+.manage-operator-page .manage-workspace { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 32px; align-items: start; margin-top: 28px; }
+.manage-operator-page .manage-workspace-rail { display: grid; gap: 16px; position: sticky; top: 108px; min-width: 0; }
+.manage-operator-page .manage-workspace-main { display: grid; gap: 26px; min-width: 0; }
+.manage-operator-page .manage-status-banner { padding: 22px; margin: 0; border-radius: 10px; }
+.manage-operator-page .manage-status-row,
+.manage-operator-page .manage-status-left-details,
+.manage-operator-page .manage-status-right-details { align-items: start; flex-direction: column; gap: 13px; }
+.manage-operator-page .manage-status-row { gap: 22px; }
+.manage-operator-page .status-left { align-items: start; gap: 10px; }
+.manage-operator-page .manage-status-left-details > span:first-child { display: grid; gap: 6px; }
+.manage-operator-page .manage-status-left-details strong { font-size: .8rem; }
+.manage-operator-page .manage-status-left-details code { font-size: .72rem; overflow-wrap: anywhere; }
+.manage-operator-page .status-badge-pill,
+.manage-operator-page .role-badge-pill { border-radius: 5px; line-height: 1.5; font-size: .65rem; }
+.manage-operator-page .manage-status-right-details { align-items: stretch; width: 100%; }
+.manage-operator-page .manage-status-right-details .status-badge-pill { align-self: start; }
+.manage-operator-page .manage-wallet-button { justify-content: center; min-height: 44px; }
+.manage-operator-page .sim-role-box { display: grid; align-items: stretch; gap: 12px; padding: 14px; margin-top: 12px; }
+.manage-operator-page .sim-role-label { font-size: .71rem; line-height: 1.6; }
+.manage-operator-page .sim-role-select { width: 100%; min-width: 0; font-size: .73rem; }
+.manage-operator-page .manage-workspace-rail > .lookup-notice,
+.manage-operator-page .wallet-guidance-banner { margin: 0; padding: 16px; font-size: .74rem; line-height: 1.75; }
+.manage-operator-page .wallet-guidance-banner { flex-wrap: wrap; }
+.manage-operator-page .portal-tabs { display: grid; gap: 5px; margin: 10px 0 0; padding: 16px 0 0; border-bottom: 0; border-top: 1px solid var(--color-line); }
+.manage-operator-page .portal-tab-btn { justify-content: start; min-height: 48px; padding: 11px 15px; border: 1px solid transparent; border-radius: 7px; font-size: .87rem; }
+.manage-operator-page .portal-tab-btn:hover { background: var(--color-bg-alt); }
+.manage-operator-page .portal-tab-btn.active { color: var(--color-green-deep); background: #e6eee4; border-color: var(--color-line-strong); box-shadow: inset 3px 0 var(--color-emerald); }
+.manage-operator-page .portal-tab-btn:focus-visible,
+.manage-operator-page .sim-role-select:focus-visible { outline: 2px solid var(--color-emerald); outline-offset: 3px; }
+.manage-operator-page .manage-tab-content { min-height: 320px; }
+.manage-operator-page .manage-workspace-main .dashboard-card { padding: clamp(24px, 2.5vw, 36px); border-radius: 12px; box-shadow: none; min-width: 0; }
+.manage-operator-page .card-header-with-icon { margin-bottom: 24px; padding-bottom: 20px; }
+.manage-operator-page .card-header-with-icon h2 { font-size: 1.3rem; letter-spacing: -.025em; }
+.manage-operator-page .manage-form { gap: 22px; }
+.manage-operator-page .form-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.manage-operator-page .form-group { min-width: 0; gap: 9px; }
+.manage-operator-page .form-group label { font-size: .8rem; line-height: 1.6; }
+.manage-operator-page .form-group input,
+.manage-operator-page .form-group select { width: 100%; min-width: 0; padding: 12px 14px; border-radius: 7px; font-size: .87rem; }
+.manage-operator-page .form-group input:focus-visible,
+.manage-operator-page .form-group select:focus-visible { outline: 2px solid var(--color-emerald); outline-offset: 3px; box-shadow: none; }
+.manage-operator-page .manage-form > .button { width: fit-content; min-height: 48px; max-width: 100%; padding-inline: 24px; font-size: .84rem; }
+.manage-operator-page .manage-form > .form-row .button { width: auto; min-height: 44px; padding-inline: 16px; margin: 0; }
+.manage-operator-page .farmer-section-divider { padding-top: 22px; margin: 12px 0 0; }
+.manage-operator-page .farmer-section-title { text-transform: none; letter-spacing: 0; font-size: .93rem; }
+.manage-operator-page .ai-preview-panel { margin: 0; padding: 22px; border-radius: 9px; }
+.manage-operator-page .ai-preview-header { flex-wrap: wrap; gap: 12px; }
+.manage-operator-page .manage-dashboard-grid { grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: 26px; margin: 0; }
+.manage-operator-page .lab-history-list { gap: 14px; }
+.manage-operator-page .lab-history-item { padding: 18px; border-radius: 7px; }
+.manage-operator-page .manage-security-note { margin-top: 40px; padding: 24px 0 0; border: 0; border-top: 1px solid var(--color-line); border-radius: 0; background: transparent; box-shadow: none; }
+.manage-operator-page .manage-security-note .card-header-with-icon { padding: 0; margin-bottom: 12px; border: 0; }
+.manage-operator-page .manage-security-note h2 { font-size: .95rem; }
+.manage-operator-page .manage-security-note p { max-width: 90ch; font-size: .8rem; line-height: 1.75; }
+
+@media (min-width: 1440px) {
+  .cloud-workspace-page .cloud-record-activity { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .cloud-workspace-page .cloud-record-activity .dashboard-card { padding: 24px; }
+  .cloud-workspace-page .cloud-record-activity .cloud-form > .button { justify-self: start; max-width: 100%; white-space: normal; }
+}
+@media (max-width: 1199px) {
+  .cloud-workspace-page .cloud-workspace { grid-template-columns: 215px minmax(0, 1fr); gap: 24px; }
+  .cloud-workspace-page .cloud-record-layout { grid-template-columns: 1fr; }
+  .cloud-workspace-page .cloud-record-rail { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+  .cloud-workspace-page .cloud-qr-sharing { grid-template-columns: 1fr; }
+  .cloud-workspace-page .cloud-qr-sharing .qr-label-card-display { max-width: 250px; }
+  .manage-operator-page .manage-workspace { grid-template-columns: 235px minmax(0, 1fr); gap: 24px; }
+  .manage-operator-page .manage-dashboard-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 899px) {
+  .cloud-public-page .cloud-record-layout { grid-template-columns: 1fr; gap: 24px; }
+  .cloud-public-page .cloud-record-rail { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cloud-public-page .cloud-record-rail .cloud-share-panel { grid-column: 1 / -1; }
+  .manage-operator-page .manage-workspace { grid-template-columns: 1fr; gap: 24px; }
+  .manage-operator-page .manage-workspace-rail { position: static; }
+  .manage-operator-page .manage-status-row { flex-direction: row; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+  .manage-operator-page .manage-status-right-details { width: auto; flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .manage-operator-page .sim-role-box { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+  .manage-operator-page .portal-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 0; border-top: 0; }
+  .manage-operator-page .portal-tab-btn { flex: 1; justify-content: center; padding-inline: 14px; }
+}
+@media (max-width: 760px) {
+  .cloud-workspace-page,
+  .cloud-public-page { padding-block: 34px 56px; }
+  .cloud-portal .cloud-page-heading { gap: 20px; padding-bottom: 24px; }
+  .cloud-workspace-page .cloud-workspace { grid-template-columns: 1fr; gap: 24px; }
+  .cloud-workspace-page .cloud-sidebar { position: static; gap: 14px; }
+  .cloud-workspace-page .cloud-batch-list { max-height: 260px; }
+  .cloud-workspace-page .cloud-new-batch .cloud-field-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cloud-portal .cloud-record-layout,
+  .cloud-workspace-page .cloud-record-rail,
+  .cloud-public-page .cloud-record-rail { grid-template-columns: 1fr; gap: 20px; }
+  .cloud-portal .cloud-record-main,
+  .cloud-portal .cloud-record-activity,
+  .cloud-portal .cloud-journey-block { gap: 20px; }
+  .cloud-portal .cloud-record-main .dashboard-card,
+  .cloud-portal .cloud-record-rail > .dashboard-card { padding: 24px; }
+  .cloud-portal .cloud-record-nav { flex-wrap: nowrap; overflow-x: auto; padding: 4px 2px 8px; }
+  .cloud-portal .cloud-record-toolbar .cloud-record-nav { min-width: 0; max-width: 100%; }
+  .cloud-portal .cloud-record-nav button { flex-shrink: 0; }
+  .cloud-portal .cloud-checklist li small { width: auto; padding-left: 0; }
+  .cloud-portal .cloud-qr-sharing .qr-label-card-display { max-width: 260px; }
+  .cloud-workspace-page .cloud-empty { min-height: 0; padding: 28px; }
+  .manage-operator-page { padding-block: 32px 56px; }
+  .manage-operator-page .unit-header-block { gap: 14px; }
+  .manage-operator-page .unit-icon-wrapper { display: none; }
+  .manage-operator-page .manage-workspace-main .dashboard-card { padding: 24px; }
+}
+@media (max-width: 540px) {
+  .cloud-workspace-page .cloud-account { flex-wrap: wrap; gap: 10px; }
+  .cloud-workspace-page .cloud-account > div { flex: 1; }
+  .cloud-workspace-page .cloud-account .button { font-size: .74rem; padding-inline: 10px; }
+  .cloud-portal .cloud-overview .cloud-facts { gap: 22px 16px; }
+  .cloud-portal .cloud-record-main .dashboard-card,
+  .cloud-portal .cloud-record-rail > .dashboard-card { padding: 21px; }
+  .cloud-portal .cloud-record-heading h2 { font-size: 1.6rem; }
+  .cloud-portal .cloud-record-heading > div { min-width: 0; }
+  .cloud-workspace-page .cloud-new-batch .cloud-field-pair { grid-template-columns: 1fr; }
+  .manage-operator-page .manage-status-row { flex-direction: column; }
+  .manage-operator-page .manage-status-right-details { width: 100%; }
+  .manage-operator-page .sim-role-box { grid-template-columns: 1fr; }
+  .manage-operator-page .portal-tabs { overflow: visible; }
+  .manage-operator-page .portal-tab-btn { flex-basis: calc(50% - 6px); white-space: normal; font-size: .78rem; }
+  .manage-operator-page .manage-workspace-main .dashboard-card { padding: 22px; }
+  .manage-operator-page .form-grid-2 { grid-template-columns: 1fr; gap: 20px; }
+  .manage-operator-page .manage-form { gap: 20px; }
+  .manage-operator-page .manage-form > .button { width: 100%; padding-inline: 16px; white-space: normal; }
+  .manage-operator-page .ai-preview-panel { padding: 18px; }
+  .manage-operator-page .card-header-with-icon h2 { font-size: 1.16rem; }
+}

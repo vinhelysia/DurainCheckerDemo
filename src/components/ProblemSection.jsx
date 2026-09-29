@@ -21,36 +21,40 @@ function ProblemSection() {
       ref={ref}
     >
       <div className="section-shell">
-        <div className="section-heading">
-          {copy.problem.kicker ? (
-            <p className="section-kicker">{copy.problem.kicker}</p>
-          ) : null}
-          <h2 id="problem-title">
-            {copy.problem.title}
-          </h2>
-        </div>
+        <div className="problem-intro-layout">
+          <div className="problem-lead">
+            <div className="section-heading">
+              {copy.problem.kicker ? (
+                <p className="section-kicker">{copy.problem.kicker}</p>
+              ) : null}
+              <h2 id="problem-title">
+                {copy.problem.title}
+              </h2>
+            </div>
 
-        <div className="problem-copy">
-          <p>{copy.problem.body1}</p>
-          <p>{copy.problem.body2}</p>
-        </div>
+            <div className="problem-copy">
+              <p>{copy.problem.body1}</p>
+              <p>{copy.problem.body2}</p>
+            </div>
+          </div>
 
-        <figure className="problem-photo">
-          <picture>
-            <source
-              srcSet={`${import.meta.env.BASE_URL}images/${copy.problem.photo || 'market.webp'}`}
-              type="image/webp"
-            />
-            <img
-              src={`${import.meta.env.BASE_URL}images/market.jpg`}
-              alt={copy.problem.photoCaption}
-              width={1200}
-              height={900}
-              loading="lazy"
-            />
-          </picture>
-          <figcaption>{copy.problem.photoCaption}</figcaption>
-        </figure>
+          <figure className="problem-photo">
+            <picture>
+              <source
+                srcSet={`${import.meta.env.BASE_URL}images/${copy.problem.photo || 'market.webp'}`}
+                type="image/webp"
+              />
+              <img
+                src={`${import.meta.env.BASE_URL}images/market.jpg`}
+                alt={copy.problem.photoCaption}
+                width={1200}
+                height={900}
+                loading="lazy"
+              />
+            </picture>
+            <figcaption>{copy.problem.photoCaption}</figcaption>
+          </figure>
+        </div>
 
         <div className="impact-grid problem-figures">
           {copy.problem.figures.map((figure) => (

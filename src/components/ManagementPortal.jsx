@@ -341,7 +341,7 @@ export default function ManagementPortal() {
   }
 
   return (
-    <div className="unit-details-page manage-theme">
+    <div className="unit-details-page manage-theme manage-operator-page">
       <div className="section-shell">
         {/* Back Link */}
         <a href="#/" onClick={handleBackToHome} className="back-link">
@@ -368,237 +368,244 @@ export default function ManagementPortal() {
             {language === 'vi' ? 'Về quản lý lô hàng — hồ sơ, bằng chứng và QR cho bên mua' : 'Back to batch management — records, evidence and buyer QR'}
           </a></p>
         )}
-        <div className="status-banner manage-status-banner">
-          <div className="manage-status-row">
-            <div className="status-left">
-              <Wallet size={22} className="status-shield-icon" />
-              <div className="manage-status-left-details">
-                <span>
-                  <strong>{copy.managePortal.walletLabel}</strong>
-                  <code className="text-xs">{account ? `${account.slice(0, 8)}...${account.slice(-8)}` : 'Disconnected'}</code>
-                </span>
-                <span className={`role-badge-pill role-${activeRoles.isOwner ? 'owner' : activeRoles.isFarmer ? 'farmer' : activeRoles.isLab ? 'lab' : activeRoles.isLogistics ? 'logistics' : 'norole'}`}>
-                  {getRoleLabel()}
-                </span>
-              </div>
-            </div>
+        <div className="manage-workspace">
+          <aside className="manage-workspace-rail" aria-label={language === 'vi' ? 'Kết nối và vai trò' : 'Connection and roles'}>
+            <div className="status-banner manage-status-banner">
+              <div className="manage-status-row">
+                <div className="status-left">
+                  <Wallet size={22} className="status-shield-icon" />
+                  <div className="manage-status-left-details">
+                    <span>
+                      <strong>{copy.managePortal.walletLabel}</strong>
+                      <code className="text-xs">{account ? `${account.slice(0, 8)}...${account.slice(-8)}` : 'Disconnected'}</code>
+                    </span>
+                    <span className={`role-badge-pill role-${activeRoles.isOwner ? 'owner' : activeRoles.isFarmer ? 'farmer' : activeRoles.isLab ? 'lab' : activeRoles.isLogistics ? 'logistics' : 'norole'}`}>
+                      {getRoleLabel()}
+                    </span>
+                  </div>
+                </div>
             
-            <div className="manage-status-right-details">
-              <span className={`status-badge-pill ${providerMode === 'chain' ? 'chain-mode' : 'fallback-mode'}`}>
-                {providerMode === 'chain' 
-                  ? copy.managePortal.devnet
-                  : copy.managePortal.fallbackMode}
-              </span>
-              <Suspense fallback={<span className="text-xs opacity-70">Loading Wallet...</span>}>
-                <WalletMultiButton className="button button-secondary text-xs py-1 px-3 min-h-0 manage-wallet-button" />
-              </Suspense>
-            </div>
-          </div>
-          
-          {/* Simulated Role selector for sandbox testing */}
-          {providerMode === 'fallback' && (
-            <div className="sim-role-box">
-              <span className="text-xs sim-role-label">
-                <RefreshCw size={14} />
-                <span>⚙️ {copy.managePortal.simulatedLabel}</span>
-              </span>
-              <select
-                value={simulatedRole}
-                onChange={(e) => setSimulatedRole(e.target.value)}
-                className="sim-role-select"
-                aria-label={copy.managePortal.simulatedRoleSelector}
-              >
-                <option value="owner">{copy.managePortal.simulatedRoles.owner}</option>
-                <option value="farmer">{copy.managePortal.simulatedRoles.farmer}</option>
-                <option value="lab">{copy.managePortal.simulatedRoles.lab}</option>
-                <option value="logistics">{copy.managePortal.simulatedRoles.logistics}</option>
-                <option value="norole">{copy.managePortal.simulatedRoles.norole}</option>
-              </select>
-            </div>
-          )}
-        </div>
-
-        {providerMode === 'fallback' && (
-          <p className="lookup-notice" role="status">{copy.demo.provenance.demo}</p>
-        )}
-
-        {storageError && (
-          <p className="lookup-notice" role="alert">{copy.demo.storageError}</p>
-        )}
-
-        {isPhantomMissing && (
-          <div className="wallet-guidance-banner" role="status">
-            <AlertTriangle size={16} aria-hidden="true" />
-            <span>{copy.managePortal.walletGuidance.noPhantom}</span>
-            <a href="https://phantom.app/" target="_blank" rel="noopener noreferrer">
-              {copy.managePortal.walletGuidance.getPhantom}
-            </a>
-          </div>
-        )}
-
-        {wallet.connected && devnetBalance === 0 && (
-          <div className="wallet-guidance-banner" role="status">
-            <AlertTriangle size={16} aria-hidden="true" />
-            <span>{copy.managePortal.walletGuidance.noBalance}</span>
-            <a href="https://faucet.solana.com" target="_blank" rel="noopener noreferrer">
-              {copy.managePortal.walletGuidance.getFaucet}
-            </a>
-          </div>
-        )}
-
-        {/* Console Operator Navigation Tabs */}
-        <div className="portal-tabs" role="tablist" aria-label={copy.managePortal.tabsAriaLabel}>
-          <button
-            id="tab-farmer"
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'farmer'}
-            aria-controls="manage-tab-panel"
-            tabIndex={activeTab === 'farmer' ? 0 : -1}
-            className={`portal-tab-btn ${activeTab === 'farmer' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('farmer')
-              setTxMessage({ text: '', type: '' })
-            }}
-          >
-            {copy.managePortal.tabs.farmer}
-          </button>
-          <button
-            id="tab-lab"
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'lab'}
-            aria-controls="manage-tab-panel"
-            tabIndex={activeTab === 'lab' ? 0 : -1}
-            className={`portal-tab-btn ${activeTab === 'lab' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('lab')
-              setTxMessage({ text: '', type: '' })
-            }}
-          >
-            {copy.managePortal.tabs.lab}
-          </button>
-          <button
-            id="tab-logistics"
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'logistics'}
-            aria-controls="manage-tab-panel"
-            tabIndex={activeTab === 'logistics' ? 0 : -1}
-            className={`portal-tab-btn ${activeTab === 'logistics' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('logistics')
-              setTxMessage({ text: '', type: '' })
-            }}
-          >
-            {copy.managePortal.tabs.logistics}
-          </button>
-          <button
-            id="tab-admin"
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'admin'}
-            aria-controls="manage-tab-panel"
-            tabIndex={activeTab === 'admin' ? 0 : -1}
-            className={`portal-tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('admin')
-              setTxMessage({ text: '', type: '' })
-            }}
-          >
-            {copy.managePortal.tabs.admin}
-          </button>
-        </div>
-
-        {/* Tab content panel */}
-        <div id="manage-tab-panel" role="tabpanel" aria-labelledby={`tab-${activeTab}`} className="manage-tab-content">
-          {renderTabWithGating()}
-        </div>
-
-        {/* Custody sits outside the role tabs on purpose: holding a batch is not a
-            role. An importer with no farmer/lab/logistics grant can still be handed
-            custody, and only the current holder can pass it on. */}
-        {wallet.publicKey && (
-          <CustodyPanel
-            language={language}
-            loading={loading}
-            registeredIds={registeredIds}
-            selectedBatchId={selectedBatchId}
-            setSelectedBatchId={setSelectedBatchId}
-            transferCustody={transferCustody}
-            acceptCustody={acceptCustody}
-            walletAddress={wallet.publicKey.toString()}
-            program={program}
-            reloadTrigger={reloadTrigger}
-          />
-        )}
-
-        {/* Success QR display code */}
-        {newlyRegisteredBatchId && activeTab === 'farmer' && (
-          <div className="dashboard-card qr-success-card">
-            <div className="qr-success-header">
-              <div className="qr-success-title-wrap">
-                <CheckCircle2 className="text-green-mid" size={20} />
-                <h3 className="qr-success-title">
-                  {copy.managePortal.qr.ready}
-                </h3>
+                <div className="manage-status-right-details">
+                  <span className={`status-badge-pill ${providerMode === 'chain' ? 'chain-mode' : 'fallback-mode'}`}>
+                    {providerMode === 'chain'
+                      ? copy.managePortal.devnet
+                      : copy.managePortal.fallbackMode}
+                  </span>
+                  <Suspense fallback={<span className="text-xs opacity-70">Loading Wallet...</span>}>
+                    <WalletMultiButton className="button button-secondary text-xs py-1 px-3 min-h-0 manage-wallet-button" />
+                  </Suspense>
+                </div>
               </div>
-              <button 
-                type="button" 
-                onClick={() => setNewlyRegisteredBatchId('')} 
-                className="qr-success-close"
-                aria-label="Dismiss QR"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="qr-success-body">
-              <Suspense fallback={<div className="qr-fallback">{copy.managePortal.qr.loading}</div>}>
-                <BatchQRLabel batchId={newlyRegisteredBatchId} language={language} loading={false} />
-              </Suspense>
-            </div>
-          </div>
-        )}
-
-        {/* Transaction Messages & Feedback Panel */}
-        {txMessage.text && (
-          <div 
-            className={`tx-feedback-banner tx-type-${txMessage.type} dashboard-card mt-6`}
-            role={txMessage.type === 'error' ? 'alert' : 'status'}
-            aria-live={txMessage.type === 'error' ? 'assertive' : 'polite'}
-          >
-            {txMessage.type === 'success' && <CheckCircle2 className="tx-icon text-green-mid" />}
-            {txMessage.type === 'error' && <AlertTriangle className="tx-icon text-red-500" />}
-            {txMessage.type === 'info' && <RefreshCw className="tx-icon text-gold animate-spin" />}
-            <div>
-              <h3>
-                {txMessage.type === 'success'
-                  ? copy.managePortal.tx.success
-                  : txMessage.type === 'error'
-                    ? copy.managePortal.tx.error
-                    : txStage === 'confirming'
-                      ? copy.managePortal.tx.confirming
-                      : copy.managePortal.tx.processing}
-              </h3>
-              <p>{txMessage.text}</p>
-              {txMessage.type === 'success' && txMessage.txSig && (
-                <div className="tx-feedback-link-wrap">
-                  <a
-                    href={`https://explorer.solana.com/tx/${txMessage.txSig}?cluster=devnet`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="explorer-link"
+          
+              {/* Simulated Role selector for sandbox testing */}
+              {providerMode === 'fallback' && (
+                <div className="sim-role-box">
+                  <span className="text-xs sim-role-label">
+                    <RefreshCw size={14} />
+                    <span>⚙️ {copy.managePortal.simulatedLabel}</span>
+                  </span>
+                  <select
+                    value={simulatedRole}
+                    onChange={(e) => setSimulatedRole(e.target.value)}
+                    className="sim-role-select"
+                    aria-label={copy.managePortal.simulatedRoleSelector}
                   >
-                    {copy.managePortal.tx.viewExplorer}
-                  </a>
+                    <option value="owner">{copy.managePortal.simulatedRoles.owner}</option>
+                    <option value="farmer">{copy.managePortal.simulatedRoles.farmer}</option>
+                    <option value="lab">{copy.managePortal.simulatedRoles.lab}</option>
+                    <option value="logistics">{copy.managePortal.simulatedRoles.logistics}</option>
+                    <option value="norole">{copy.managePortal.simulatedRoles.norole}</option>
+                  </select>
                 </div>
               )}
             </div>
+
+            {providerMode === 'fallback' && (
+              <p className="lookup-notice" role="status">{copy.demo.provenance.demo}</p>
+            )}
+
+            {storageError && (
+              <p className="lookup-notice" role="alert">{copy.demo.storageError}</p>
+            )}
+
+            {isPhantomMissing && (
+              <div className="wallet-guidance-banner" role="status">
+                <AlertTriangle size={16} aria-hidden="true" />
+                <span>{copy.managePortal.walletGuidance.noPhantom}</span>
+                <a href="https://phantom.app/" target="_blank" rel="noopener noreferrer">
+                  {copy.managePortal.walletGuidance.getPhantom}
+                </a>
+              </div>
+            )}
+
+            {wallet.connected && devnetBalance === 0 && (
+              <div className="wallet-guidance-banner" role="status">
+                <AlertTriangle size={16} aria-hidden="true" />
+                <span>{copy.managePortal.walletGuidance.noBalance}</span>
+                <a href="https://faucet.solana.com" target="_blank" rel="noopener noreferrer">
+                  {copy.managePortal.walletGuidance.getFaucet}
+                </a>
+              </div>
+            )}
+
+            {/* Console Operator Navigation Tabs */}
+            <div className="portal-tabs" role="tablist" aria-label={copy.managePortal.tabsAriaLabel}>
+              <button
+                id="tab-farmer"
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'farmer'}
+                aria-controls="manage-tab-panel"
+                tabIndex={activeTab === 'farmer' ? 0 : -1}
+                className={`portal-tab-btn ${activeTab === 'farmer' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('farmer')
+                  setTxMessage({ text: '', type: '' })
+                }}
+              >
+                {copy.managePortal.tabs.farmer}
+              </button>
+              <button
+                id="tab-lab"
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'lab'}
+                aria-controls="manage-tab-panel"
+                tabIndex={activeTab === 'lab' ? 0 : -1}
+                className={`portal-tab-btn ${activeTab === 'lab' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('lab')
+                  setTxMessage({ text: '', type: '' })
+                }}
+              >
+                {copy.managePortal.tabs.lab}
+              </button>
+              <button
+                id="tab-logistics"
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'logistics'}
+                aria-controls="manage-tab-panel"
+                tabIndex={activeTab === 'logistics' ? 0 : -1}
+                className={`portal-tab-btn ${activeTab === 'logistics' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('logistics')
+                  setTxMessage({ text: '', type: '' })
+                }}
+              >
+                {copy.managePortal.tabs.logistics}
+              </button>
+              <button
+                id="tab-admin"
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'admin'}
+                aria-controls="manage-tab-panel"
+                tabIndex={activeTab === 'admin' ? 0 : -1}
+                className={`portal-tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('admin')
+                  setTxMessage({ text: '', type: '' })
+                }}
+              >
+                {copy.managePortal.tabs.admin}
+              </button>
+            </div>
+
+          </aside>
+          <div className="manage-workspace-main">
+            {/* Tab content panel */}
+            <div id="manage-tab-panel" role="tabpanel" aria-labelledby={`tab-${activeTab}`} className={`manage-tab-content manage-tab-content--${activeTab}`}>
+              {renderTabWithGating()}
+            </div>
+
+            {/* Custody sits outside the role tabs on purpose: holding a batch is not a
+                role. An importer with no farmer/lab/logistics grant can still be handed
+                custody, and only the current holder can pass it on. */}
+            {wallet.publicKey && (
+              <CustodyPanel
+                language={language}
+                loading={loading}
+                registeredIds={registeredIds}
+                selectedBatchId={selectedBatchId}
+                setSelectedBatchId={setSelectedBatchId}
+                transferCustody={transferCustody}
+                acceptCustody={acceptCustody}
+                walletAddress={wallet.publicKey.toString()}
+                program={program}
+                reloadTrigger={reloadTrigger}
+              />
+            )}
+
+            {/* Success QR display code */}
+            {newlyRegisteredBatchId && activeTab === 'farmer' && (
+              <div className="dashboard-card qr-success-card">
+                <div className="qr-success-header">
+                  <div className="qr-success-title-wrap">
+                    <CheckCircle2 className="text-green-mid" size={20} />
+                    <h3 className="qr-success-title">
+                      {copy.managePortal.qr.ready}
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setNewlyRegisteredBatchId('')}
+                    className="qr-success-close"
+                    aria-label="Dismiss QR"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="qr-success-body">
+                  <Suspense fallback={<div className="qr-fallback">{copy.managePortal.qr.loading}</div>}>
+                    <BatchQRLabel batchId={newlyRegisteredBatchId} language={language} loading={false} />
+                  </Suspense>
+                </div>
+              </div>
+            )}
+
+            {/* Transaction Messages & Feedback Panel */}
+            {txMessage.text && (
+              <div
+                className={`tx-feedback-banner tx-type-${txMessage.type} dashboard-card mt-6`}
+                role={txMessage.type === 'error' ? 'alert' : 'status'}
+                aria-live={txMessage.type === 'error' ? 'assertive' : 'polite'}
+              >
+                {txMessage.type === 'success' && <CheckCircle2 className="tx-icon text-green-mid" />}
+                {txMessage.type === 'error' && <AlertTriangle className="tx-icon text-red-500" />}
+                {txMessage.type === 'info' && <RefreshCw className="tx-icon text-gold animate-spin" />}
+                <div>
+                  <h3>
+                    {txMessage.type === 'success'
+                      ? copy.managePortal.tx.success
+                      : txMessage.type === 'error'
+                        ? copy.managePortal.tx.error
+                        : txStage === 'confirming'
+                          ? copy.managePortal.tx.confirming
+                          : copy.managePortal.tx.processing}
+                  </h3>
+                  <p>{txMessage.text}</p>
+                  {txMessage.type === 'success' && txMessage.txSig && (
+                    <div className="tx-feedback-link-wrap">
+                      <a
+                        href={`https://explorer.solana.com/tx/${txMessage.txSig}?cluster=devnet`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="explorer-link"
+                      >
+                        {copy.managePortal.tx.viewExplorer}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
           </div>
-        )}
+        </div>
 
         {/* Educational Callout */}
-        <div className="dashboard-card visual-callout-card mt-6">
+        <div className="dashboard-card visual-callout-card manage-security-note">
           <div className="card-header-with-icon">
             <h2>{copy.managePortal.security.title}</h2>
           </div>

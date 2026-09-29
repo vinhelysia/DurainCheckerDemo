@@ -4,6 +4,7 @@ import './index.css'
 import './App.css'
 import './utilities.css'
 import './refinement.css'
+import './operator-layout.css'
 import App from './App.jsx'
 import { LanguageProvider } from './components/LanguageContext.jsx'
 

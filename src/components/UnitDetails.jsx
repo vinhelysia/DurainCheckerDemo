@@ -102,29 +102,31 @@ export default function UnitDetails({ unitType }) {
         </a>
 
         {/* Page Header */}
-        <div className="unit-header-block">
-          <div>
-            <h1>{activeData.title}</h1>
-            <p className="unit-subtitle">{activeData.subtitle}</p>
+        <div className="unit-intro-layout">
+          <div className="unit-header-block">
+            <div>
+              <h1>{activeData.title}</h1>
+              <p className="unit-subtitle">{activeData.subtitle}</p>
+            </div>
           </div>
-        </div>
 
-        {(() => {
-          const photo = unitPhotos[unitType] || unitPhotos.farm
-          return (
-            <picture>
-              <source srcSet={photo.webp} type="image/webp" />
-              <img
-                className="unit-photo"
-                src={photo.jpg}
-                alt={copy.units.photoAlts[unitType] || copy.units.photoAlts.farm}
-                width={1200}
-                height={800}
-                loading="lazy"
-              />
-            </picture>
-          )
-        })()}
+          {(() => {
+            const photo = unitPhotos[unitType] || unitPhotos.farm
+            return (
+              <picture>
+                <source srcSet={photo.webp} type="image/webp" />
+                <img
+                  className="unit-photo"
+                  src={photo.jpg}
+                  alt={copy.units.photoAlts[unitType] || copy.units.photoAlts.farm}
+                  width={1200}
+                  height={800}
+                  loading="lazy"
+                />
+              </picture>
+            )
+          })()}
+        </div>
 
         {/* Status Banner */}
         <div className="status-banner">

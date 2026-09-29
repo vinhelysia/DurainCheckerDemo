@@ -21,45 +21,49 @@ function ImpactSection() {
       ref={ref}
     >
       <div className="section-shell">
-        <div className="section-heading">
-          {copy.impact.kicker ? (
-            <p className="section-kicker">{copy.impact.kicker}</p>
-          ) : null}
-          <h2 id="impact-title">{copy.impact.title}</h2>
-        </div>
+        <div className="impact-intro-layout">
+          <div className="impact-lead">
+            <div className="section-heading">
+              {copy.impact.kicker ? (
+                <p className="section-kicker">{copy.impact.kicker}</p>
+              ) : null}
+              <h2 id="impact-title">{copy.impact.title}</h2>
+            </div>
 
-        <div className="impact-grid">
-          {copy.impact.metrics.map((metric) => (
-            <article className="impact-tile" key={metric.value}>
-              <strong>{metric.value}</strong>
-              <p>{metric.label}</p>
-            </article>
-          ))}
-        </div>
-
-        {photos.length > 0 ? (
-          <div className="impact-photo-row" aria-hidden={false}>
-            {photos.map((photo) => {
-              const webp = photo.src
-              const jpg = webp.replace(/\.webp$/i, '.jpg')
-              return (
-                <figure className="impact-photo" key={webp}>
-                  <picture>
-                    <source srcSet={asset(webp)} type="image/webp" />
-                    <img
-                      src={asset(jpg)}
-                      alt={photo.alt}
-                      width={720}
-                      height={480}
-                      loading="lazy"
-                    />
-                  </picture>
-                  <figcaption>{photo.alt}</figcaption>
-                </figure>
-              )
-            })}
+            <div className="impact-grid">
+              {copy.impact.metrics.map((metric) => (
+                <article className="impact-tile" key={metric.value}>
+                  <strong>{metric.value}</strong>
+                  <p>{metric.label}</p>
+                </article>
+              ))}
+            </div>
           </div>
-        ) : null}
+
+          {photos.length > 0 ? (
+            <div className="impact-photo-row" aria-hidden={false}>
+              {photos.map((photo) => {
+                const webp = photo.src
+                const jpg = webp.replace(/\.webp$/i, '.jpg')
+                return (
+                  <figure className="impact-photo" key={webp}>
+                    <picture>
+                      <source srcSet={asset(webp)} type="image/webp" />
+                      <img
+                        src={asset(jpg)}
+                        alt={photo.alt}
+                        width={720}
+                        height={480}
+                        loading="lazy"
+                      />
+                    </picture>
+                    <figcaption>{photo.alt}</figcaption>
+                  </figure>
+                )
+              })}
+            </div>
+          ) : null}
+        </div>
 
         <div className="impact-outcomes">
           <h3>{copy.impact.outcomesTitle}</h3>

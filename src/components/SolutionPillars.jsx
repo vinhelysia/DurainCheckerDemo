@@ -13,7 +13,7 @@ function SolutionPillars() {
 
   return (
     <section
-      className={`section reveal-on-scroll ${isVisible ? 'revealed' : ''}`}
+      className={`section solution-section reveal-on-scroll ${isVisible ? 'revealed' : ''}`}
       id="solution"
       aria-labelledby="solution-title"
       ref={ref}
