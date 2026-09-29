@@ -54,7 +54,7 @@ Chữ ký xác định ví nào đã gửi hoặc chấp nhận một bản ghi 
 
 ## 14. AI gợi ý từ ảnh lá (35s)
 
-API Python dùng Pillow/NumPy và ONNX Runtime để đưa ra gợi ý từ ảnh lá. Trên 202 ảnh của ba nhãn đối chiếu trong tập test Mendeley Data v2, model API trong repo đúng 80 ảnh, tức 39,6%; riêng Phomopsis đúng 0/59. Candidate Colab dùng PyTorch MobileNetV3Small đúng 72/202, tức 35,6%, nên không thay model API. Đây chưa phải đánh giá theo vườn/cây, và chưa xác nhận bản Render đang chạy cùng model hash. Vì vậy không dùng gợi ý để quyết định xử lý bệnh. Ảnh lá không đo Cadimi hay Vàng O. [Nguồn và giao thức](../../review/ai-training/MENDELEY_EXTERNAL_EVAL.md).
+API Python dùng Pillow/NumPy và ONNX Runtime để xử lý ảnh lá và đưa ra gợi ý trong năm nhóm đã định nghĩa. Giao diện hiển thị điểm của model và yêu cầu người có chuyên môn kiểm tra trước khi xử lý bệnh. Điểm model trên một ảnh chưa phải accuracy. Chúng tôi giữ model cũ; bản fine-tune chưa đáp ứng tiêu chí thay thế. Các phép đo, dataset và giới hạn nằm ở phụ lục để đối chiếu khi hỏi đáp. Ảnh lá không đo Cadimi hoặc Vàng O, và chưa có đánh giá độc lập theo vườn/cây để khẳng định hiệu quả ngoài thực tế.
 
 ## 15. Các thử nghiệm dự đoán (25s)
 
@@ -62,7 +62,7 @@ Hai thử nghiệm tabular dùng scikit-learn để huấn luyện, skl2onnx đ�
 
 ## 16. MVP hiện tại (35s)
 
-MVP có website và API đã deploy. Người dùng đã xác nhận đăng nhập Google vào được màn quản lý. Local tests cho cloud client và backend pass, nhưng chưa hoàn tất lượt kiểm thử tạo lô, upload, công khai và thu hồi trên production. Các thử nghiệm Solana có source và local validator. Phép dò AI trên Mendeley v2 cho thấy model API trong repo đúng 80/202 ảnh ở ba nhãn đối chiếu; Phomopsis đúng 0/59. Chưa xác nhận hash model đang chạy trên Render hoặc khả năng dùng ngoài vườn. Mốc tiếp theo là kiểm chứng flow thật và xin một pilot nhỏ.
+MVP có website và API đã deploy. Người dùng đã xác nhận đăng nhập Google vào được màn quản lý. Local tests cho cloud client và backend pass, nhưng chưa hoàn tất lượt kiểm thử tạo lô, upload, công khai và thu hồi trên production. Các thử nghiệm Solana có source và local validator. AI ảnh lá giữ model cũ với yêu cầu kiểm tra thủ công; kết quả đánh giá chi tiết nằm ở phụ lục. Hiệu năng ngoài vườn và hash model đang chạy trên Render chưa được xác minh. Mốc tiếp theo là kiểm chứng flow thật và xin một pilot nhỏ.
 
 ## 17. Pilot với một hợp tác xã (35s)
 
@@ -77,3 +77,10 @@ MVP có website và API đã deploy. Người dùng đã xác nhận đăng nh�
 Mời ban giám khảo mở hồ sơ mẫu bằng QR và xem repository công khai. DurianTrust tập trung vào một công việc có thể dùng thử: chuẩn bị và chia sẻ hồ sơ của một lô. Giá trị cần chứng minh bằng pilot là người dùng tìm được tài liệu đúng lô nhanh hơn và biết hồ sơ đang thiếu gì. Phần Solana nghiên cứu bàn giao có hai chữ ký, còn AI là thử nghiệm hỗ trợ. Chúng tôi mong nhận phản hồi về pilot và khả năng xác minh nguồn tài liệu.
 
 Tổng thời lượng dự kiến: 600 giây.
+
+
+## Phụ lục: đánh giá AI (ngoài bài nói 10 phút)
+
+Model cũ trên DurianLDD: test 889 ảnh, năm nhãn, accuracy 85,38%. Training provenance của model cũ chưa rõ; có thể model đã thấy ảnh nguồn này, nên đây chưa phải independent test được chứng minh. Trên cùng 202 ảnh thuộc ba nhãn đối chiếu Mendeley Data v2, model cũ đúng 80/202 (39,6%), Phomopsis 0/59; candidate Colab đúng 72/202 (35,6%). Đây không phải hai phép đo trên cùng dataset/taxonomy. Mapping nhãn và dHash không chứng minh độc lập theo vườn/cây. Chưa xác nhận hash model đang chạy trên Render. Candidate không được promote. Model vẫn chỉ dùng như gợi ý cần chuyên gia kiểm tra. Phụ lục nằm ngoài bài nói 10 phút; mở khi hỏi đáp.
+
+Nguồn: https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MODEL_CARD.md ; https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md ; https://data.mendeley.com/datasets/pxzvksbwnj/2 (CC BY 4.0).

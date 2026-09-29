@@ -2,9 +2,10 @@
 
 ## File dùng để trình bày
 
-- `DurianTrust_Morph_59_VI-HTX-v4.pptx`: bản chính với 19 ý và 59 bước Morph. Video nằm ở slide 32, sau luồng hồ sơ và trước công nghệ.
-- `DurianTrust_Core_19_VI-HTX-v4.pptx`: bản rút gọn, một slide cho mỗi ý. Video nằm ở slide 10.
+- `DurianTrust_Morph_59_VI-HTX-v5.pptx`: bản chính với 19 ý, 59 bước Morph và một slide phụ lục (60 slide tổng cộng). Video nằm ở slide 32, sau luồng hồ sơ và trước công nghệ.
+- `DurianTrust_Core_19_VI-HTX-v5.pptx`: bản rút gọn với 19 slide chính và một slide phụ lục (20 slide tổng cộng). Video nằm ở slide 10.
 - `Speaker_Notes_VI_10min_HTX.md`: lời nói tiếng Việt, tổng thời lượng dự kiến 600 giây, gồm video 90 giây. Notes cũng nằm trong PowerPoint.
+- `../../../output/pdf/DurianTrust_Kich_ban_thuyet_trinh_10_phut_v5.pdf`: kịch bản PDF, sáu trang lời nói và một trang phụ lục AI.
 - Video dự phòng: `DurianTrust_HTX_Demo_90s.mp4`, có ở website và được nhúng vào cả hai deck.
 
 ## Tình huống demo
@@ -19,4 +20,6 @@ Video dài đúng 90 giây, dùng ảnh chụp giao diện app chạy local, con
 
 Mở deck bằng PowerPoint desktop, nhấn F5 rồi dùng Space hoặc mũi tên phải để chuyển từng bước. Bấm vào khung video để phát. Nếu video không phát trên máy trình chiếu, mở file MP4 dự phòng. Hãy thử Morph và video trên máy sẽ dùng để thi; playback native trong PowerPoint chưa được xác nhận tại đây.
 
-Nền deck, màu xanh, typography, video và các object Morph giữ theo bản trước. Nội dung quản lý và bên mua dùng giao diện ngày 28/09/2026. Slide AI và MVP cập nhật phép dò trên Mendeley Data v2 ngày 29/09/2026: model API trong repo đúng 80/202 ảnh ở ba nhãn đối chiếu, Phomopsis 0/59. Đây không phải đánh giá theo vườn/cây; chưa xác nhận model hash trên Render. [Giao thức và giới hạn](../../review/ai-training/MENDELEY_EXTERNAL_EVAL.md).
+Kết thúc bài pitch ở slide 59 của bản Morph hoặc slide 19 của bản Core. Phụ lục AI ở slide 60 / 20 dùng khi hỏi đáp, không nằm trong thời lượng 10 phút.
+
+Nền deck, màu xanh, typography, video và các object Morph giữ theo bản trước. Nội dung quản lý và bên mua dùng giao diện ngày 28/09/2026. Phần chính mô tả AI thử nghiệm và yêu cầu chuyên gia đối chiếu. Phụ lục giữ đầy đủ kết quả: model cũ đạt 85,38% trên DurianLDD cùng nguồn và 39,6% (80/202 ảnh) trên ba nhãn đối chiếu Mendeley Data v2, Phomopsis 0/59; candidate Colab đạt 35,6% và chưa được promote. Chưa có đánh giá theo vườn/cây; chưa xác nhận model hash trên Render. [Giao thức và giới hạn](../../review/ai-training/MENDELEY_EXTERNAL_EVAL.md).
