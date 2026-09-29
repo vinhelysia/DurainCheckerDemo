@@ -37,4 +37,4 @@ Test cũ đã được xem ở lượt 12 epochs; lượt này chỉ là tuning 
 
 Lượt Colab 29/09/2026 đã hoàn tất trên Tesla T4: dừng sau 23 epochs, chọn epoch 19, validation accuracy 85,33% và macro-F1 0,8499 trên 443 ảnh. [Báo cáo và artifact checks](../submission/review/ai-training/colab-validation-24/README.md). Candidate ONNX chưa được đưa vào production.
 
-[External check trên Mendeley Data v2](../submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md): 72/202 ảnh đúng (35,6%) trong ba class đối chiếu sau sàng lọc ảnh gần trùng. Kết quả này không đủ để promote candidate; cần dữ liệu thực địa có nhãn xác nhận và holdout mới theo vườn/cây.
+[External check trên Mendeley Data v2](../submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md): candidate đúng 72/202 ảnh (35,6%); model API trong repo đúng 80/202 (39,6%), trong đó Phomopsis 0/59. Đây chỉ là ba class đối chiếu sau sàng lọc ảnh gần trùng; chưa xác minh model đang chạy trên Render có cùng hash. Không promote candidate hoặc dùng model API để kết luận bệnh; cần dữ liệu thực địa có nhãn xác nhận và holdout mới theo vườn/cây.

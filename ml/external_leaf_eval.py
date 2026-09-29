@@ -1,4 +1,4 @@
-"""Probe a frozen leaf candidate on the Mendeley v2 source test split."""
+"""Probe a frozen leaf ONNX model on the Mendeley v2 source test split."""
 import argparse
 import hashlib
 from io import BytesIO
@@ -36,15 +36,17 @@ def fingerprint(image):
     return pixels, dhash
 
 
-def evaluate(dataset, candidate):
+def evaluate(dataset, candidate, model_file=None):
     with ZipFile(candidate) as z:
         manifest_bytes = z.read("manifest.json")
         config = json.loads(z.read("training-config.json"))
         export = json.loads(z.read("export.json"))
-        model_bytes = z.read("candidate.onnx")
+        candidate_bytes = z.read("candidate.onnx")
     assert hashlib.sha256(manifest_bytes).hexdigest() == config["manifest_sha256"]
-    assert hashlib.sha256(model_bytes).hexdigest() == export["onnx_sha256"]
+    assert hashlib.sha256(candidate_bytes).hexdigest() == export["onnx_sha256"]
     assert config["validation_only"] and export["status"] == "candidate_only_not_promoted"
+    model_bytes = model_file.read_bytes() if model_file else candidate_bytes
+    model_sha256 = hashlib.sha256(model_bytes).hexdigest()
     original = json.loads(manifest_bytes)["records"]
     original_pixels = {record["pixel_sha256"] for record in original}
     original_hashes = [record["dhash"] for record in original]
@@ -103,7 +105,8 @@ def evaluate(dataset, candidate):
     return {
         "source": SOURCE, "source_version": 2, "license": "CC BY 4.0",
         "source_archive_sha256": hashlib.sha256(dataset.read_bytes()).hexdigest(),
-        "candidate_onnx_sha256": export["onnx_sha256"],
+        "model_onnx_sha256": model_sha256,
+        "model_source": model_file.as_posix() if model_file else "candidate.onnx in candidate archive",
         "scope": "Mendeley source test split; three conservatively matched classes only",
         "excluded_classes": ["Leaf_Colletotrichum", "Leaf_Rhizoctonia", "Leaf_Blight"],
         "overlap_screen": {**overlap, "dhash_distance": 4},
@@ -117,11 +120,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", type=Path, required=True)
     parser.add_argument("--candidate", type=Path, required=True)
+    parser.add_argument("--model-file", type=Path, help="Frozen ONNX file; defaults to candidate.onnx")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     assert test_label("root/Test/Leaf_Phomopsis/image.JPG") == "PHOMOPSIS_LEAF_SPOT"
     assert test_label("root/Train/Leaf_Phomopsis/image.JPG") is None
-    result = evaluate(args.dataset, args.candidate)
+    result = evaluate(args.dataset, args.candidate, args.model_file)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps(result, indent=2, ensure_ascii=False))
