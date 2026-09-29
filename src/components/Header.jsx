@@ -59,14 +59,12 @@ function Header() {
             </a>
           ))}
           <details className="nav-more" ref={moreRef}>
-            <summary className="nav-link">
+            <summary className={`nav-link ${pages.some(item => path === item.href) || path.startsWith('#/unit/demo') ? 'active' : ''}`}>
               {language === 'vi' ? 'Tìm hiểu thêm' : 'Explore'}
               <ChevronDown size={16} aria-hidden="true" />
             </summary>
             <div className="nav-more-panel">
               <p>{language === 'vi' ? 'Giới thiệu dự án' : 'About the project'}</p>
-              <a href="#/unit/demo">{language === 'vi' ? 'Tra cứu Solana · thử nghiệm' : 'Solana lookup · experiment'}</a>
-              <a href="#/manage/solana">{language === 'vi' ? 'Solana & AI · thử nghiệm' : 'Solana & AI · experiments'}</a>
               {pages.slice(0, 3).map((item) => (
                 <a key={item.href} href={item.href} onClick={(event) => { event.currentTarget.closest('details').open = false; setMenuOpen(false) }}>
                   {nav[item.key]}
@@ -78,6 +76,9 @@ function Header() {
                   {nav[item.key]}
                 </a>
               ))}
+              <p>{language === 'vi' ? 'Thử nghiệm' : 'Experiments'}</p>
+              <a href="#/unit/demo">{language === 'vi' ? 'Tra cứu Solana & AI ảnh lá' : 'Solana lookup & leaf AI'}</a>
+              <a href="#/manage/solana">{language === 'vi' ? 'Thao tác trên Solana Devnet' : 'Solana Devnet workspace'}</a>
             </div>
           </details>
         </nav>

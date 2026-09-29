@@ -1,5 +1,16 @@
 import { expect, it } from 'vitest'
-import { formatDate } from './batches'
+import { filterCloudBatches, formatDate } from './batches'
+
+it('filters loaded cloud batches by code, farm or region without changing the rows', () => {
+  const rows = [{ code: 'TEST-01', farm: 'Vườn Bình An', province: 'Đắk Lắk' }, { code: 'TEST-02', farm: 'HTX Mẫu', province: 'Lâm Đồng' }]
+  for (const language of ['vi', 'en']) {
+    for (const term of [' test-01 ', 'BÌNH AN', 'ĐẮK LẮK']) expect(filterCloudBatches(rows, term, language)).toEqual([rows[0]])
+    expect(filterCloudBatches(rows, '   ', language)).toEqual(rows)
+    expect(filterCloudBatches(rows, 'missing', language)).toEqual([])
+    expect(filterCloudBatches([], 'test', language)).toEqual([])
+  }
+  expect(rows).toHaveLength(2)
+})
 
 it('preserves the recorded calendar day for viewers west of UTC', () => {
   const previous = process.env.TZ

@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
+import { useEffect, useState, useMemo, lazy, Suspense } from 'react'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { clusterApiUrl } from '@solana/web3.js'
-import Lenis from 'lenis'
 import Footer from './components/Footer'
 import Header from './components/Header'
 import Hero from './components/Hero'
@@ -10,7 +9,6 @@ import ImpactSection from './components/ImpactSection'
 import ProblemSection from './components/ProblemSection'
 import SolutionPillars from './components/SolutionPillars'
 import { useLanguage } from './components/LanguageContext'
-import 'lenis/dist/lenis.css'
 import '@solana/wallet-adapter-react-ui/styles.css'
 
 const DemoSection = lazy(() => import('./components/DemoSection'))
@@ -32,43 +30,6 @@ function App() {
   const endpoint = useMemo(() => import.meta.env.VITE_RPC_URL || clusterApiUrl('devnet'), [])
   // Phantom (and other Wallet Standard wallets) auto-register; no adapters needed.
   const wallets = useMemo(() => [], [])
-
-  const lenisRef = useRef(null)
-
-  useEffect(() => {
-    const prefersReduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (prefersReduced) {
-      lenisRef.current = null
-      return
-    }
-
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-    })
-
-    lenisRef.current = lenis
-
-    let rafId = 0
-    function raf(time) {
-      lenis.raf(time)
-      rafId = requestAnimationFrame(raf)
-    }
-
-    rafId = requestAnimationFrame(raf)
-
-    return () => {
-      cancelAnimationFrame(rafId)
-      lenis.destroy()
-      lenisRef.current = null
-    }
-  }, [])
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -95,11 +56,7 @@ function App() {
       setCurrentRoute(newHash)
       
       // Reset scroll position immediately
-      if (lenisRef.current) {
-        lenisRef.current.scrollTo(0, { immediate: true })
-      } else {
-        window.scrollTo({ top: 0, behavior: 'instant' })
-      }
+      window.scrollTo({ top: 0, behavior: 'instant' })
     }
 
     window.addEventListener('hashchange', handleHashChange)

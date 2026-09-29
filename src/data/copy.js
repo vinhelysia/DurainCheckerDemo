@@ -124,9 +124,9 @@ export const copyData = {
     },
     problem: {
       kicker: '',
-      title: 'Vì sao cần hồ sơ cho từng lô sầu riêng?',
-      body1: 'Trong 8 tháng đầu năm 2026, Trung Quốc chiếm khoảng 95% kim ngạch xuất khẩu sầu riêng Việt Nam: khoảng 1,85 tỷ USD trên tổng 1,95 tỷ USD ước tính, theo thông tin tại họp báo Chính phủ ngày 3/9/2026. Mức phụ thuộc lớn này khiến yêu cầu chất lượng và truy xuất của thị trường Trung Quốc đặc biệt quan trọng.',
-      body2: 'Website giúp nông hộ hoặc HTX liên kết thông tin vườn, tài liệu và lịch sử theo mã lô để bên mua đối chiếu. Nhu cầu và mức tiết kiệm thời gian còn cần khảo sát thực tế; nhóm chưa có pilot. Phát hiện hóa chất vẫn cần lấy mẫu và kiểm nghiệm.',
+      title: 'Hồ sơ rời rạc, khó đối chiếu theo lô',
+      body1: '8 tháng đầu năm 2026: Trung Quốc chiếm khoảng 95% kim ngạch sầu riêng Việt Nam, theo họp báo Chính phủ ngày 3/9/2026. Các số liệu bên dưới là bối cảnh thị trường.',
+      body2: 'Xuất khẩu sang Trung Quốc cần hồ sơ nguồn gốc và kiểm nghiệm gắn với đúng lô. DurianTrust tập hợp thông tin vườn, tài liệu và nhật ký để chủ lô và bên mua đối chiếu.',
       photoCaption: 'Hồ sơ cần liên kết với đúng lô và vùng trồng. Ảnh minh họa bối cảnh.',
       photo: 'market.webp',
       figures: [
@@ -134,7 +134,7 @@ export const copyData = {
         { value: '1,95 tỷ USD', label: 'Kim ngạch xuất khẩu sầu riêng VN ước tính, 8 tháng 2026' },
         { value: '1,85 tỷ USD', label: 'Kim ngạch xuất sang Trung Quốc, 8 tháng 2026' },
       ],
-      newsTitle: 'Nguồn về bối cảnh và yêu cầu truy xuất',
+      newsTitle: 'Bối cảnh thị trường & nguồn tham khảo',
       newsAria: 'Tin tức về xuất khẩu sầu riêng',
       news: [
         { source: 'Cục BVTV', title: 'Yêu cầu truy xuất và lưu hồ sơ vùng trồng, cơ sở đóng gói', href: 'https://sansangxuatkhau.ppd.gov.vn/tin-tuc-su-kien/sau-rieng-duoc-xuat-khau-chinh-ngach-sang-trung-quoc.html' },
@@ -148,58 +148,25 @@ export const copyData = {
       disclaimer: 'Prototype chưa có pilot. QR mở hồ sơ khai báo, chưa xác thực hàng vật lý, phiếu lab hoặc điều kiện xuất khẩu.',
       pointsAriaLabel: 'Các thách thức xuất khẩu chính',
       points: [
-        {
-          icon: 'shield',
-          title: 'Đối chiếu vùng trồng',
-          desc: 'Tên vườn và mã vùng do người dùng khai báo. Hệ thống chưa xác minh qua cơ sở dữ liệu mã vùng chính thức.',
-          image: 'orchard.webp',
-        },
-        {
-          icon: 'temp',
-          title: 'Ghi nhận điều kiện bảo quản',
-          desc: 'Có thể đính kèm tài liệu và mốc vận chuyển. Prototype chưa thu dữ liệu nhiệt độ từ cảm biến.',
-          image: 'reefer.webp',
-        },
-        {
-          icon: 'file',
-          title: 'Phiếu lab gắn với lô',
-          desc: 'Chủ hồ sơ đính kèm tệp cùng nguồn và ngày khai báo. Tệp PDF chưa có xác nhận từ phòng kiểm nghiệm phát hành.',
-          image: 'lab.webp',
-        },
-        {
-          icon: 'clock',
-          title: 'Truy vết khi lô gặp sự cố',
-          desc: 'Hồ sơ giúp xem lại tài liệu và mốc đã ghi. Cần pilot để đo thời gian tìm hồ sơ và số tài liệu còn thiếu.',
-          image: 'port.webp',
-        },
+        { icon: 'shield', title: 'Đối chiếu vùng trồng', desc: 'Ghi tên vườn và mã vùng do chủ lô khai báo.', image: 'orchard.webp' },
+        { icon: 'temp', title: 'Ghi nhận điều kiện bảo quản', desc: 'Đính kèm tài liệu và mốc vận chuyển.', image: 'reefer.webp' },
+        { icon: 'file', title: 'Phiếu lab gắn với lô', desc: 'Giữ phiếu lab cùng nguồn và ngày khai báo.', image: 'lab.webp' },
+        { icon: 'clock', title: 'Truy vết khi lô gặp sự cố', desc: 'Xem lại tài liệu và sự kiện trong cùng hồ sơ.', image: 'port.webp' },
       ],
     },
     solution: {
       kicker: '',
       title: 'Mỗi lô một hồ sơ: vườn → lab → lạnh → cảng',
       pillars: [
-        {
-          title: 'Ghi sổ theo mốc',
-          subtitle: 'Chỉ thêm, không xóa lặng',
-          body: 'Thu hoạch, lab, đóng gói, xuất — mỗi bước thêm một dòng. Hôm qua viết gì, hôm nay vẫn đọc được.',
-          tags: ['Ghi sổ', 'Mốc hành trình'],
-          image: 'port.webp',
-        },
-        {
-          title: 'Khoanh vùng khi bị cảnh báo',
-          subtitle: 'Vườn · tỉnh · chặng',
-          body: 'Lô cờ đỏ thì lần ra nông trại và vùng — ví dụ Đắk Lắk, Tiền Giang, Đồng Nai — và chặng phát sinh rủi ro.',
-          tags: ['Hồ sơ lô', 'Nhật ký chuỗi'],
-          image: 'orchard.webp',
-        },
-        {
-          title: 'Cổng Cadimi theo quy tắc',
-          subtitle: 'Ngưỡng demo 0.05 ppm',
-          body: 'Lab nhập số → hệ thống so ngưỡng minh họa → Dưới ngưỡng, Cần xem lại, hoặc Giữ lô. Rõ ràng, kiểm lại được.',
-          tags: ['Xác nhận lab', 'Đối chiếu'],
-          image: 'lab.webp',
-        },
+        { title: 'Tạo hồ sơ riêng', subtitle: 'Mỗi tài khoản quản lý lô của mình.', body: 'Đăng nhập và tạo mã lô, khai báo vườn cùng ngày thu hoạch. Hồ sơ mới ở chế độ riêng.' },
+        { title: 'Thêm bằng chứng', subtitle: 'Tài liệu và nhật ký đi cùng mã lô.', body: 'Đính kèm phiếu lab, hồ sơ đóng gói hoặc vận chuyển; ghi sự kiện để xem lại theo lô.' },
+        { title: 'Chọn công khai', subtitle: 'Người mua quét QR để đọc.', body: 'Chủ lô quyết định công khai hồ sơ. QR đưa bên mua đến trang đọc hồ sơ đã công khai, không cấp quyền chỉnh sửa.' },
       ],
+      lead: 'Tạo riêng → thêm tài liệu & nhật ký → chủ lô chọn công khai.',
+      detailsLabel: 'Cách hoạt động',
+      action: 'Mở quản lý hồ sơ',
+      technologyTitle: 'QR, AI & blockchain làm được gì?',
+      technologyBody: 'QR chỉ mở hồ sơ đã công khai để đọc. AI hỗ trợ đọc tài liệu hoặc gợi ý, không chứng nhận an toàn. Solana Devnet là thử nghiệm riêng; hồ sơ cloud không tự neo lên blockchain. Các công cụ này không xác thực phiếu lab hay quyết định điều kiện xuất khẩu.',
     },
     demo: {
       kicker: '',
@@ -324,36 +291,25 @@ export const copyData = {
     },
     impact: {
       kicker: '',
-      title: 'Hồ sơ đủ thì bớt kẹt — đó là mục tiêu demo',
+      title: 'Một hồ sơ, hai cách sử dụng',
       metrics: [
-        {
-          value: 'Cùng một màn',
-          label: 'Xem nguồn gốc lô không chờ fax hay gọi từng đầu mối (trong demo)',
-        },
-        {
-          value: 'Mở khi quét',
-          label: 'Phiếu lab và mốc hành trình gắn với mã lô',
-        },
-        {
-          value: 'Cadimi kèm lô',
-          label: 'Số đo và trạng thái Đạt / Xem lại / Giữ nằm cùng hồ sơ',
-        },
+        { value: 'Cùng một màn', label: 'Xem nguồn gốc lô không chờ fax hay gọi từng đầu mối (trong demo)' },
+        { value: 'Mở khi quét', label: 'Phiếu lab và mốc hành trình gắn với mã lô' },
+        { value: 'Cadimi kèm lô', label: 'Số đo và trạng thái Đạt / Xem lại / Giữ nằm cùng hồ sơ' },
       ],
       outcomesTitle: 'Ai dùng được gì?',
       outcomes: [
-        { who: 'Nhà vườn', text: 'Mã vùng trồng dính vào lô của mình, không bị mượn lung tung.' },
-        { who: 'Doanh nghiệp xuất khẩu', text: 'Tra số Cadimi đã nhập theo từng lô; dữ liệu Vàng O chưa tích hợp.' },
-        { who: 'Đối tác nhập khẩu', text: 'Xem lịch sử báo cáo và giao dịch trên chain; phiếu lab gốc cần xác thực riêng.' },
-        { who: 'Người mua (demo)', text: 'Quét QR trên bao/thùng để xem đường đi vườn → cảng.' },
+        { who: 'Chủ lô / HTX', text: 'Tạo lô riêng, đính kèm tài liệu, ghi nhật ký và chọn công khai.' },
+        { who: 'Người mua / đối tác', text: 'Mở QR để đối chiếu thông tin và tài liệu được công khai.' },
       ],
       photos: [
         { src: 'orchard.webp', alt: 'Vườn sầu riêng — phía nhà vườn' },
         { src: 'reefer.webp', alt: 'Container lạnh — chặng vận chuyển' },
       ],
-      cta: {
-        title: 'Tự mở một lô mẫu trên Solana devnet',
-        button: 'Mở tra cứu lô',
-      },
+      cta: { title: 'Bắt đầu với hồ sơ của bạn', button: 'Mở quản lý hồ sơ' },
+      lead: 'Chủ lô cập nhật. Người mua đọc phần đã công khai.',
+      detailsTitle: 'Giới hạn & bước kiểm chứng tiếp theo',
+      detailsBody: 'Prototype chưa có pilot; chưa đo mức tiết kiệm thời gian hoặc giảm sự cố. Mã vùng, hàng vật lý và phiếu lab cần xác minh riêng. Kiểm nghiệm và quyết định xuất khẩu vẫn thuộc các đơn vị có thẩm quyền.',
     },
     footer: {
       demoText: 'Demo học thuật — minh họa truy xuất, không thay phiếu lab chính thức.',
@@ -362,19 +318,14 @@ export const copyData = {
     },
     units: {
       farmTitle: 'Vườn trồng',
-      farmSubtitle: 'Đăng ký nông trại và nhật ký cảm biến',
-      photoAlts: {
-        farm: 'Vườn sầu riêng',
-        transport: 'Container lạnh xếp tại bãi',
-        testing: 'Kỹ thuật viên xử lý mẫu trong phòng lab',
-        export: 'Tàu container tại cảng',
-      },
+      farmSubtitle: 'Thông tin vườn và thu hoạch theo lô',
+      photoAlts: { farm: 'Vườn sầu riêng', transport: 'Container lạnh xếp tại bãi', testing: 'Kỹ thuật viên xử lý mẫu trong phòng lab', export: 'Tàu container tại cảng' },
       transportTitle: 'Vận chuyển lạnh',
-      transportSubtitle: 'Nhiệt độ container và mốc GPS',
+      transportSubtitle: 'Tài liệu và nhật ký vận chuyển',
       testingTitle: 'Kiểm nghiệm lab',
-      testingSubtitle: 'Cadimi, Vàng O và cổng quy tắc',
+      testingSubtitle: 'Phiếu lab đính kèm theo mã lô',
       exportTitle: 'Cảng và thông quan',
-      exportSubtitle: 'Hồ sơ xuất và xác nhận cuối',
+      exportSubtitle: 'Tập hợp hồ sơ để đối chiếu',
       backToHome: 'Quay lại trang chủ',
       iotTelemetry: 'Số đo cảm biến (mẫu demo)',
       blockchainProof: 'Bằng chứng trên blockchain',
@@ -581,24 +532,8 @@ export const copyData = {
       connected: 'Đã liên kết',
       safetyTitle: 'An toàn chuỗi (mẫu demo)',
       safetyDesc: 'Số đo cảm biến là dữ liệu minh họa. Vượt ngưỡng sẽ gắn cờ trên blockchain và khóa lô để xem lại — trong demo.',
-      farm: {
-        soilMoisture: 'Độ ẩm đất',
-        soilPh: 'pH đất',
-        ambientTemp: 'Nhiệt độ môi trường',
-        soilOrganicMatter: 'Hàm lượng hữu cơ',
-        plotRegistered: 'Đăng ký lô đất vườn',
-        runoffCleared: 'Kiểm dư lượng đất và nước',
-        harvestDeclared: 'Khai báo thu hoạch lô #B882'
-      },
-      transport: {
-        containerTemp: 'Nhiệt độ thùng lạnh',
-        containerHumidity: 'Độ ẩm thùng lạnh',
-        gpsSpeed: 'Vận tốc trung bình',
-        vibration: 'Độ rung',
-        journeyInitiated: 'Bắt đầu chuyến lạnh',
-        pingLogged: 'Ghi GPS và nhiệt độ container',
-        arrivedHub: 'Tới cảng trung chuyển Cát Lái'
-      },
+      farm: { soilMoisture: 'Độ ẩm đất', soilPh: 'pH đất', ambientTemp: 'Nhiệt độ môi trường', soilOrganicMatter: 'Hàm lượng hữu cơ', plotRegistered: 'Đăng ký lô đất vườn', runoffCleared: 'Kiểm dư lượng đất và nước', harvestDeclared: 'Khai báo thu hoạch lô #B882' },
+      transport: { containerTemp: 'Nhiệt độ thùng lạnh', containerHumidity: 'Độ ẩm thùng lạnh', gpsSpeed: 'Vận tốc trung bình', vibration: 'Độ rung', journeyInitiated: 'Bắt đầu chuyến lạnh', pingLogged: 'Ghi GPS và nhiệt độ container', arrivedHub: 'Tới cảng trung chuyển Cát Lái' },
       testing: {
         cadmiumLevel: 'Hàm lượng Cadimi',
         yellowODye: 'Vàng O',
@@ -607,7 +542,7 @@ export const copyData = {
         labAccreditation: 'Chứng nhận lab (demo)',
         sampleCheckedIn: 'Tiếp nhận mẫu lab',
         assayResultsLogged: 'Ghi kết quả Cadimi',
-        auditSignOff: 'Ký xác nhận kiểm nghiệm'
+        auditSignOff: 'Ký xác nhận kiểm nghiệm',
       },
       export: {
         declarationId: 'Mã tờ khai hải quan',
@@ -616,8 +551,44 @@ export const copyData = {
         smartContractStatus: 'Trạng thái trên blockchain',
         filesDeposited: 'Nộp hồ sơ hải quan lên blockchain',
         clearanceVerified: 'Thông quan cảng xuất thành công',
-        recordFinalized: 'Khóa hồ sơ lô trên sổ'
-      }
+        recordFinalized: 'Khóa hồ sơ lô trên sổ',
+      },
+      recordTitle: 'Thông tin cần ghi',
+      limitationsTitle: 'Giới hạn kỹ thuật',
+      overview: {
+        farm: {
+          records: [
+            'Tên vườn, địa điểm và mã vùng khai báo',
+            'Ngày thu hoạch và thông tin lô',
+            'Tài liệu canh tác liên quan',
+          ],
+          limitations: 'Chưa xác minh mã vùng qua cơ sở dữ liệu chính thức; chưa kết nối cảm biến vườn.',
+        },
+        transport: {
+          records: [
+            'Mốc nhận và giao lô',
+            'Thông tin chặng vận chuyển',
+            'Tài liệu điều kiện bảo quản',
+          ],
+          limitations: 'Nhật ký do người dùng ghi; chưa thu nhiệt độ hoặc GPS tự động.',
+        },
+        testing: {
+          records: [
+            'Phiếu lab và nguồn phát hành khai báo',
+            'Ngày lấy mẫu hoặc kiểm nghiệm',
+            'Ghi chú liên kết mẫu với mã lô',
+          ],
+          limitations: 'Tệp đính kèm chưa được phòng lab xác thực. AI không đo Cadimi từ ảnh; ngưỡng trong demo không kết luận an toàn.',
+        },
+        export: {
+          records: [
+            'Tài liệu đóng gói và xuất khẩu',
+            'Thông tin đối tác, mốc bàn giao',
+            'Hồ sơ công khai để bên mua đối chiếu',
+          ],
+          limitations: 'Chưa kết nối thông quan hoặc xác thực chứng thư. Hồ sơ số không xác nhận đủ điều kiện xuất khẩu.',
+        },
+      },
     },
   },
   en: {
@@ -733,9 +704,9 @@ export const copyData = {
     },
     problem: {
       kicker: '',
-      title: 'Why each durian batch needs a linked record',
-      body1: 'In the first eight months of 2026, China accounted for approximately 95% of Vietnam’s durian export value: around USD 1.85 billion out of an estimated USD 1.95 billion, according to the government briefing on 3 September 2026. This concentration makes China’s quality and traceability requirements particularly important.',
-      body2: 'The website helps growers or cooperatives link origin details, documents and journey events by batch for buyers to review. User needs and time savings still require field research; the team has no pilot. Chemical detection requires sampling and laboratory testing.',
+      title: 'Scattered documents, harder batch reviews',
+      body1: 'January–August 2026: China accounted for approximately 95% of Vietnam’s durian export value, according to the government briefing on 3 September 2026. The figures below provide market context.',
+      body2: 'Exports to China require origin and testing records linked to the right batch. DurianTrust brings farm information, documents and history together for owners and buyers to review.',
       photoCaption: 'Records need to identify the batch and growing area. Context illustration.',
       photo: 'market.webp',
       figures: [
@@ -743,7 +714,7 @@ export const copyData = {
         { value: 'USD 1.95 bn', label: 'Estimated total durian export value, January–August 2026' },
         { value: 'USD 1.85 bn', label: 'Durian export value to China, January–August 2026' },
       ],
-      newsTitle: 'Sources on context and traceability requirements',
+      newsTitle: 'Market context & sources',
       newsAria: 'News on durian exports',
       news: [
         { source: 'Plant Protection Department', title: 'Traceability and record keeping for growing areas and packing facilities', href: 'https://sansangxuatkhau.ppd.gov.vn/tin-tuc-su-kien/sau-rieng-duoc-xuat-khau-chinh-ngach-sang-trung-quoc.html' },
@@ -757,58 +728,25 @@ export const copyData = {
       disclaimer: 'Prototype without a field pilot. QR opens declared records. Physical goods, lab documents and export eligibility remain unverified.',
       pointsAriaLabel: 'Key export challenges',
       points: [
-        {
-          icon: 'shield',
-          title: 'Check the growing area',
-          desc: 'Users declare the orchard and growing-area code. The system does not verify them against an official registry.',
-          image: 'orchard.webp',
-        },
-        {
-          icon: 'temp',
-          title: 'Record storage conditions',
-          desc: 'Users can attach documents and transport events. The prototype does not collect sensor temperature data.',
-          image: 'reefer.webp',
-        },
-        {
-          icon: 'file',
-          title: 'Lab documents linked to the batch',
-          desc: 'Owners attach files with a declared source and date. The issuing laboratory has not authenticated these PDFs.',
-          image: 'lab.webp',
-        },
-        {
-          icon: 'clock',
-          title: 'A hold, then records to retrieve',
-          desc: 'The record brings together documents and declared events. A pilot must measure retrieval time and missing documents.',
-          image: 'port.webp',
-        },
+        { icon: 'shield', title: 'Check the growing area', desc: 'Record the orchard and owner-declared growing-area code.', image: 'orchard.webp' },
+        { icon: 'temp', title: 'Record storage conditions', desc: 'Attach transport documents and journey events.', image: 'reefer.webp' },
+        { icon: 'file', title: 'Lab documents linked to the batch', desc: 'Keep lab documents with their declared source and date.', image: 'lab.webp' },
+        { icon: 'clock', title: 'A hold, then records to retrieve', desc: 'Review documents and events in one record.', image: 'port.webp' },
       ],
     },
     solution: {
       kicker: '',
       title: 'One file per batch: orchard → lab → cold chain → port',
       pillars: [
-        {
-          title: 'Write milestones',
-          subtitle: 'Add only, no silent deletes',
-          body: 'Harvest, lab, packing, export — each step adds a line. What was written yesterday is still readable today.',
-          tags: ['Ledger write', 'Journey log'],
-          image: 'port.webp',
-        },
-        {
-          title: 'Narrow the source when flagged',
-          subtitle: 'Farm · province · stage',
-          body: 'A red batch points back to the orchard and region — e.g. Dak Lak, Tien Giang, Dong Nai — and the stage where risk showed up.',
-          tags: ['Batch record', 'Chain log'],
-          image: 'orchard.webp',
-        },
-        {
-          title: 'Cadmium rule gate',
-          subtitle: 'Demo threshold 0.05 ppm',
-          body: 'Lab enters a number → compare to the demo threshold → Below threshold, Needs review, or Hold. Clear and checkable.',
-          tags: ['Lab certify', 'Verify'],
-          image: 'lab.webp',
-        },
+        { title: 'Create privately', subtitle: 'Each account manages its own batches.', body: 'Sign in, create a batch ID and declare the orchard and harvest date. New records are private.' },
+        { title: 'Add evidence', subtitle: 'Documents and journal follow the batch ID.', body: 'Attach lab, packing or transport documents and record events for later review.' },
+        { title: 'Choose to publish', subtitle: 'Buyers scan QR to read.', body: 'The owner decides to publish. QR opens the published record for buyers to read, without edit access.' },
       ],
+      lead: 'Create privately → add documents & journal → the owner chooses to publish.',
+      detailsLabel: 'How it works',
+      action: 'Open batch management',
+      technologyTitle: 'What can QR, AI & blockchain do?',
+      technologyBody: 'QR opens a published record for reading. AI assists document reading or suggestions; it cannot certify safety. Solana Devnet is a separate experiment; cloud records are not automatically anchored on blockchain. These tools do not authenticate lab reports or determine export eligibility.',
     },
     demo: {
       kicker: '',
@@ -933,36 +871,25 @@ export const copyData = {
     },
     impact: {
       kicker: '',
-      title: 'Complete files, fewer holds — what this demo aims at',
+      title: 'One record, two ways to use it',
       metrics: [
-        {
-          value: 'One screen',
-          label: 'Trace likely origin without fax chains (in the demo)',
-        },
-        {
-          value: 'Open on scan',
-          label: 'Lab notes and milestones travel with the batch ID',
-        },
-        {
-          value: 'Cadmium with the load',
-          label: 'Readings plus Below demo threshold / Needs review / Hold on one record',
-        },
+        { value: 'One screen', label: 'Trace likely origin without fax chains (in the demo)' },
+        { value: 'Open on scan', label: 'Lab notes and milestones travel with the batch ID' },
+        { value: 'Cadmium with the load', label: 'Readings plus Below demo threshold / Needs review / Hold on one record' },
       ],
       outcomesTitle: 'Who can use what?',
       outcomes: [
-        { who: 'Growers', text: 'Your growing-area code sticks to your batch — harder to borrow.' },
-        { who: 'Exporters', text: 'Look up entered Cadmium values by batch; Yellow O data is not integrated.' },
-        { who: 'Importers', text: 'Review report history and chain transactions; verify original lab records separately.' },
-        { who: 'Buyers (demo)', text: 'Scan a carton QR to see orchard-to-port stops.' },
+        { who: 'Owners / cooperatives', text: 'Create private batches, attach documents, keep a journal and choose to publish.' },
+        { who: 'Buyers / partners', text: 'Open QR to review published information and documents.' },
       ],
       photos: [
         { src: 'orchard.webp', alt: 'Durian orchard — grower side' },
         { src: 'reefer.webp', alt: 'Reefer containers — transport leg' },
       ],
-      cta: {
-        title: 'Open a sample batch on Solana devnet',
-        button: 'Open batch lookup',
-      },
+      cta: { title: 'Start with your own record', button: 'Open batch management' },
+      lead: 'Owners update. Buyers read what is published.',
+      detailsTitle: 'Limits & next validation step',
+      detailsBody: 'This prototype has no field pilot; time savings and incident reduction have not been measured. Growing-area codes, physical goods and lab documents require separate verification. Testing and export decisions remain with the appropriate authorities.',
     },
     footer: {
       demoText: 'Academic demo — shows traceability, not an official lab certificate.',
@@ -971,19 +898,14 @@ export const copyData = {
     },
     units: {
       farmTitle: 'Orchard',
-      farmSubtitle: 'Farm registration and sensor log',
-      photoAlts: {
-        farm: 'Durian orchard',
-        transport: 'Refrigerated containers at a depot',
-        testing: 'Technician processing samples in a lab',
-        export: 'Container ship at port',
-      },
+      farmSubtitle: 'Orchard and harvest details by batch',
+      photoAlts: { farm: 'Durian orchard', transport: 'Refrigerated containers at a depot', testing: 'Technician processing samples in a lab', export: 'Container ship at port' },
       transportTitle: 'Cold transport',
-      transportSubtitle: 'Container temperature and GPS stops',
+      transportSubtitle: 'Transport documents and journal',
       testingTitle: 'Lab testing',
-      testingSubtitle: 'Cadmium, Yellow O, and the rule gate',
+      testingSubtitle: 'Lab documents attached by batch ID',
       exportTitle: 'Port and customs',
-      exportSubtitle: 'Export file and final confirmation',
+      exportSubtitle: 'Bring documents together for review',
       backToHome: 'Back to home',
       iotTelemetry: 'Sensor readings (demo sample)',
       blockchainProof: 'Blockchain proof',
@@ -1190,24 +1112,8 @@ export const copyData = {
       connected: 'Linked',
       safetyTitle: 'Chain safety (demo sample)',
       safetyDesc: 'Sensor numbers here are illustrative. Over-limit readings flag the batch on-chain and lock it for review — in the demo.',
-      farm: {
-        soilMoisture: 'Soil moisture',
-        soilPh: 'Soil pH',
-        ambientTemp: 'Ambient temperature',
-        soilOrganicMatter: 'Organic matter',
-        plotRegistered: 'Orchard plot registered',
-        runoffCleared: 'Soil and water runoff cleared',
-        harvestDeclared: 'Harvest declared for batch #B882'
-      },
-      transport: {
-        containerTemp: 'Container temperature',
-        containerHumidity: 'Container humidity',
-        gpsSpeed: 'Average speed',
-        vibration: 'Vibration',
-        journeyInitiated: 'Cold trip started',
-        pingLogged: 'GPS and container temperature logged',
-        arrivedHub: 'Arrived Cat Lai transfer hub'
-      },
+      farm: { soilMoisture: 'Soil moisture', soilPh: 'Soil pH', ambientTemp: 'Ambient temperature', soilOrganicMatter: 'Organic matter', plotRegistered: 'Orchard plot registered', runoffCleared: 'Soil and water runoff cleared', harvestDeclared: 'Harvest declared for batch #B882' },
+      transport: { containerTemp: 'Container temperature', containerHumidity: 'Container humidity', gpsSpeed: 'Average speed', vibration: 'Vibration', journeyInitiated: 'Cold trip started', pingLogged: 'GPS and container temperature logged', arrivedHub: 'Arrived Cat Lai transfer hub' },
       testing: {
         cadmiumLevel: 'Cadmium level',
         yellowODye: 'Yellow O',
@@ -1216,7 +1122,7 @@ export const copyData = {
         labAccreditation: 'Lab accreditation (demo)',
         sampleCheckedIn: 'Lab sample checked in',
         assayResultsLogged: 'Cadmium result logged',
-        auditSignOff: 'Lab sign-off recorded'
+        auditSignOff: 'Lab sign-off recorded',
       },
       export: {
         declarationId: 'Customs declaration ID',
@@ -1225,8 +1131,44 @@ export const copyData = {
         smartContractStatus: 'Blockchain status',
         filesDeposited: 'Customs files on blockchain',
         clearanceVerified: 'Port clearance confirmed',
-        recordFinalized: 'Batch file locked on the ledger'
-      }
+        recordFinalized: 'Batch file locked on the ledger',
+      },
+      recordTitle: 'What to record',
+      limitationsTitle: 'Technical limits',
+      overview: {
+        farm: {
+          records: [
+            'Orchard, location and declared growing-area code',
+            'Harvest date and batch details',
+            'Relevant growing documents',
+          ],
+          limitations: 'No official growing-area registry verification or orchard sensor integration.',
+        },
+        transport: {
+          records: [
+            'Receipt and delivery events',
+            'Journey details',
+            'Storage condition documents',
+          ],
+          limitations: 'Users enter journal events; temperature and GPS are not collected automatically.',
+        },
+        testing: {
+          records: [
+            'Lab document and declared issuer',
+            'Sampling or testing date',
+            'Notes linking the sample to the batch',
+          ],
+          limitations: 'Attachments are not authenticated by the laboratory. AI cannot measure Cadmium from a photo; demo thresholds do not establish safety.',
+        },
+        export: {
+          records: [
+            'Packing and export documents',
+            'Partner details and handoff events',
+            'Published records for buyer review',
+          ],
+          limitations: 'No customs integration or certificate authentication. A digital record does not establish export eligibility.',
+        },
+      },
     },
   },
 }

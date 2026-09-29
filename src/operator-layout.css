@@ -1,21 +1,31 @@
 /* Batch workspaces keep the record separate from its status and sharing controls. */
 .cloud-workspace-page,
-.cloud-public-page { padding-block: 54px 88px; }
-.cloud-workspace-page .cloud-portal { max-width: 1440px; gap: 30px; }
+.cloud-public-page { padding-block: 32px 48px; }
+.cloud-workspace-page .cloud-portal { max-width: 1440px; gap: 16px; }
 .cloud-public-page .cloud-portal { max-width: 1240px; gap: 30px; }
-.cloud-portal .cloud-page-heading { align-items: end; padding-bottom: 28px; border-bottom: 1px solid var(--color-line); }
-.cloud-portal .cloud-page-heading h1 { margin-block: 10px 14px; font-size: clamp(2rem, 3.5vw, 3.15rem); }
+.cloud-portal .cloud-page-heading { align-items: end; padding-bottom: 16px; border-bottom: 1px solid var(--color-line); }
+.cloud-portal .cloud-page-heading h1 { margin-block: 6px 10px; font-size: clamp(1.8rem, 3vw, 2.5rem); }
 .cloud-portal .cloud-page-heading > div > p:last-child { max-width: 58ch; font-size: .94rem; }
-.cloud-workspace-page .cloud-account { padding-block: 0 22px; border-top: 0; }
+.cloud-workspace-page .cloud-account { padding-block: 0 16px; border-top: 0; }
 .cloud-workspace-page .cloud-account-avatar { width: 36px; height: 36px; border-radius: 10px; font-size: .85rem; }
-.cloud-workspace-page .cloud-workspace { grid-template-columns: 232px minmax(0, 1fr); gap: 30px; }
+.cloud-workspace-page .cloud-workspace { grid-template-columns: 280px minmax(0, 1fr); gap: 24px; }
+.cloud-open-selected { display: none; }
+#cloud-selected-record { min-width: 0; scroll-margin-top: 90px; }
+#cloud-selected-record:focus-visible { outline: 2px solid var(--color-emerald); outline-offset: 4px; }
 .cloud-workspace-page .cloud-sidebar { position: sticky; top: 108px; gap: 14px; }
-.cloud-workspace-page .cloud-sidebar .dashboard-card { padding: 20px; border-radius: 10px; box-shadow: none; }
-.cloud-workspace-page .cloud-batch-index { gap: 16px; }
+.cloud-workspace-page .cloud-sidebar .dashboard-card { padding: 16px; border-radius: 6px; box-shadow: none; }
+.cloud-workspace-page .cloud-batch-index { gap: 12px; border: 0; background: transparent; padding: 0; }
+.cloud-workspace-page .cloud-batch-search { font-size: .76rem; color: var(--color-ink-soft); }
+.cloud-workspace-page .cloud-batch-search input { min-height: 44px; padding: 10px 12px; font-size: .85rem; }
 .cloud-workspace-page .cloud-sidebar-heading h2 { font-size: 1.06rem; }
-.cloud-workspace-page .cloud-batch-list { display: grid; gap: 6px; max-height: 420px; overflow-y: auto; padding: 2px; margin-inline: -2px; }
+.cloud-workspace-page .cloud-batch-list { display: grid; gap: 0; max-height: 480px; overflow-y: auto; padding: 2px; margin-inline: -2px; }
 .cloud-workspace-page .cloud-batch-list > p { font-size: .86rem; line-height: 1.7; }
-.cloud-workspace-page .cloud-batch-choice { padding: 12px; gap: 5px; border-radius: 6px; border-color: transparent; font-size: .83rem; }
+.cloud-workspace-page .cloud-batch-choice { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 12px 10px; gap: 4px 8px; border: 0; border-bottom: 1px solid var(--color-line); border-radius: 0; font-size: .83rem; }
+.cloud-workspace-page .cloud-batch-choice small,
+.cloud-workspace-page .cloud-batch-region { grid-column: 1 / -1; }
+.cloud-workspace-page .cloud-batch-region { color: var(--color-ink-faint); font-size: .7rem; font-weight: 400; line-height: 1.5; }
+.cloud-workspace-page .cloud-batch-choice .cloud-batch-visibility { grid-column: 2; grid-row: 1; font-size: .68rem; white-space: nowrap; }
+.cloud-workspace-page .cloud-batch-choice:focus-visible { outline: 2px solid var(--color-emerald); outline-offset: -2px; }
 .cloud-workspace-page .cloud-batch-choice strong { font-family: var(--font-mono); font-size: .83rem; font-weight: 600; }
 .cloud-workspace-page .cloud-batch-choice small { color: var(--color-ink-soft); font-size: .75rem; line-height: 1.5; }
 .cloud-workspace-page .cloud-batch-choice:hover { background: var(--color-bg-alt); border-color: var(--color-line); }
@@ -43,24 +53,24 @@
 .cloud-portal .cloud-record-activity,
 .cloud-portal .cloud-journey-block { display: grid; align-items: start; gap: 24px; min-width: 0; }
 .cloud-portal :is(#cloud-overview, #cloud-evidence, #cloud-journey, #cloud-share) { scroll-margin-top: 108px; }
-.cloud-portal .cloud-record-main .dashboard-card { padding: clamp(24px, 2.6vw, 36px); box-shadow: none; border-radius: 12px; }
-.cloud-portal .cloud-overview { gap: 22px; }
+.cloud-portal .cloud-record-main .dashboard-card { padding: 24px; box-shadow: none; border-radius: 6px; }
+.cloud-portal .cloud-overview { gap: 16px; }
 .cloud-portal .cloud-record-heading { flex-wrap: wrap; gap: 18px; }
 .cloud-portal .cloud-record-heading h2 { font-size: clamp(1.65rem, 2.8vw, 2.3rem); }
 .cloud-portal .cloud-record-farm { font-size: 1.06rem; }
 .cloud-portal .cloud-status { padding: 6px 9px; border-radius: 5px; font-size: .72rem; }
 .cloud-portal .cloud-visibility-note { max-width: 63ch; padding-left: 14px; border-left: 2px solid var(--color-line-strong); line-height: 1.7; }
-.cloud-portal .cloud-overview .cloud-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 28px; padding-block: 24px; }
+.cloud-portal .cloud-overview .cloud-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; padding-block: 16px; }
 .cloud-portal .cloud-facts dt { font-size: .75rem; }
 .cloud-portal .cloud-facts dd { font-size: 1.05rem; }
 .cloud-portal .cloud-record-main .cloud-muted { font-size: .8rem; line-height: 1.75; }
 .cloud-portal .cloud-record-main .cloud-overview > form { padding-top: 22px; border-top: 1px solid var(--color-line); }
-.cloud-portal .cloud-record-rail > .dashboard-card { padding: 22px; border-radius: 10px; box-shadow: none; }
+.cloud-portal .cloud-record-rail > .dashboard-card { padding: 20px; border-radius: 6px; box-shadow: none; }
 .cloud-portal .cloud-record-rail .cloud-checklist { border: 1px solid var(--color-line); background: var(--color-bg-alt); }
 .cloud-portal .cloud-checklist-heading { display: grid; gap: 7px; }
 .cloud-portal .cloud-checklist-heading h3 { font-size: .92rem; }
 .cloud-portal .cloud-checklist-heading > span { font-size: .72rem; }
-.cloud-portal .cloud-checklist ul { margin-block: 20px 18px; gap: 16px; }
+.cloud-portal .cloud-checklist ul { margin-block: 16px; gap: 12px; }
 .cloud-portal .cloud-checklist li { flex-wrap: wrap; gap: 7px; font-size: .77rem; line-height: 1.5; }
 .cloud-portal .cloud-checklist li > span { flex: 1; }
 .cloud-portal .cloud-checklist li small { width: 100%; padding-left: 25px; font-size: .7rem; }
@@ -183,7 +193,7 @@
   .cloud-workspace-page .cloud-record-activity .cloud-form > .button { justify-self: start; max-width: 100%; white-space: normal; }
 }
 @media (max-width: 1199px) {
-  .cloud-workspace-page .cloud-workspace { grid-template-columns: 215px minmax(0, 1fr); gap: 24px; }
+  .cloud-workspace-page .cloud-workspace { grid-template-columns: 260px minmax(0, 1fr); gap: 24px; }
   .cloud-workspace-page .cloud-record-layout { grid-template-columns: 1fr; }
   .cloud-workspace-page .cloud-record-rail { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
   .cloud-workspace-page .cloud-qr-sharing { grid-template-columns: 1fr; }
@@ -210,6 +220,7 @@
   .cloud-workspace-page .cloud-workspace { grid-template-columns: 1fr; gap: 24px; }
   .cloud-workspace-page .cloud-sidebar { position: static; gap: 14px; }
   .cloud-workspace-page .cloud-batch-list { max-height: 260px; }
+  .cloud-open-selected { display: inline-flex; }
   .cloud-workspace-page .cloud-new-batch .cloud-field-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cloud-portal .cloud-record-layout,
   .cloud-workspace-page .cloud-record-rail,

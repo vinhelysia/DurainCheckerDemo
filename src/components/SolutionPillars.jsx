@@ -1,72 +1,27 @@
+import { ArrowRight } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
-import { useIntersectionObserver } from '../hooks/useIntersectionObserver'
 
-const base = import.meta.env.BASE_URL
-
-function asset(file) {
-  return `${base}images/${file}`
-}
-
-function SolutionPillars() {
+export default function SolutionPillars() {
   const { copy } = useLanguage()
-  const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 })
-
   return (
-    <section
-      className={`section solution-section reveal-on-scroll ${isVisible ? 'revealed' : ''}`}
-      id="solution"
-      aria-labelledby="solution-title"
-      ref={ref}
-    >
+    <section className="section solution-section compact-intro" id="solution" aria-labelledby="solution-title">
       <div className="section-shell">
-        <div className="section-heading">
-          {copy.solution.kicker ? (
-            <p className="section-kicker">{copy.solution.kicker}</p>
-          ) : null}
-          <h2 id="solution-title">
-            {copy.solution.title}
-          </h2>
+        <div className="section-heading"><h2 id="solution-title">{copy.solution.title}</h2></div>
+        <div className="intro-overview">
+          <div><p>{copy.solution.lead}</p><div className="service-actions"><a className="button button-primary" href="#/manage/cloud">{copy.solution.action}<ArrowRight size={18} aria-hidden="true" /></a></div></div>
+          <figure className="intro-photo"><img src={`${import.meta.env.BASE_URL}images/port.webp`} alt={copy.units.photoAlts.export} width={480} height={320} /><figcaption>{copy.problem.photoCaption}</figcaption></figure>
         </div>
-
-        <div className="pillar-grid">
-          {copy.solution.pillars.map((pillar) => {
-            const webp = pillar.image
-            const jpg = webp ? webp.replace(/\.webp$/i, '.jpg') : null
-            return (
-              <article className="pillar-card pillar-card-with-media" key={pillar.title}>
-                {webp ? (
-                  <div className="pillar-media">
-                    <picture>
-                      <source srcSet={asset(webp)} type="image/webp" />
-                      <img
-                        src={asset(jpg)}
-                        alt=""
-                        width={480}
-                        height={320}
-                        loading="lazy"
-                      />
-                    </picture>
-                  </div>
-                ) : null}
-                <div className="pillar-body">
-                  <h3>{pillar.title}</h3>
-                  <p className="pillar-subtitle">{pillar.subtitle}</p>
-                  <p>{pillar.body}</p>
-                  {pillar.tags && (
-                    <p className="pillar-tags">
-                      {pillar.tags.map((tag) => (
-                        <span className="pillar-tag" key={tag}>{tag}</span>
-                      ))}
-                    </p>
-                  )}
-                </div>
-              </article>
-            )
-          })}
+        <div className="service-grid">
+          {copy.solution.pillars.map((pillar, index) => (
+            <article className="service-card" key={pillar.title}>
+              <span className="service-step" aria-hidden="true">0{index + 1}</span>
+              <h3>{pillar.title}</h3><p>{pillar.subtitle}</p>
+              <details className="technical-details"><summary>{copy.solution.detailsLabel}</summary><p>{pillar.body}</p></details>
+            </article>
+          ))}
         </div>
+        <details className="technical-details"><summary>{copy.solution.technologyTitle}</summary><p>{copy.solution.technologyBody}</p></details>
       </div>
     </section>
   )
 }
-
-export default SolutionPillars

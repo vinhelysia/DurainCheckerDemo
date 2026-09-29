@@ -1,3 +1,8 @@
+export function filterCloudBatches(rows, query, language) {
+  const term = query.trim().toLocaleLowerCase(language)
+  return rows.filter(batch => [batch.code, batch.farm, batch.province].join(' ').toLocaleLowerCase(language).includes(term))
+}
+
 export const batches = [
   {
     id: 'DRN-2026-LD-0429',

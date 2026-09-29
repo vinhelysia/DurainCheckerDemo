@@ -7,7 +7,7 @@ import { API_BASE_URL } from '../lib/api'
 import BatchQRLabel from './BatchQRLabel'
 import BatchEvidence from './BatchEvidence'
 import { exampleBatch } from '../data/recordExample'
-import { formatDate } from '../data/batches'
+import { filterCloudBatches, formatDate } from '../data/batches'
 
 function BatchFields({ batch = {}, t }) {
   return <>
@@ -312,11 +312,13 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
 function Workspace({ t, language }) {
   const [batches, setBatches] = useState([])
   const [selected, setSelected] = useState('')
+  const [query, setQuery] = useState('')
   const [offset, setOffset] = useState(0)
   const [revision, setRevision] = useState(0)
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const visibleBatches = filterCloudBatches(batches, query, language)
   useEffect(() => {
     const controller = new AbortController()
     async function load() {
@@ -355,9 +357,11 @@ function Workspace({ t, language }) {
       <aside className="cloud-sidebar">
         <section className="dashboard-card cloud-form cloud-batch-index">
           <div className="cloud-sidebar-heading"><h2>{t('Lô của bạn', 'Your batches')}</h2><span>{batches.length}{batches.length >= 50 ? '+' : ''}</span></div>
+          <label className="cloud-batch-search">{t('Tìm trong trang này', 'Search this page')}<input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t('Mã lô, vườn hoặc vùng', 'Code, farm or region')} /></label>
           <div className="cloud-batch-list" role="group" aria-label={t('Chọn hồ sơ lô', 'Choose a batch record')}>
           {loading ? <p role="status">{t('Đang tải… Máy chủ Free có thể cần thời gian khởi động.', 'Loading… The free server may need time to start.')}</p> : batches.length ?
-            batches.map(batch => <button key={batch.id} className="button button-secondary cloud-batch-choice" aria-pressed={selected === batch.id} onClick={() => setSelected(batch.id)}><strong>{batch.code}</strong><small>{batch.farm}</small><span className={`cloud-batch-visibility${batch.is_public ? ' is-public' : ''}`}>{batch.is_public ? <Globe size={13} aria-hidden="true" /> : <LockKeyhole size={13} aria-hidden="true" />}{batch.is_public ? t('Công khai', 'Public') : t('Riêng tư', 'Private')}</span></button>) : <p>{offset ? t('Chưa có lô ở trang này.', 'No batches on this page.') : t('Bạn chưa tạo lô nào.', 'You have not created a batch yet.')}</p>}
+            visibleBatches.map(batch => <button key={batch.id} className="button button-secondary cloud-batch-choice" aria-pressed={selected === batch.id} onClick={() => setSelected(batch.id)}><strong>{batch.code}</strong><small>{batch.farm}</small><span className="cloud-batch-region">{batch.province} · {formatDate(batch.harvest_date, language)}</span><span className={`cloud-batch-visibility${batch.is_public ? ' is-public' : ''}`}>{batch.is_public ? <Globe size={13} aria-hidden="true" /> : <LockKeyhole size={13} aria-hidden="true" />}{batch.is_public ? t('Công khai', 'Public') : t('Riêng tư', 'Private')}</span></button>) : <p>{offset ? t('Chưa có lô ở trang này.', 'No batches on this page.') : t('Bạn chưa tạo lô nào.', 'You have not created a batch yet.')}</p>}
+          {!loading && batches.length > 0 && !visibleBatches.length && <p role="status">{t('Không có lô phù hợp trong trang này.', 'No matching batches on this page.')}</p>}
           </div>
           <div className="cloud-actions">
             {(offset > 0 || batches.length >= 50) && <><button className="button button-secondary" disabled={!offset || loading} onClick={() => setOffset(v => v - 50)}>{t('Trước', 'Previous')}</button>
@@ -365,13 +369,16 @@ function Workspace({ t, language }) {
             <button className="button button-secondary" disabled={loading} onClick={() => setRevision(v => v + 1)}>{t('Tải lại', 'Reload')}</button>
           </div>
         </section>
+        {selected && <button type="button" className="button button-primary cloud-open-selected" onClick={() => document.getElementById('cloud-selected-record')?.focus()}>{t('Xem hồ sơ đã chọn', 'View selected record')}<ArrowRight size={16} aria-hidden="true" /></button>}
         <details className="dashboard-card cloud-disclosure cloud-new-batch" open={!batches.length || undefined}><summary><Plus size={18} aria-hidden="true" />{t('Tạo lô riêng tư', 'Create private batch')}</summary><form className="cloud-form" onSubmit={create}>
           <label>{t('Mã lô (chữ, số, - hoặc _)', 'Batch code (letters, numbers, - or _)')}<input id="cloud-batch-code" name="code" required maxLength={64} pattern="[A-Za-z0-9][A-Za-z0-9_\-]{0,63}" /></label>
           <BatchFields t={t} />
           <button className="button button-primary" disabled={busy}>{busy ? t('Đang lưu…', 'Saving…') : t('Tạo hồ sơ lô', 'Create batch record')}</button>
         </form></details>
       </aside>
+      <div id="cloud-selected-record" tabIndex={-1}>
       {selected ? <BatchDetails key={selected} id={selected} publicView={false} t={t} language={language} onChange={updated => setBatches(rows => rows.map(row => row.id === updated.id ? updated : row))} /> : <div className="dashboard-card cloud-empty"><Sprout size={40} aria-hidden="true" /><p className="section-kicker">{t('Workspace của bạn', 'Your workspace')}</p><h2>{loading ? t('Đang mở workspace…', 'Opening your workspace…') : batches.length ? t('Chọn lô để xem hồ sơ', 'Select a batch to open its record') : t('Tạo hồ sơ lô đầu tiên', 'Create your first batch record')}</h2><p role={loading ? 'status' : undefined}>{t('Bắt đầu từ thông tin lô, sau đó thêm tài liệu và chia sẻ khi hồ sơ đã sẵn sàng.', 'Start with batch details, add documents, then share when the record is ready.')}</p><ol className="cloud-start-steps"><li><ClipboardList size={20} aria-hidden="true" /><span>{t('Nhập thông tin vườn và thu hoạch', 'Enter farm and harvest details')}</span></li><li><FileUp size={20} aria-hidden="true" /><span>{t('Đính kèm ảnh hoặc phiếu kiểm nghiệm', 'Attach photos or lab documents')}</span></li><li><QrCode size={20} aria-hidden="true" /><span>{t('Kiểm tra hồ sơ rồi chia sẻ QR', 'Review the record and share its QR')}</span></li></ol>{!loading && !batches.length && <button type="button" className="button button-primary" onClick={() => document.getElementById('cloud-batch-code')?.focus()}>{t('Bắt đầu tạo lô', 'Create a batch')}<ArrowRight size={18} aria-hidden="true" /></button>}</div>}
+      </div>
     </div>
   </>
 }

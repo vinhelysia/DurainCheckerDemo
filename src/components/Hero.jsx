@@ -28,11 +28,11 @@ export default function Hero() {
       <div className="section-shell hero-shell">
         <div className="hero-copy">
           <p className="eyebrow">{t('Từ vườn đến bên mua', 'From farm to buyer')}</p>
-          <h1 id="hero-title">{t('Hiểu rõ hồ sơ của từng lô sầu riêng.', 'Know the record behind every durian batch.')}</h1>
-          <p className="hero-lead">{t('Nguồn gốc khai báo, tài liệu và hành trình trong một hồ sơ. Chủ vườn chuẩn bị; bên mua và người xem mở bằng QR để đối chiếu.', 'Declared origin, documents and journey in one record. Growers prepare it; buyers and consumers open a QR to review it.')}</p>
+          <h1 id="hero-title">{t('Hồ sơ lô sầu riêng, sẵn sàng gửi bên mua.', 'Durian batch records, ready for your buyer.')}</h1>
+          <p className="hero-lead">{t('Tập hợp nguồn gốc, tài liệu và lịch sử của từng lô. Chọn công khai khi cần, gửi một mã QR để bên mua đối chiếu.', 'Keep origin, documents and batch history together. Publish when ready and send one QR for your buyer to review.')}</p>
           <div className="hero-actions" aria-label={copy.hero.ariaLabelActions}>
-            <button className="button button-primary" type="button" onClick={() => setScanning(true)}><QrCode size={19} aria-hidden="true" />{t('Quét QR / mở hồ sơ', 'Scan QR / open a record')}</button>
-            <a className="button button-secondary" href="#/manage">{t('Quản lý lô của tôi', 'Manage my batches')}<ArrowRight size={18} aria-hidden="true" /></a>
+            <a className="button button-primary" href="#/manage">{t('Quản lý lô của tôi', 'Manage my batches')}<ArrowRight size={18} aria-hidden="true" /></a>
+            <button className="button button-secondary" type="button" onClick={() => setScanning(true)}><QrCode size={19} aria-hidden="true" />{t('Quét QR hồ sơ', 'Scan a record QR')}</button>
           </div>
           <a className="home-sample-link" href="#/records/example">{t('Xem hồ sơ mẫu', 'Explore a sample record')}<ArrowRight size={16} aria-hidden="true" /></a>
           <p className="home-access-note">{t('Xem hồ sơ công khai không cần tài khoản hoặc ví.', 'No account or wallet needed to view a public record.')}</p>
@@ -58,27 +58,25 @@ export default function Hero() {
 
     <section className="section home-workflow" aria-labelledby="workflow-title">
       <div className="section-shell home-workflow-layout">
-        <figure className="home-workflow-photo"><img src={asset('orchard.webp')} alt={t('Vườn sầu riêng, ảnh minh họa vùng trồng', 'Durian orchard, illustrative growing region photo')} width={960} height={720} loading="lazy" /><figcaption>{t('Chủ vườn · HTX · Đơn vị bán', 'Growers · Cooperatives · Sellers')}</figcaption></figure>
         <div className="home-workflow-copy">
-          <div className="section-heading"><p className="section-kicker">{t('Chuẩn bị để gửi bên mua', 'Prepare for your buyer')}</p><h2 id="workflow-title">{t('Tài liệu đúng lô. Chia sẻ đúng lúc.', 'The right documents. Ready to share.')}</h2><p>{t('Từ thông tin vườn đến tài liệu đính kèm, tập hợp vào một hồ sơ để người mua và người tiêu dùng dễ đối chiếu.', 'Bring farm information and supporting files into one record that buyers and consumers can review.')}</p></div>
+          <div className="section-heading"><p className="section-kicker">{t('Dành cho chủ vườn, HTX và bên mua', 'For growers, cooperatives and buyers')}</p><h2 id="workflow-title">{t('Từ tạo lô đến chia sẻ hồ sơ', 'From batch to shared record')}</h2></div>
           <ol className="record-flow">{steps.map(([Icon, title, detail], index) => <li key={title}><div className="record-flow-symbol" aria-hidden="true"><Icon size={23} strokeWidth={1.7} /><span>0{index + 1}</span></div><h3>{title}</h3><p>{detail}</p></li>)}</ol>
           <p className="home-privacy-line"><LockKeyhole size={17} aria-hidden="true" />{t('Chỉ chủ tài khoản được sửa. Người mở QR chỉ được xem.', 'Only the account owner can edit. QR visitors can only view.')}</p>
-          <a className="home-sample-link" href="#/manage">{t('Bắt đầu quản lý lô', 'Start your batch workspace')}<ArrowRight size={16} aria-hidden="true" /></a>
         </div>
       </div>
     </section>
 
     <section className="section home-record-boundary" aria-labelledby="boundary-title">
       <div className="section-shell home-boundary-grid">
-        <div><p className="section-kicker">{t('Hiểu đúng bằng chứng', 'Understanding the evidence')}</p><h2 id="boundary-title">{t('Có hồ sơ để đối chiếu. Có giới hạn cần hiểu.', 'Records to review. Limits to understand.')}</h2><a className="home-sample-link" href="#/intro/problem">{t('Vì sao cần hồ sơ theo lô?', 'Why do batches need linked records?')}<ArrowRight size={16} aria-hidden="true" /></a></div>
+        <div><p className="section-kicker">{t('Hiểu đúng bằng chứng', 'Understanding the evidence')}</p><h2 id="boundary-title">{t('Hồ sơ hỗ trợ đối chiếu.', 'Records support review.')}</h2><a className="home-sample-link" href="#/intro/problem">{t('Vì sao cần hồ sơ theo lô?', 'Why do batches need linked records?')}<ArrowRight size={16} aria-hidden="true" /></a></div>
         <div className="home-boundary-copy"><p>{t('Thông tin do chủ hồ sơ khai báo. QR không chứng minh hàng thật, phiếu lab chính thức hoặc đủ điều kiện xuất khẩu. Tài liệu còn thiếu được hiển thị trong hồ sơ.', 'Information is declared by the record owner. A QR does not prove physical origin, official lab certification or export eligibility. Missing documents are identified in the record.')}</p><details><summary>{t('Cách lưu dữ liệu & giới hạn Solana', 'Data storage & Solana limitations')}</summary><dl><div><dt>{t('Hồ sơ đang dùng', 'Current batch records')}</dt><dd>{t('Lưu trong database, riêng tư theo tài khoản và công khai khi chọn. Chưa tự neo dữ liệu lên blockchain.', 'Stored in a database, private per account and published by choice. Records are not automatically anchored to a blockchain.')}</dd></div><div><dt>{t('Thử nghiệm Solana', 'Solana experiment')}</dt><dd>{t('Có thể đối chiếu dữ liệu và ví ký trên Devnet. Chữ ký cho biết ví ký; không xác nhận phép đo hoặc hàng vật lý.', 'Data and wallet signers can be inspected on Devnet. A signature identifies the signing wallet; it does not validate a measurement or physical goods.')}</dd></div></dl></details></div>
       </div>
     </section>
 
-    <section className="landing-features home-experiments" aria-labelledby="features-title">
-      <div className="section-shell"><div className="section-heading"><p className="section-kicker">{t('Công nghệ · Prototype', 'Technology · Prototype')}</p><h2 id="features-title">{copy.landing.featureTitle}</h2><p>{copy.landing.featureLead}</p></div>
+    <section className="landing-features home-experiments">
+      <div className="section-shell"><details className="technical-details"><summary>{copy.landing.featureTitle}</summary><p>{copy.landing.featureLead}</p>
         <div className="feature-stories">{copy.landing.features.map(feature => <article className="feature-story" key={feature.image}><figure><img src={asset(feature.image)} alt={feature.alt} width={960} height={640} loading="lazy" /><figcaption>{copy.landing.featureIllustration}</figcaption></figure><div className="feature-story-body"><p className="section-kicker">{feature.kicker}</p><h3>{feature.title}</h3><p>{feature.description}</p><ol className="feature-steps">{feature.steps.map(step => <li key={step}>{step}</li>)}</ol><p className="feature-limit">{feature.note}</p><a className="button button-secondary" href={feature.href}>{feature.action}<ArrowRight size={18} aria-hidden="true" /></a></div></article>)}</div>
-      </div>
+      </details></div>
     </section>
     {scanning && <Suspense fallback={<p className="home-scanner-loading" role="status">{t('Đang mở trình quét…', 'Opening scanner…')}</p>}><QRScannerModal isOpen onClose={() => setScanning(false)} batches={[]} onScanSuccess={openRecord} /></Suspense>}
   </>
