@@ -2,13 +2,13 @@
 
 ## File dùng để trình bày
 
-- `DurianTrust_Morph_59_VI-HTX-v6.pptx`: bản chính với 19 ý, 59 bước Morph và một slide phụ lục (60 slide tổng cộng). Video nằm ở slide 32, sau luồng hồ sơ và trước công nghệ.
-- `DurianTrust_Core_19_VI-HTX-v6.pptx`: bản rút gọn với 19 slide chính và một slide phụ lục (20 slide tổng cộng). Video nằm ở slide 10.
+- `DurianTrust_Morph_59_VI-HTX-v7.pptx`: bản chính với 19 ý, 59 bước Morph và một slide phụ lục (60 slide tổng cộng). Video nằm ở slide 32, sau luồng hồ sơ và trước công nghệ.
+- `DurianTrust_Core_19_VI-HTX-v7.pptx`: bản rút gọn với 19 slide chính và một slide phụ lục (20 slide tổng cộng). Video nằm ở slide 10.
 - `Speaker_Notes_VI_10min_HTX.md`: lời nói tiếng Việt, tổng thời lượng dự kiến 600 giây, gồm video 90 giây. Notes cũng nằm trong PowerPoint.
 - `../../../output/pdf/DurianTrust_Kich_ban_thuyet_trinh_10_phut_v5.pdf`: kịch bản PDF, sáu trang lời nói và một trang phụ lục AI.
 - Video dự phòng: `DurianTrust_HTX_Demo_90s.mp4`, có ở website và được nhúng vào cả hai deck.
 
-Bản v6 thêm logo công nghệ ở phần kiến trúc cloud, Solana và AI. Nguồn logo và attribution nằm trong speaker notes/phụ lục. Nội dung, thứ tự và thời lượng bài nói vẫn theo kịch bản v5.
+Bản v7 dùng logo công nghệ ở phần kiến trúc cloud, Solana và AI, với wordmark Supabase rõ hơn ở Database và Storage. Nguồn logo và attribution nằm trong speaker notes/phụ lục. Nội dung, thứ tự và thời lượng bài nói vẫn theo kịch bản v5.
 
 ## Tình huống demo
 

@@ -9,7 +9,7 @@ The practical workflow is for a grower or cooperative: create a private batch, r
 ## For team review
 
 - [Live web app](https://durian-web3.vercel.app/) and [Corelia project](https://app.corelia.academy/projects/duriantrust)
-- [Current 10-minute Morph deck (59 steps + AI appendix)](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v6.pptx), [short deck (19 slides + AI appendix)](submission/presentation/output/DurianTrust_Core_19_VI-HTX-v6.pptx), [speaker notes](submission/presentation/output/Speaker_Notes_VI_10min_HTX.md), and [Vietnamese script PDF](output/pdf/DurianTrust_Kich_ban_thuyet_trinh_10_phut_v5.pdf)
+- [Current 10-minute Morph deck (59 steps + AI appendix)](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v7.pptx), [short deck (19 slides + AI appendix)](submission/presentation/output/DurianTrust_Core_19_VI-HTX-v7.pptx), [speaker notes](submission/presentation/output/Speaker_Notes_VI_10min_HTX.md), and [Vietnamese script PDF](output/pdf/DurianTrust_Kich_ban_thuyet_trinh_10_phut_v5.pdf)
 - [90-second workflow video](public/submission/DurianTrust_HTX_Demo_90s.mp4): local UI with simulated auth/API, not a field pilot or verified production recording
 - [External leaf-model evaluation](submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md) and [backend setup](backend/README.md)
 
@@ -88,7 +88,7 @@ upload the local demo ledger. The diagram above describes the experimental path.
 
 **No wallet required to inspect the sample buyer record.** The production cloud workflow still needs an authenticated end-to-end check.
 
-Current pitch deck: [DurianTrust_Morph_59_VI-HTX-v6.pptx](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v6.pptx), with technology logos. Detailed AI evaluation is in the appendix after the 10-minute pitch. The v5 script PDF remains compatible with this visual update. The root-level `DurianTrust_Pitch_Deck.pptx` is an older version.
+Current pitch deck: [DurianTrust_Morph_59_VI-HTX-v7.pptx](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v7.pptx), with technology logos and a clearer Supabase wordmark. Detailed AI evaluation is in the appendix after the 10-minute pitch. The v5 script PDF remains compatible with this visual update. The root-level `DurianTrust_Pitch_Deck.pptx` is an older version.
 
 Current workflow video: [DurianTrust_HTX_Demo_90s.mp4](public/submission/DurianTrust_HTX_Demo_90s.mp4). It uses local simulated auth/API and does not demonstrate production access or a real HTX pilot.
 
