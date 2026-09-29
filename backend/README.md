@@ -19,10 +19,12 @@ authenticated cloud records. Existing Vercel inference stays available when
 - Verified live: anonymous Data API reads return empty lists; Render rejects an
   unauthenticated owner-list request with 401 and an unknown public record with 404.
   These checks do not prove authenticated creation or account isolation in production.
-- Authentication uses the default magic-link email with PKCE. Site URL is
+- Google OAuth is configured and the user confirmed reaching the management screen.
+  This is a user confirmation, not an independently observed production E2E run.
+  Email magic links also use PKCE. Site URL is
   `https://durian-web3.vercel.app/?auth=callback`. Open the link in the same browser
-  that requested it. SMTP is not configured; team-email login and the full live
-  private/publish/revoke workflow still need verification.
+  that requested it. SMTP is not configured for wider email sign-in. The full live
+  create/upload/private/publish/revoke workflow still needs verification.
 - This service uses the public Git repository connection. Deploy later backend
   commits with Render's Manual Deploy control; do not assume automatic deploys.
 
@@ -138,7 +140,7 @@ records distinct even when different users choose the same batch code.
 
 ## Verify before announcing cloud is live
 
-1. Sign in as A via magic link. Create a private batch, append an event and attach
+1. Sign in as A via Google (or magic link if email delivery is configured). Create a private batch, append an event and attach
    a JPG/PNG/PDF with its declared source/date. Download it and compare the bytes.
 2. Sign in on a second device as A; confirm both are visible.
 3. Signed out and as B: the private QR must show not found/private.
