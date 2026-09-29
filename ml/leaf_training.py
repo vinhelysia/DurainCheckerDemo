@@ -191,7 +191,7 @@ def train(args):
     if args.epochs < 2 or args.batch_size < 1 or args.minutes <= 0:
         raise ValueError("Require epochs >=2, positive batch size and time budget")
     if (out / "metrics.json").exists():
-        raise ValueError("This test set was already evaluated. Use a new run directory/locked manifest.")
+        raise ValueError("This run already has metrics. Preserve it; use a new run directory for a deliberate new protocol.")
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -218,8 +218,9 @@ def train(args):
         def __getitem__(self, index):
             return self.transform(self.images[index]).permute(1, 2, 0), CLASSES.index(self.records[index]["label"])
 
-    datasets = {s: LeafDataset(s) for s in SPLITS}
-    loaders = {s: DataLoader(datasets[s], batch_size=args.batch_size, shuffle=s == "train", num_workers=0) for s in SPLITS}
+    active_splits = ["train", "val"] if args.validation_only else SPLITS
+    datasets = {s: LeafDataset(s) for s in active_splits}
+    loaders = {s: DataLoader(datasets[s], batch_size=args.batch_size, shuffle=s == "train", num_workers=0) for s in active_splits}
     backbone = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1)
     backbone.classifier[-1] = torch.nn.Linear(backbone.classifier[-1].in_features, len(CLASSES))
 
@@ -286,41 +287,52 @@ def train(args):
     selected = torch.load(checkpoint, map_location=device, weights_only=True)
     model.load_state_dict(selected["state_dict"])
     val_logits, val_labels = predict(loaders["val"])
-    temperature = min(np.linspace(.5, 3.0, 51), key=lambda t: metrics((val_logits/t).softmax(1).numpy(), val_labels)["nll"])
-    val_probs = (val_logits/temperature).softmax(1).numpy()
-    threshold, margin = 1.01, .2
-    for value in np.linspace(.5, .99, 50):
-        ordered = np.sort(val_probs, axis=1)
-        accepted = (ordered[:, -1] >= value) & (ordered[:, -1] - ordered[:, -2] >= margin)
-        successes = int((val_probs.argmax(1)[accepted] == val_labels[accepted]).sum())
-        if accepted.sum() >= 30 and wilson_lower(successes, int(accepted.sum())) >= .9:
-            threshold = float(value)
-            break
+    temperature, threshold, margin = 1.0, None, None
+    if not args.validation_only:
+        temperature = min(np.linspace(.5, 3.0, 51), key=lambda t: metrics((val_logits/t).softmax(1).numpy(), val_labels)["nll"])
+        val_probs = (val_logits/temperature).softmax(1).numpy()
+        threshold, margin = 1.01, .2
+        for value in np.linspace(.5, .99, 50):
+            ordered = np.sort(val_probs, axis=1)
+            accepted = (ordered[:, -1] >= value) & (ordered[:, -1] - ordered[:, -2] >= margin)
+            successes = int((val_probs.argmax(1)[accepted] == val_labels[accepted]).sum())
+            if accepted.sum() >= 30 and wilson_lower(successes, int(accepted.sum())) >= .9:
+                threshold = float(value)
+                break
     config = {"seed": args.seed, "epochs_limit": args.epochs, "batch_size": args.batch_size, "minutes": args.minutes,
               "selected_epoch": selected["epoch"], "temperature": float(temperature), "confidence_threshold": threshold,
-              "margin_threshold": margin, "selection": "validation macro-F1; temperature/threshold validation only",
+              "margin_threshold": margin, "validation_only": args.validation_only,
+              "selection": "validation macro-F1 only" if args.validation_only else "validation macro-F1; temperature/threshold validation only",
               "manifest_sha256": sha(manifest_path), "input": "float32 NHWC RGB [0,1] 1x224x224x3",
               "backbone": "torchvision MobileNetV3Small ImageNet1K_V1", "torch": torch.__version__}
     save(out / "training-config.json", config)
-    # Configuration is frozen before the first and only candidate test evaluation.
-    test_logits, test_labels = predict(loaders["test"])
-    test_probs = (test_logits/temperature).softmax(1).numpy()
-    result = {"validation_raw": metrics(val_logits.softmax(1).numpy(), val_labels),
-              "validation_calibrated": metrics(val_probs, val_labels, threshold, margin),
-              "test_raw": metrics(test_logits.softmax(1).numpy(), test_labels),
-              "test_calibrated": metrics(test_probs, test_labels, threshold, margin), "config": config}
-    np.savez_compressed(out / "predictions.npz", val_logits=val_logits.numpy(), val_labels=val_labels,
-                        test_logits=test_logits.numpy(), test_labels=test_labels)
-    # Old model provenance is unknown; this comparison cannot prove absence of its test leakage.
-    session = ort.InferenceSession(str(args.baseline), providers=["CPUExecutionProvider"])
-    for split, labels in [("val", val_labels), ("test", test_labels)]:
-        baseline_probs = []
-        for index in range(len(datasets[split])):
-            pixels = np.asarray(datasets[split].images[index], dtype=np.float32)[None] / 255.0
-            baseline_probs.append(session.run(None, {session.get_inputs()[0].name: pixels})[0][0])
-        result["baseline_" + ("validation" if split == "val" else "test")] = metrics(np.asarray(baseline_probs), labels, .8, .2)
-    result["baseline_model_sha256"] = sha(args.baseline)
-    result["baseline_provenance_warning"] = "Existing model training data unknown; possible exposure to this source holdout"
+    if args.validation_only:
+        validation = metrics(val_logits.softmax(1).numpy(), val_labels)
+        validation.pop("abstention")
+        result = {"validation_raw": validation, "config": config,
+                  "evaluation_status": "validation_only; reused test holdout not evaluated",
+                  "calibration_status": "not fitted; no selective accuracy or abstention policy evaluated"}
+        np.savez_compressed(out / "predictions.npz", val_logits=val_logits.numpy(), val_labels=val_labels)
+    else:
+        # Configuration is frozen before the first and only candidate test evaluation.
+        test_logits, test_labels = predict(loaders["test"])
+        test_probs = (test_logits/temperature).softmax(1).numpy()
+        result = {"validation_raw": metrics(val_logits.softmax(1).numpy(), val_labels),
+                  "validation_calibrated": metrics(val_probs, val_labels, threshold, margin),
+                  "test_raw": metrics(test_logits.softmax(1).numpy(), test_labels),
+                  "test_calibrated": metrics(test_probs, test_labels, threshold, margin), "config": config}
+        np.savez_compressed(out / "predictions.npz", val_logits=val_logits.numpy(), val_labels=val_labels,
+                            test_logits=test_logits.numpy(), test_labels=test_labels)
+        # Old model provenance is unknown; this comparison cannot prove absence of its test leakage.
+        session = ort.InferenceSession(str(args.baseline), providers=["CPUExecutionProvider"])
+        for split, labels in [("val", val_labels), ("test", test_labels)]:
+            baseline_probs = []
+            for index in range(len(datasets[split])):
+                pixels = np.asarray(datasets[split].images[index], dtype=np.float32)[None] / 255.0
+                baseline_probs.append(session.run(None, {session.get_inputs()[0].name: pixels})[0][0])
+            result["baseline_" + ("validation" if split == "val" else "test")] = metrics(np.asarray(baseline_probs), labels, .8, .2)
+        result["baseline_model_sha256"] = sha(args.baseline)
+        result["baseline_provenance_warning"] = "Existing model training data unknown; possible exposure to this source holdout"
     save(out / "metrics.json", result)
 
     class Export(torch.nn.Module):
@@ -385,6 +397,8 @@ if __name__ == "__main__":
     parser.add_argument("--archive", type=Path, default=Path("tmp/ai-training/durian-leaf-v1.zip"))
     parser.add_argument("--output", type=Path, default=Path("tmp/ai-training/run-1"))
     parser.add_argument("--baseline", type=Path, default=Path("api/leaf_disease_model.onnx"))
+    parser.add_argument("--validation-only", action="store_true",
+                        help="Train/select on validation; do not evaluate previously inspected test holdout or fit calibration")
     parser.add_argument("--seed", type=int, default=1337)
     parser.add_argument("--epochs", type=int, default=12)
     parser.add_argument("--batch-size", type=int, default=64)

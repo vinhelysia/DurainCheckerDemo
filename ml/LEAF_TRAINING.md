@@ -26,3 +26,13 @@ Hai epoch đầu train classifier; các epoch còn lại fine-tune bốn feature
 Artifacts trong `tmp/ai-training/run-1`: locked manifest, config, epoch history, checkpoint, metrics/predictions, candidate ONNX và parity result. ONNX nhận float32 NHWC RGB `[0,1]`, reshape + ImageNet normalize trong graph, trả five-class calibrated softmax theo thứ tự production. Artifact không tự thay production. Cùng API contract không đủ để promote; cần kiểm ngoài taxonomy, field test mới và chuyên gia review. `self-check` dùng ảnh/records tạo tại runtime để kiểm holdout priority, leakage, metrics và notebook preprocessing; không giả metrics training.
 
 `ml/train.py` / `ml/train_disease.py` chỉ là demo synthetic: stratified 60/20/20, chọn model bằng validation, test một lần, output tmp candidate. Chúng không đo Cd, không chứng minh disease risk ngoài thực tế và không overwrite API model.
+
+## Fine-tune trên Colab
+
+Mở [notebook Colab](durian_leaf_colab_reproduce.ipynb), chọn **T4 GPU / runtime 2025.10**, chạy bốn code cells theo thứ tự. Notebook khóa dependency versions, SHA256 pipeline/dataset và tự tải dataset public; không cần mount Drive. Cell cuối tải ZIP gồm checkpoint, ONNX, log và metrics.
+
+Cấu hình: tối đa **24 epochs**, seed 1337, batch 64, giới hạn 30 phút; early stopping sau bốn epochs không cải thiện validation macro-F1. `--validation-only` chỉ load train/validation, không evaluate test hoặc baseline, không fit temperature/threshold. ONNX xuất với temperature 1, score chưa calibration.
+
+Test cũ đã được xem ở lượt 12 epochs; lượt này chỉ là tuning trên validation, không phải bằng chứng accuracy mới trên dữ liệu độc lập. Cần holdout mới trước khi quyết định thay model production. Notebook kiểm protocol và không có test/baseline metrics trước khi tải artifacts.
+
+Lượt Colab 29/09/2026 đã hoàn tất trên Tesla T4: dừng sau 23 epochs, chọn epoch 19, validation accuracy 85,33% và macro-F1 0,8499 trên 443 ảnh. [Báo cáo và artifact checks](../submission/review/ai-training/colab-validation-24/README.md). Candidate ONNX chưa được đưa vào production.

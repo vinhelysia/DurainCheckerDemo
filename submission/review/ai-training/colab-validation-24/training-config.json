@@ -1,0 +1,16 @@
+{
+  "seed": 1337,
+  "epochs_limit": 24,
+  "batch_size": 64,
+  "minutes": 30.0,
+  "selected_epoch": 19,
+  "temperature": 1.0,
+  "confidence_threshold": null,
+  "margin_threshold": null,
+  "validation_only": true,
+  "selection": "validation macro-F1 only",
+  "manifest_sha256": "afd8dc64cb655767b4afea35a0befe6bc1160d8cb273d481473e178fd3e3ad1f",
+  "input": "float32 NHWC RGB [0,1] 1x224x224x3",
+  "backbone": "torchvision MobileNetV3Small ImageNet1K_V1",
+  "torch": "2.8.0+cu128"
+}

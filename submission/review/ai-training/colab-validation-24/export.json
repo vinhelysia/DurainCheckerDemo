@@ -1,0 +1,13 @@
+{
+  "onnx_sha256": "35ba652c6e88232819387b6c9757cc4e6db97a3ea58f00259fe5aa764f361e21",
+  "max_absolute_difference": 2.9802322387695312e-06,
+  "validation_samples_checked": 5,
+  "classes": [
+    "HEALTHY_LEAF",
+    "ALGAL_LEAF_SPOT",
+    "LEAF_BLIGHT",
+    "PHOMOPSIS_LEAF_SPOT",
+    "ALLOCARIDARA_ATTACK"
+  ],
+  "status": "candidate_only_not_promoted"
+}

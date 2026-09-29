@@ -1,0 +1,72 @@
+{
+  "validation_raw": {
+    "n": 443,
+    "accuracy": 0.8532731376975169,
+    "macro_f1": 0.8499059323480808,
+    "per_class_recall": {
+      "HEALTHY_LEAF": 0.9278350515463918,
+      "ALGAL_LEAF_SPOT": 0.7671232876712328,
+      "LEAF_BLIGHT": 0.8723404255319149,
+      "PHOMOPSIS_LEAF_SPOT": 0.75,
+      "ALLOCARIDARA_ATTACK": 0.9230769230769231
+    },
+    "confusion_matrix": [
+      [
+        90,
+        1,
+        1,
+        3,
+        2
+      ],
+      [
+        1,
+        56,
+        1,
+        9,
+        6
+      ],
+      [
+        4,
+        2,
+        82,
+        5,
+        1
+      ],
+      [
+        10,
+        1,
+        4,
+        66,
+        7
+      ],
+      [
+        1,
+        3,
+        0,
+        3,
+        84
+      ]
+    ],
+    "nll": 0.4143708348274231,
+    "brier": 0.21865440196378708,
+    "ece_10_bins": 0.03467551896319162
+  },
+  "config": {
+    "seed": 1337,
+    "epochs_limit": 24,
+    "batch_size": 64,
+    "minutes": 30.0,
+    "selected_epoch": 19,
+    "temperature": 1.0,
+    "confidence_threshold": null,
+    "margin_threshold": null,
+    "validation_only": true,
+    "selection": "validation macro-F1 only",
+    "manifest_sha256": "afd8dc64cb655767b4afea35a0befe6bc1160d8cb273d481473e178fd3e3ad1f",
+    "input": "float32 NHWC RGB [0,1] 1x224x224x3",
+    "backbone": "torchvision MobileNetV3Small ImageNet1K_V1",
+    "torch": "2.8.0+cu128"
+  },
+  "evaluation_status": "validation_only; reused test holdout not evaluated",
+  "calibration_status": "not fitted; no selective accuracy or abstention policy evaluated"
+}

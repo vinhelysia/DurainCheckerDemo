@@ -1,0 +1,12 @@
+{
+  "source_commit": "bfce1662da352cb6394c4e7bc3284664d4b8c5d4",
+  "pipeline_sha256": "3c301d8bc959b699a4cad2f94fc6799abe6f9f70a004c17073ce7bfd77c7e6fc",
+  "epochs_limit": 24,
+  "seed": 1337,
+  "batch_size": 64,
+  "minutes": 30,
+  "validation_only": true,
+  "calibration_fitted": false,
+  "evaluation_note": "Previously inspected test holdout is not evaluated; validation selects checkpoints.",
+  "deployment": "research candidate only; no production replacement"
+}
