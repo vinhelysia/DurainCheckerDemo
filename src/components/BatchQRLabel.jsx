@@ -33,6 +33,9 @@ export default function BatchQRLabel({ batchId, language, loading, shareUrl }) {
           return
         }
 
+        // The renderer sets a fixed inline height; keep the QR square when its container narrows.
+        canvas.style.height = 'auto'
+
         // Draw centered logo (durian-logo.svg)
         const logo = new Image()
         logo.src = `${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}durian-logo.svg`
