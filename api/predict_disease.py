@@ -139,7 +139,9 @@ def predict_disease(temperature_c, humidity_pct, rainfall_mm, leaf_wetness_hours
     return {
         "disease": disease_name,
         "probability": round(pred_prob, 4),
-        "risk": risk_level
+        "risk": risk_level,
+        "decision": "needs_review",
+        "training_data": "synthetic",
     }
 
 class handler(BaseHTTPRequestHandler):

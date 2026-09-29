@@ -122,7 +122,9 @@ def predict_batch(province, harvest_month, farm_violation_history, rainfall_mm):
         "risk": risk_level_str,
         "probability": round(pred_prob, 4),
         # A synthetic risk estimate cannot waive laboratory testing.
-        "needs_full_testing": True
+        "needs_full_testing": True,
+        "decision": "needs_review",
+        "training_data": "synthetic",
     }
 
 class handler(BaseHTTPRequestHandler):

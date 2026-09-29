@@ -105,6 +105,11 @@ class ValidationTests(unittest.TestCase):
             self.assertEqual((status, body), (200, response))
 
     def test_invalid_and_oversize_images(self):
+        content_type = "multipart/form-data; boundary=boundary"
+        limit = leaf.MAX_IMAGE_BYTES
+        self.assertEqual(len(leaf.extract_multipart_image(content_type, multipart(b'x' * limit))), limit)
+        with self.assertRaisesRegex(ValueError, "exceeds 5MB"):
+            leaf.extract_multipart_image(content_type, multipart(b'x' * (limit + 1)))
         with self.assertRaisesRegex(ValueError, "invalid or unsupported image"):
             leaf.image_to_array(b"not an image")
         buf = BytesIO()
@@ -154,6 +159,30 @@ class ValidationTests(unittest.TestCase):
             result = predict.predict_batch(**RISK)
         self.assertTrue(result["needs_full_testing"])
         self.assertEqual(result["risk"], "low")
+        self.assertEqual(result["training_data"], "synthetic")
+        self.assertEqual(result["decision"], "needs_review")
+
+    def test_leaf_scores_never_bypass_review_and_reject_invalid_output(self):
+        fake_session = types.SimpleNamespace(
+            get_inputs=lambda: [types.SimpleNamespace(name="image")],
+            run=lambda *args: [np.array([[0.99, 0.0025, 0.0025, 0.0025, 0.0025]])],
+        )
+        image = np.full((1, 224, 224, 3), 0.5, dtype=np.float32)
+        with patch.object(leaf, "session", fake_session), patch.object(leaf, "labels", {}):
+            result = leaf.predict_leaf(image)
+            self.assertEqual(result["decision"], "needs_review")
+            self.assertFalse(result["score_is_calibrated"])
+            self.assertIn("low_image_contrast", result["review_reasons"])
+            self.assertIn("field_validation_pending", result["review_reasons"])
+            fake_session.run = lambda *args: [np.array([[0.4, 0.39, 0.1, 0.06, 0.05]])]
+            result = leaf.predict_leaf(image)
+            self.assertIn("low_model_score", result["review_reasons"])
+            self.assertIn("similar_scores", result["review_reasons"])
+            fake_session.run = lambda *args: [np.array([[float('nan')] * 5])]
+            with self.assertRaises(RuntimeError):
+                leaf.predict_leaf(image)
+            with self.assertRaises(ValueError):
+                leaf.predict_leaf(image * float('nan'))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "checks": [
+    "fileChangeDuringLoading:replacementPdfPreserved",
+    "fileClearDuringLoading:lateWorkerTerminatedNoStaleResult",
+    "formReset:resultAndFileCleared",
+    "actualEnglishImageOcr:QA English Lab/2026-09-27"
+  ],
+  "appExceptions": [],
+  "uploadCalls": 0,
+  "ocrResponses": [
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+      "status": 200
+    }
+  ]
+}

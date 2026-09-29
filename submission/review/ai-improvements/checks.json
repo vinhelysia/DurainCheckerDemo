@@ -1,0 +1,108 @@
+{
+  "status": "passed",
+  "checks": [
+    "leaf-vi:highReview,blankUncertain,notesReset,loading,error,oversize",
+    "leaf-en:highReview,blankUncertain,notesReset,loading,error,oversize",
+    "document-vi:privateOwnerOnly,realPdf,manualApplyOnly,ambiguousDate,scanFallback,fileBounds,manualErrorFallback,noCloudWrites",
+    "document-en:privateOwnerOnly,realPdf,manualApplyOnly,ambiguousDate,scanFallback,fileBounds,manualErrorFallback,noCloudWrites"
+  ],
+  "documentResults": [
+    {
+      "lang": "vi",
+      "method": "actual_image_ocr",
+      "status": "passed",
+      "source": "HTX Kiểm thử QA",
+      "documentDate": "2026-09-27"
+    },
+    {
+      "lang": "vi",
+      "method": "actual_pdf_text",
+      "status": "passed"
+    },
+    {
+      "lang": "en",
+      "method": "actual_image_ocr",
+      "status": "passed",
+      "source": "HTX Kiểm thử QA",
+      "documentDate": "2026-09-27"
+    },
+    {
+      "lang": "en",
+      "method": "actual_pdf_text",
+      "status": "passed"
+    }
+  ],
+  "classification": "mocked UI responses; API accuracy is outside this check",
+  "documents": "actual OCR/PDF extraction; synthetic labelled QA files only",
+  "ocrAssets": [
+    "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+    "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+    "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+    "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz"
+  ],
+  "ocrResponses": [
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+      "status": 200
+    }
+  ],
+  "blocked": [
+    "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap",
+    "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap",
+    "https://api.devnet.solana.com/",
+    "https://api.devnet.solana.com/",
+    "https://api.devnet.solana.com/",
+    "https://api.devnet.solana.com/"
+  ],
+  "appExceptions": [],
+  "output": "C:\\Stuff\\DurianBlockchainWeb3\\durian-web3\\submission\\review\\ai-improvements\\",
+  "targetedLifecycle": {
+    "status": "passed",
+    "checks": [
+      "fileChangeDuringLoading:replacementPdfPreserved",
+      "fileClearDuringLoading:lateWorkerTerminatedNoStaleResult",
+      "formReset:resultAndFileCleared",
+      "actualEnglishImageOcr:QA English Lab/2026-09-27"
+    ],
+    "appExceptions": [],
+    "uploadCalls": 0,
+    "ocrResponses": [
+      {
+        "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+        "status": 200
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+        "status": 200
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+        "status": 200
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+        "status": 200
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/vie.traineddata.gz",
+        "status": 200
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int/eng.traineddata.gz",
+        "status": 200
+      }
+    ]
+  }
+}

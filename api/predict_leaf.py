@@ -8,12 +8,13 @@ import os
 import sys
 import numpy as np
 import onnxruntime as ort
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(CURRENT_DIR, "leaf_disease_model.onnx")
 LABELS_PATH = os.path.join(CURRENT_DIR, "leaf_labels.json")
-MAX_BODY_BYTES = 5 * 1024 * 1024  # 5MB
+MAX_IMAGE_BYTES = 5 * 1024 * 1024
+MAX_BODY_BYTES = MAX_IMAGE_BYTES + 16_384  # Include bounded multipart headers.
 MAX_IMAGE_PIXELS = 20_000_000
 ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "http://localhost:5173")
 
@@ -64,7 +65,7 @@ def image_to_array(image_bytes):
         with Image.open(BytesIO(image_bytes)) as source:
             if source.width * source.height > MAX_IMAGE_PIXELS:
                 raise ValueError("image exceeds 20 million pixels")
-            img = source.convert("RGB").resize((224, 224))
+            img = ImageOps.exif_transpose(source).convert("RGB").resize((224, 224), Image.Resampling.BILINEAR)
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
         raise ValueError("invalid or unsupported image") from exc
     arr = np.asarray(img, dtype=np.float32) / 255.0
@@ -90,6 +91,8 @@ def extract_multipart_image(content_type, body):
             payload = part.get_payload(decode=True)
             if payload is None:
                 raise ValueError("empty image part")
+            if len(payload) > MAX_IMAGE_BYTES:
+                raise ValueError("image exceeds 5MB")
             return payload
 
     raise ValueError("missing form field 'image'")
@@ -111,10 +114,19 @@ def predict_leaf(pixels_or_array):
         X = np.array(pixels_or_array, dtype=np.float32) / 255.0
         X = X.reshape((1, 224, 224, 3))
 
+    if not np.isfinite(X).all() or np.any(X < 0) or np.any(X > 1):
+        raise ValueError("Image pixels must be finite and scaled to 0-1")
+    if (session is None or labels is None) and not load_resources():
+        raise RuntimeError("Leaf model is missing")
+
     input_name = session.get_inputs()[0].name
     # Output is [1, N] softmax probabilities (N = number of classes).
     probabilities = session.run(None, {input_name: X})[0][0]
     num_classes = len(probabilities)
+    if (np.asarray(probabilities).shape != (len(CLASS_SLUGS),) or not np.isfinite(probabilities).all()
+            or np.any(probabilities < 0) or np.any(probabilities > 1)
+            or not np.isclose(np.sum(probabilities), 1, atol=0.01)):
+        raise RuntimeError("Invalid leaf model output")
 
     pred_index = int(np.argmax(probabilities))
     pred_prob = float(probabilities[pred_index])
@@ -123,12 +135,25 @@ def predict_leaf(pixels_or_array):
     label_info = labels.get(str(pred_index), {})
     scores = {_slug_for(i): float(probabilities[i]) for i in range(num_classes)}
 
+    # ponytail: basic score/contrast guards do not detect unknown diseases or non-leaf images.
+    # Every suggestion needs human review until field validation exists, even at high scores.
+    review_reasons = ["field_validation_pending"]
+    if pred_prob < 0.8:
+        review_reasons.append("low_model_score")
+    if float(np.sort(probabilities)[-1] - np.sort(probabilities)[-2]) < 0.15:
+        review_reasons.append("similar_scores")
+    if float(X[0].std(axis=(0, 1)).mean()) < 0.015:
+        review_reasons.append("low_image_contrast")
+
     return {
         "disease": _slug_for(pred_index),
         "label_vi": label_info.get("vi", _slug_for(pred_index)),
         "label_en": label_info.get("en", _slug_for(pred_index)),
         "probability": round(pred_prob, 4),
         "scores": scores,
+        "decision": "needs_review",
+        "review_reasons": review_reasons,
+        "score_is_calibrated": False,
     }
 
 class handler(BaseHTTPRequestHandler):

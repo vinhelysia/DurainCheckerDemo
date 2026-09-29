@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { FileText, Image, Download, Upload } from 'lucide-react'
 import { cloudError, downloadEvidence, uploadEvidence } from '../lib/cloudClient'
+import DocumentAssistant from './DocumentAssistant'
 
 export default function BatchEvidence({ batchId, records, more, onMore, onSaved, publicView, t }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [kind, setKind] = useState('all')
+  const [file, setFile] = useState(null)
+  const [fileRevision, setFileRevision] = useState(0)
+  const [uploadKind, setUploadKind] = useState('photo')
+  const uploadForm = useRef(null)
   const kindName = kind => kind === 'photo' ? t('Ảnh lô hàng', 'Batch photo') : kind === 'lab_report' ? t('Phiếu kiểm nghiệm', 'Lab document') : t('Tài liệu khác', 'Other document')
   const visibleRecords = kind === 'all' ? records : records.filter(record => record.kind === kind)
 
@@ -49,11 +54,15 @@ export default function BatchEvidence({ batchId, records, more, onMore, onSaved,
       </li>)}</ul>}
     {more && <button className="button button-secondary" disabled={busy} onClick={async () => { setBusy(true); try { await onMore() } finally { setBusy(false) } }}>{t('Xem thêm tài liệu', 'Load more documents')}</button>}
     {!publicView && <details className="cloud-disclosure"><summary><Upload size={18} aria-hidden="true" />{t('Đính kèm bằng chứng', 'Attach evidence')}</summary>
-      <form className="cloud-form" onSubmit={upload}>
-        <label>{t('Loại bằng chứng', 'Evidence type')}<select name="kind"><option value="photo">{kindName('photo')}</option><option value="lab_report">{kindName('lab_report')}</option><option value="other">{kindName('other')}</option></select></label>
+      <form ref={uploadForm} className="cloud-form" onSubmit={upload} onReset={() => { setFile(null); setFileRevision(value => value + 1); setUploadKind('photo') }}>
+        <label>{t('Loại bằng chứng', 'Evidence type')}<select name="kind" onChange={event => setUploadKind(event.target.value)}><option value="photo">{kindName('photo')}</option><option value="lab_report">{kindName('lab_report')}</option><option value="other">{kindName('other')}</option></select></label>
         <label>{t('Người chụp / đơn vị phát hành (khai báo)', 'Photographer / issuing organization (declared)')}<input name="source" required maxLength={160} /></label>
         <label>{t('Ngày chụp / ngày tài liệu', 'Photo / document date')}<input type="date" name="document_date" required /></label>
-        <label>{t('Tệp JPG, PNG hoặc PDF · tối đa 5 MB', 'JPG, PNG or PDF · up to 5 MB')}<input name="file" type="file" accept="image/jpeg,image/png,application/pdf" required /></label>
+        <label>{t('Tệp JPG, PNG hoặc PDF · tối đa 5 MB', 'JPG, PNG or PDF · up to 5 MB')}<input name="file" type="file" accept="image/jpeg,image/png,application/pdf" required onChange={event => { setFile(event.target.files?.[0] || null); setFileRevision(value => value + 1) }} /></label>
+        <DocumentAssistant key={fileRevision} file={file} kind={uploadKind} t={t} disabled={busy} onApply={fields => {
+          if (!uploadForm.current) return
+          for (const [name, value] of Object.entries(fields)) if (value) uploadForm.current.elements.namedItem(name).value = value
+        }} />
         <p className="cloud-muted">{t('Khi công khai hồ sơ, các tệp này cũng được chia sẻ. Che thông tin cá nhân trước khi tải lên. Tệp đã gắn vào hồ sơ không sửa hoặc xóa trong ứng dụng; thêm tệp mới để đính chính.', 'Publishing the record also shares these files. Redact personal information first. Attached files cannot be changed or deleted in the app; add a new file for a correction.')}</p>
         <button className="button button-primary" disabled={busy}>{busy ? t('Đang tải lên…', 'Uploading…') : t('Lưu bằng chứng', 'Save evidence')}</button>
       </form>

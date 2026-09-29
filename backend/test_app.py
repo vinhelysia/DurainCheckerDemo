@@ -62,6 +62,23 @@ class ApiTests(unittest.TestCase):
         with patch.object(module, 'SUPABASE_URL', ''):
             self.assertEqual(self.client.get('/api/cloud/batches', headers=auth).status_code, 503)
 
+    def test_optional_model_failure_does_not_block_records(self):
+        with patch.object(module.predict_leaf, 'load_resources', side_effect=RuntimeError('private path')), \
+                patch.object(module.predict_leaf, 'session', None), \
+                patch.object(module.predict, 'load_resources', side_effect=RuntimeError('private path')), \
+                patch.object(module, 'supabase', side_effect=lambda _method, path, *_args, **_kwargs:
+                             {'id': '11111111-1111-4111-8111-111111111111'} if path == '/auth/v1/user' else []):
+            with TestClient(module.app, raise_server_exceptions=False) as client:
+                self.assertEqual(client.get('/health').status_code, 200)
+                self.assertEqual(client.get('/api/cloud/batches', headers={'Authorization': 'Bearer owner'}).status_code, 200)
+                image = BytesIO()
+                Image.new('RGB', (32, 32)).save(image, format='PNG')
+                with self.assertLogs(level='ERROR'):
+                    response = client.post('/api/predict_leaf', files={'image': ('leaf.png', image.getvalue(), 'image/png')})
+                self.assertEqual(response.status_code, 503)
+                self.assertNotIn('private path', response.text)
+                self.assertEqual(client.get('/api/cloud/batches', headers={'Authorization': 'Bearer owner'}).status_code, 200)
+
     def test_jwt_forwarding_and_database_failures(self):
         with patch.object(module, 'SUPABASE_URL', 'https://test.supabase.co'), patch.object(module, 'SUPABASE_KEY', 'publishable'), patch.object(module.httpx, 'request') as request:
             request.return_value = httpx.Response(200, json=[])

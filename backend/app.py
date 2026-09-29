@@ -1,5 +1,4 @@
 """Render API. Supabase enforces permissions using the caller's JWT, never a service key."""
-from contextlib import asynccontextmanager
 from datetime import date
 import json
 import logging
@@ -22,17 +21,8 @@ SUPABASE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY', '')
 INFERENCE_LOCK = Lock()
 
 
-@asynccontextmanager
-async def lifespan(app):
-    # Fail deployment health checks if any model is missing or corrupt.
-    predict.load_resources()
-    predict_disease.load_resources()
-    if not predict_leaf.load_resources():
-        raise RuntimeError('Leaf model is missing')
-    yield
-
-
-app = FastAPI(title='DurianTrust API', lifespan=lifespan)
+# Optional models load inside inference, so an AI failure cannot block batch records.
+app = FastAPI(title='DurianTrust API')
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.environ.get('ALLOWED_ORIGIN', 'http://localhost:5173')],

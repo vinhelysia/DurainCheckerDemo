@@ -24,6 +24,8 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: pip install -r backend/requirements.txt
       - run: python -m unittest backend.test_app -v
+      - run: python -m unittest discover -s api -p 'test_*.py' -v
+      - run: python ml/leaf_training.py self-check
       - name: Check database permissions in disposable PostgreSQL
         env:
           PGPASSWORD: test-only

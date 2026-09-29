@@ -38,3 +38,5 @@ coverage/
 
 .vercel
 .venv-backend/
+# Downloaded training data, runtime, and checkpoints stay local.
+tmp/ai-training/

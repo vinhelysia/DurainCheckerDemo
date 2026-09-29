@@ -1,0 +1,23 @@
+.cloud-evidence .document-assistant { display: grid; gap: 16px; padding: 22px; border: 1px solid var(--color-line); border-radius: 9px; background: var(--color-bg-alt); min-width: 0; }
+.cloud-evidence .document-assistant-heading { display: flex; align-items: start; gap: 12px; }
+.cloud-evidence .document-assistant-heading > svg { flex-shrink: 0; color: var(--color-emerald); }
+.cloud-evidence .document-assistant-heading h3 { font-size: .98rem; margin: 0 0 6px; }
+.cloud-evidence .document-assistant-heading p,
+.cloud-evidence .document-assistant-privacy { font-size: .8rem; line-height: 1.75; color: var(--color-ink-soft); }
+.cloud-evidence .document-assistant-limit,
+.cloud-evidence .document-assistant-excerpt { font-size: .73rem; line-height: 1.75; color: var(--color-ink-soft); overflow-wrap: anywhere; }
+.cloud-evidence .document-assistant-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.cloud-evidence .document-assistant .button { min-height: 44px; max-width: 100%; padding: 10px 14px; font-size: .76rem; white-space: normal; }
+.cloud-evidence .document-assistant-status { font-size: .78rem; color: var(--color-green-deep); }
+.cloud-evidence .document-assistant-error,
+.cloud-evidence .document-assistant-warning { padding: 12px; border-left: 3px solid #98743a; background: #fcf6e8; color: #6e532e; font-size: .77rem; line-height: 1.75; }
+.cloud-evidence .document-assistant-review { display: grid; gap: 16px; padding-top: 20px; border-top: 1px solid var(--color-line-strong); min-width: 0; }
+.cloud-evidence .document-assistant-review-label { display: flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 600; }
+.cloud-evidence .document-assistant-extracted { min-width: 0; }
+.cloud-evidence .document-assistant-extracted summary { cursor: pointer; font-size: .78rem; font-weight: 600; }
+.cloud-evidence .document-assistant-extracted pre { max-height: 250px; overflow: auto; padding: 14px; margin: 14px 0 0; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 6px; color: var(--color-ink-soft); font-size: .73rem; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cloud-evidence .document-assistant-review label { font-size: .78rem; }
+.cloud-evidence .document-assistant-review .document-assistant-confirm { display: flex; align-items: start; gap: 10px; line-height: 1.75; cursor: pointer; }
+.cloud-evidence .document-assistant-confirm input { flex: 0 0 18px; width: 18px; height: 18px; min-height: 0; margin-top: 4px; accent-color: var(--color-emerald); }
+.cloud-evidence .document-assistant :is(summary, button, input):focus-visible { outline: 2px solid var(--color-emerald); outline-offset: 3px; }
+@media (max-width: 540px) { .cloud-evidence .document-assistant { padding: 18px; } }

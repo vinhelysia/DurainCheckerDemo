@@ -14,6 +14,7 @@ const SAMPLE_IMAGES = [
 export default function LeafDiseaseScanner() {
   const { language, copy } = useLanguage()
   const scannerCopy = copy.leafScanner
+  const t = (vi, en) => language === 'vi' ? vi : en
 
   const [imagePreview, setImagePreview] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -21,6 +22,7 @@ export default function LeafDiseaseScanner() {
   const [errorState, setErrorState] = useState(null)
   const [badgeSource, setBadgeSource] = useState(null) // 'ai' | 'error'
   const [lastRequest, setLastRequest] = useState(null) // Blob/File to retry with
+  const [manualNote, setManualNote] = useState('')
 
   const abortControllerRef = useRef(null)
   const isSlow = useSlowLoading(loading, 3000)
@@ -46,6 +48,15 @@ export default function LeafDiseaseScanner() {
   const handleImageChange = (e) => {
     const file = e.target.files[0]
     if (!file) return
+    if (file.size > 5 * 1024 * 1024 || file.size === 0) {
+      setPrediction(null)
+      setImagePreview(null)
+      setManualNote('')
+      setLastRequest(null)
+      setErrorState('Invalid file size')
+      setBadgeSource('error')
+      return
+    }
 
     // Revoke previous URL if exists
     if (imagePreview && imagePreview.startsWith('blob:')) {
@@ -55,6 +66,7 @@ export default function LeafDiseaseScanner() {
     const previewUrl = URL.createObjectURL(file)
     setImagePreview(previewUrl)
     setPrediction(null)
+    setManualNote('')
     setErrorState(null)
     setBadgeSource(null)
     setLastRequest(file)
@@ -72,12 +84,14 @@ export default function LeafDiseaseScanner() {
 
     setImagePreview(sample.src)
     setPrediction(null)
+    setManualNote('')
     setErrorState(null)
     setBadgeSource(null)
     setLoading(true)
 
     try {
       const response = await fetch(sample.src)
+      if (!response.ok) throw new Error('Sample unavailable')
       const blob = await response.blob()
       setLastRequest(blob)
       sendInferenceRequest(blob)
@@ -149,11 +163,9 @@ export default function LeafDiseaseScanner() {
     return scannerCopy.diseases[diseaseKey] || diseaseKey
   }
 
-  // Get translated generic care advice
-  const getTreatmentText = (diseaseKey) => {
-    if (!scannerCopy.treatments) return ''
-    return scannerCopy.treatments[diseaseKey] || ''
-  }
+  const unclear = prediction && ((prediction.review_reasons || []).some(reason =>
+    ['low_model_score', 'similar_scores', 'low_image_contrast'].includes(reason)) || prediction.probability < 0.8)
+  const errorLabel = errorState === 'Invalid file size' ? t('Tệp không hợp lệ', 'Invalid file') : scannerCopy.sourceOffline
 
   return (
     <div className="leaf-scanner-card">
@@ -161,6 +173,7 @@ export default function LeafDiseaseScanner() {
         <span className="leaf-scanner-kicker">{scannerCopy.kicker}</span>
         <h2 className="leaf-scanner-title">{scannerCopy.title}</h2>
         <p className="leaf-scanner-desc">{scannerCopy.desc}</p>
+        <p className="leaf-scanner-desc">{t('Model thử nghiệm với 5 nhóm lá. Kết quả cần người có chuyên môn đối chiếu; ảnh ngoài các nhóm này vẫn có thể bị nhận nhầm.', 'Experimental model covering five leaf classes. A specialist must review suggestions; images outside these classes may still be misclassified.')}</p>
       </div>
 
       <div className="leaf-scanner-controls">
@@ -211,22 +224,22 @@ export default function LeafDiseaseScanner() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
             <AlertCircle size={20} />
             <strong style={{ fontFamily: 'var(--font-mono)' }}>
-              {scannerCopy.sourceOffline}
+              {errorLabel}
             </strong>
           </div>
-          <p style={{ margin: 0, fontSize: '0.85rem' }}>{copy.common.aiUnavailable}</p>
+          <p style={{ margin: 0, fontSize: '0.85rem' }}>{errorState === 'Invalid file size' ? t('Chọn ảnh có dung lượng từ 1 byte đến 5 MB.', 'Choose an image between 1 byte and 5 MB.') : copy.common.aiUnavailable}</p>
           <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span className="scanner-badge scanner-badge-error">
-              {scannerCopy.sourceOffline}
+              {errorLabel}
             </span>
-            <button
+            {lastRequest && <button
               type="button"
               className="button button-secondary scanner-retry-btn"
               onClick={handleRetry}
             >
               <RotateCcw size={14} aria-hidden="true" />
               <span>{copy.common.retry}</span>
-            </button>
+            </button>}
           </div>
         </div>
       )}
@@ -253,12 +266,12 @@ export default function LeafDiseaseScanner() {
 
           <div className="scanner-result-details">
             <h3 className="scanner-result-title" style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-ledger)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-mono)' }}>
-              {scannerCopy.resultHeader}
+                {t('Gợi ý cần kiểm tra', 'Suggestion requiring review')}
             </h3>
 
             <div>
               <span style={{ fontSize: '0.8rem', color: 'var(--color-ink-soft)', display: 'block' }}>
-                {scannerCopy.diseaseLabel}
+                {t('Nhóm model đang nghiêng về — chưa phải chẩn đoán', 'Leading model class — not a diagnosis')}
               </span>
               <h2 className="scanner-disease-name" style={{ fontSize: '1.75rem', marginTop: '4px' }}>
                 {getDiseaseLabel(prediction.disease)}
@@ -268,25 +281,17 @@ export default function LeafDiseaseScanner() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Sparkles size={18} style={{ color: 'var(--color-gold)' }} />
               <span>
-                <strong>{scannerCopy.probabilityLabel}:</strong> {(prediction.probability * 100).toFixed(1)}%
+                <strong>{t('Điểm model (chưa hiệu chuẩn)', 'Model score (uncalibrated)')}:</strong> {(prediction.probability * 100).toFixed(1)}%
               </span>
             </div>
 
-            {getTreatmentText(prediction.disease) && (
-              <div className="scanner-remedy-box">
-                <span className="scanner-remedy-title">
-                  {scannerCopy.treatmentHeader}
-                </span>
-                <p className="scanner-remedy-text">
-                  {getTreatmentText(prediction.disease)}
-                </p>
-                {scannerCopy.treatmentDisclaimer ? (
-                  <p className="scanner-remedy-disclaimer">
-                    {scannerCopy.treatmentDisclaimer}
-                  </p>
-                ) : null}
-              </div>
-            )}
+            <div className="scanner-remedy-box" role="status">
+              <strong>{unclear ? t('Chưa đủ tin cậy để kết luận', 'Insufficient confidence to conclude') : t('Cần kiểm tra thủ công', 'Manual review required')}</strong>
+              <p className="scanner-remedy-text">{t('Điểm này không phải độ chính xác của chẩn đoán. Chụp rõ cả hai mặt lá, đối chiếu triệu chứng ngoài vườn và nhờ cán bộ kỹ thuật kiểm tra trước khi xử lý.', 'This score is not diagnostic accuracy. Photograph both sides of the leaf, compare field symptoms and ask an agricultural specialist to review before treatment.')}</p>
+              <label>{t('Ghi chú kiểm tra của bạn (chỉ giữ trên màn hình này)', 'Your review notes (kept only on this screen)')}
+                <textarea rows={3} maxLength={1000} value={manualNote} onChange={event => setManualNote(event.target.value)} style={{ display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 8 }} />
+              </label>
+            </div>
           </div>
         </div>
       )}

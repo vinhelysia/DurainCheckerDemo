@@ -1,0 +1,459 @@
+{
+  "validation_raw": {
+    "n": 443,
+    "accuracy": 0.8284424379232506,
+    "macro_f1": 0.8243701360006206,
+    "per_class_recall": {
+      "HEALTHY_LEAF": 0.8969072164948454,
+      "ALGAL_LEAF_SPOT": 0.7671232876712328,
+      "LEAF_BLIGHT": 0.851063829787234,
+      "PHOMOPSIS_LEAF_SPOT": 0.7045454545454546,
+      "ALLOCARIDARA_ATTACK": 0.9010989010989011
+    },
+    "confusion_matrix": [
+      [
+        87,
+        3,
+        1,
+        4,
+        2
+      ],
+      [
+        1,
+        56,
+        0,
+        9,
+        7
+      ],
+      [
+        5,
+        3,
+        80,
+        4,
+        2
+      ],
+      [
+        10,
+        2,
+        5,
+        62,
+        9
+      ],
+      [
+        1,
+        5,
+        1,
+        2,
+        82
+      ]
+    ],
+    "nll": 0.47364506125450134,
+    "brier": 0.2485709995410264,
+    "ece_10_bins": 0.022767771783854605,
+    "abstention": {
+      "threshold": 0.0,
+      "margin": 0.0,
+      "accepted": 443,
+      "coverage": 1.0,
+      "accepted_accuracy": 0.8284424379232506
+    }
+  },
+  "validation_calibrated": {
+    "n": 443,
+    "accuracy": 0.8284424379232506,
+    "macro_f1": 0.8243701360006206,
+    "per_class_recall": {
+      "HEALTHY_LEAF": 0.8969072164948454,
+      "ALGAL_LEAF_SPOT": 0.7671232876712328,
+      "LEAF_BLIGHT": 0.851063829787234,
+      "PHOMOPSIS_LEAF_SPOT": 0.7045454545454546,
+      "ALLOCARIDARA_ATTACK": 0.9010989010989011
+    },
+    "confusion_matrix": [
+      [
+        87,
+        3,
+        1,
+        4,
+        2
+      ],
+      [
+        1,
+        56,
+        0,
+        9,
+        7
+      ],
+      [
+        5,
+        3,
+        80,
+        4,
+        2
+      ],
+      [
+        10,
+        2,
+        5,
+        62,
+        9
+      ],
+      [
+        1,
+        5,
+        1,
+        2,
+        82
+      ]
+    ],
+    "nll": 0.47364506125450134,
+    "brier": 0.2485709995410264,
+    "ece_10_bins": 0.022767771783854605,
+    "abstention": {
+      "threshold": 0.76,
+      "margin": 0.2,
+      "accepted": 303,
+      "coverage": 0.6839729119638827,
+      "accepted_accuracy": 0.9372937293729373
+    }
+  },
+  "test_raw": {
+    "n": 889,
+    "accuracy": 0.8233970753655793,
+    "macro_f1": 0.8201659532858387,
+    "per_class_recall": {
+      "HEALTHY_LEAF": 0.9132653061224489,
+      "ALGAL_LEAF_SPOT": 0.8027210884353742,
+      "LEAF_BLIGHT": 0.7967914438502673,
+      "PHOMOPSIS_LEAF_SPOT": 0.6988636363636364,
+      "ALLOCARIDARA_ATTACK": 0.8907103825136612
+    },
+    "confusion_matrix": [
+      [
+        179,
+        3,
+        6,
+        7,
+        1
+      ],
+      [
+        6,
+        118,
+        4,
+        6,
+        13
+      ],
+      [
+        13,
+        10,
+        149,
+        11,
+        4
+      ],
+      [
+        24,
+        10,
+        10,
+        123,
+        9
+      ],
+      [
+        5,
+        6,
+        5,
+        4,
+        163
+      ]
+    ],
+    "nll": 0.4803926646709442,
+    "brier": 0.2507725790564794,
+    "ece_10_bins": 0.020655659575296064,
+    "abstention": {
+      "threshold": 0.0,
+      "margin": 0.0,
+      "accepted": 889,
+      "coverage": 1.0,
+      "accepted_accuracy": 0.8233970753655793
+    }
+  },
+  "test_calibrated": {
+    "n": 889,
+    "accuracy": 0.8233970753655793,
+    "macro_f1": 0.8201659532858387,
+    "per_class_recall": {
+      "HEALTHY_LEAF": 0.9132653061224489,
+      "ALGAL_LEAF_SPOT": 0.8027210884353742,
+      "LEAF_BLIGHT": 0.7967914438502673,
+      "PHOMOPSIS_LEAF_SPOT": 0.6988636363636364,
+      "ALLOCARIDARA_ATTACK": 0.8907103825136612
+    },
+    "confusion_matrix": [
+      [
+        179,
+        3,
+        6,
+        7,
+        1
+      ],
+      [
+        6,
+        118,
+        4,
+        6,
+        13
+      ],
+      [
+        13,
+        10,
+        149,
+        11,
+        4
+      ],
+      [
+        24,
+        10,
+        10,
+        123,
+        9
+      ],
+      [
+        5,
+        6,
+        5,
+        4,
+        163
+      ]
+    ],
+    "nll": 0.4803926646709442,
+    "brier": 0.2507725790564794,
+    "ece_10_bins": 0.020655659575296064,
+    "abstention": {
+      "threshold": 0.76,
+      "margin": 0.2,
+      "accepted": 631,
+      "coverage": 0.7097862767154106,
+      "accepted_accuracy": 0.9318541996830428
+    }
+  },
+  "config": {
+    "seed": 1337,
+    "epochs_limit": 12,
+    "batch_size": 64,
+    "minutes": 12.0,
+    "selected_epoch": 12,
+    "temperature": 1.0,
+    "confidence_threshold": 0.76,
+    "margin_threshold": 0.2,
+    "selection": "validation macro-F1; temperature/threshold validation only",
+    "manifest_sha256": "4ecbefbaf4759d9c6e817390b5eb818f28bc0a0fc964286dfac98e99b4f8317f",
+    "input": "float32 NHWC RGB [0,1] 1x224x224x3",
+    "backbone": "torchvision MobileNetV3Small ImageNet1K_V1",
+    "torch": "2.8.0+cu128"
+  },
+  "baseline_test": {
+    "n": 889,
+    "accuracy": 0.8537682789651294,
+    "macro_f1": 0.8508793225723752,
+    "per_class_recall": {
+      "HEALTHY_LEAF": 0.9744897959183674,
+      "ALGAL_LEAF_SPOT": 0.891156462585034,
+      "LEAF_BLIGHT": 0.8074866310160428,
+      "PHOMOPSIS_LEAF_SPOT": 0.6647727272727273,
+      "ALLOCARIDARA_ATTACK": 0.9234972677595629
+    },
+    "confusion_matrix": [
+      [
+        191,
+        1,
+        1,
+        2,
+        1
+      ],
+      [
+        5,
+        131,
+        2,
+        3,
+        6
+      ],
+      [
+        17,
+        8,
+        151,
+        2,
+        9
+      ],
+      [
+        31,
+        15,
+        4,
+        117,
+        9
+      ],
+      [
+        7,
+        7,
+        0,
+        0,
+        169
+      ]
+    ],
+    "nll": 0.4160725474357605,
+    "brier": 0.21040871099486197,
+    "ece_10_bins": 0.04733466096348116,
+    "abstention": {
+      "threshold": 0.8,
+      "margin": 0.2,
+      "accepted": 705,
+      "coverage": 0.7930258717660292,
+      "accepted_accuracy": 0.9390070921985816
+    }
+  },
+  "baseline_model_sha256": "2b61ebcc9bd9c993e6071500d88c2aed5467c4eba19a15053d6010ee7a23c8f4",
+  "baseline_provenance_warning": "Existing model training data unknown; possible exposure to this source holdout",
+  "baseline_validation": {
+    "n": 443,
+    "accuracy": 0.8758465011286681,
+    "macro_f1": 0.872565614124221,
+    "per_class_recall": {
+      "HEALTHY_LEAF": 0.9896907216494846,
+      "ALGAL_LEAF_SPOT": 0.8493150684931506,
+      "LEAF_BLIGHT": 0.8723404255319149,
+      "PHOMOPSIS_LEAF_SPOT": 0.7045454545454546,
+      "ALLOCARIDARA_ATTACK": 0.945054945054945
+    },
+    "confusion_matrix": [
+      [
+        96,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        2,
+        62,
+        0,
+        4,
+        5
+      ],
+      [
+        7,
+        3,
+        82,
+        1,
+        1
+      ],
+      [
+        16,
+        4,
+        2,
+        62,
+        4
+      ],
+      [
+        1,
+        3,
+        0,
+        1,
+        86
+      ]
+    ],
+    "nll": 0.4179737865924835,
+    "brier": 0.20293395320996727,
+    "ece_10_bins": 0.03851365646175014,
+    "abstention": {
+      "threshold": 0.8,
+      "margin": 0.2,
+      "accepted": 346,
+      "coverage": 0.781038374717833,
+      "accepted_accuracy": 0.9393063583815029
+    }
+  },
+  "export": {
+    "onnx_sha256": "1e277e7793822a7990898ea6c3121f4e09979ab7f9cd3c0a1aefdc49f887cbde",
+    "max_absolute_difference": 1.3113021850585938e-06,
+    "saved_gpu_validation_logit_max_difference": 0.017850399017333984,
+    "saved_gpu_validation_probability_max_difference": 0.003615438938140869,
+    "validation_samples_checked": 5,
+    "classes": [
+      "HEALTHY_LEAF",
+      "ALGAL_LEAF_SPOT",
+      "LEAF_BLIGHT",
+      "PHOMOPSIS_LEAF_SPOT",
+      "ALLOCARIDARA_ATTACK"
+    ],
+    "status": "candidate_only_not_promoted",
+    "repair": "Outer export wrapper set eval; no retraining or repeated candidate test evaluation"
+  },
+  "dataset": {
+    "source": "https://www.kaggle.com/datasets/cthng123/durian-leaf-disease-dataset",
+    "version": 1,
+    "license": "CC BY 4.0",
+    "archive_sha256": "d90b6f9d856d3f48016d78a205bc028d113e848fce1e07a072d1fe03ae0ce3bd",
+    "source_images": 4437,
+    "counts": {
+      "train": {
+        "HEALTHY_LEAF": 681,
+        "ALGAL_LEAF_SPOT": 512,
+        "LEAF_BLIGHT": 655,
+        "PHOMOPSIS_LEAF_SPOT": 614,
+        "ALLOCARIDARA_ATTACK": 639
+      },
+      "val": {
+        "HEALTHY_LEAF": 97,
+        "ALGAL_LEAF_SPOT": 73,
+        "LEAF_BLIGHT": 94,
+        "PHOMOPSIS_LEAF_SPOT": 88,
+        "ALLOCARIDARA_ATTACK": 91
+      },
+      "test": {
+        "HEALTHY_LEAF": 196,
+        "ALGAL_LEAF_SPOT": 147,
+        "LEAF_BLIGHT": 187,
+        "PHOMOPSIS_LEAF_SPOT": 176,
+        "ALLOCARIDARA_ATTACK": 183
+      }
+    },
+    "split_policy": "Source splits preserved; discard cross-split group members from lower-priority splits",
+    "deduplication": "exact RGB pixels + 64-bit dHash Hamming <=4; holdout-priority groups",
+    "orchard_tree_leaf_ids": "not provided; image holdout only, no independent-orchard claim"
+  },
+  "excluded_images": [
+    {
+      "path": "DLD_FinalDataset_224_spit/train/ALGAL_LEAF_SPOT/to_label_196.jpg",
+      "label": "ALGAL_LEAF_SPOT",
+      "split": "train",
+      "reason": "near_duplicate_cross_split"
+    },
+    {
+      "path": "DLD_FinalDataset_224_spit/train/HEALTHY_LEAF/to_label_2682.jpg",
+      "label": "HEALTHY_LEAF",
+      "split": "train",
+      "reason": "near_duplicate_cross_split"
+    },
+    {
+      "path": "DLD_FinalDataset_224_spit/train/HEALTHY_LEAF/to_label_2683.jpg",
+      "label": "HEALTHY_LEAF",
+      "split": "train",
+      "reason": "near_duplicate_cross_split"
+    },
+    {
+      "path": "DLD_FinalDataset_224_spit/test/LEAF_BLIGHT/to_label_3222.jpg",
+      "label": "LEAF_BLIGHT",
+      "split": "test",
+      "reason": "exact_duplicate"
+    }
+  ],
+  "pretrained_weights": {
+    "filename": "mobilenet_v3_small-047dcff4.pth",
+    "sha256": "047dcff4addef86ea5bc2eff13c9614dc11f47ab1160d0a71a25e7db994f4e1f"
+  },
+  "deployment_gate": {
+    "validation_macro_f1_min_improvement": 0.02,
+    "max_per_class_validation_recall_drop": 0.05,
+    "observed_validation_macro_f1_difference": -0.048195478123600366,
+    "passed": false,
+    "decision": "keep_existing_model; candidate_research_only; manual_review_required"
+  }
+}
