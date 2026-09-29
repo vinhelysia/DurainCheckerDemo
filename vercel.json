@@ -2,7 +2,8 @@
   "functions": {
     "api/**/*.py": {
       "maxDuration": 30,
-      "memory": 1024
+      "memory": 1024,
+      "excludeFiles": "{submission/**,output/**,public/**,*.pptx}"
     }
   }
 }
