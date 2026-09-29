@@ -1,4 +1,4 @@
-# DurianTrust — lời thuyết trình khoảng 10 phút
+# DurianTrust - lời thuyết trình khoảng 10 phút (deck v9)
 
 ## 1. DurianTrust (22s)
 
@@ -18,11 +18,11 @@ Luồng chính gồm bốn bước. Chủ hồ sơ tạo lô riêng tư. Tiếp 
 
 ## 5. Thông tin lô (20s)
 
-Tình huống minh họa dùng HTX chuẩn bị lô MAU-2026-01 tại Lâm Đồng, giống Ri6, khối lượng 850 kg và ngày thu hoạch 28/09/2026. Lô mới mặc định riêng tư. Màn quản lý tách thông tin, tài liệu, lịch sử và chia sẻ QR. Ảnh dùng dữ liệu local, không chứng minh đã tạo lô trên production.
+Tình huống minh họa dùng HTX chuẩn bị lô MAU-2026-01 tại Lâm Đồng, giống Ri6, khối lượng 850 kg và ngày thu hoạch 29/09/2026. Lô mới mặc định riêng tư. Màn quản lý tách thông tin, tài liệu, lịch sử và chia sẻ QR. Ảnh dùng giao diện compact chạy local với dữ liệu TEST và Auth/API mô phỏng. Chưa có kiểm chứng đầy đủ lượt ghi trên production.
 
 ## 6. Ảnh và tài liệu gắn với lô (20s)
 
-Mỗi lô có thể đính kèm ảnh JPG, PNG hoặc phiếu PDF, cùng nguồn và ngày tài liệu. Hệ thống kiểm tra loại tệp và dung lượng tối đa 5 MB. Việc đính kèm chưa xác minh người phát hành hoặc tính thật của phiếu.
+Mỗi lô có thể đính kèm ảnh JPG, PNG hoặc tài liệu PDF, cùng nguồn và ngày. Tài liệu TEST trong demo mô tả lô minh họa, không phải phiếu kiểm nghiệm. Hệ thống kiểm tra loại tệp và dung lượng tối đa 5 MB. Việc đính kèm chưa xác minh người phát hành hoặc tính thật của phiếu.
 
 ## 7. Lịch sử hành trình (18s)
 
@@ -38,11 +38,11 @@ Hồ sơ mới riêng tư. Chủ hồ sơ có thể công khai, rồi chuyển l
 
 ## 10. HTX chuẩn bị hồ sơ cho bên mua (90s)
 
-Bấm vào video 90 giây đã nhúng. HTX minh họa tạo lô MAU-2026-01, đính kèm ảnh và tài liệu mô tả lô, rồi thêm mốc đóng gói. Chủ hồ sơ kiểm tra nội dung trước khi công khai QR. Bên mua mở hồ sơ chỉ đọc và tìm tài liệu đúng lô. Cuối video, HTX chuyển lại riêng tư để chặn lượt đọc mới. Video dùng ảnh giao diện app local cùng con trỏ và highlight minh họa. Auth và API được mô phỏng, không chứng minh hoàn tất flow trên production. PDF là tài liệu demo, không phải phiếu kiểm nghiệm. Nếu PowerPoint không phát, dùng link video dự phòng hoặc file MP4 đi kèm.
+Bấm vào video 90 giây đã nhúng. HTX minh họa tạo lô riêng tư MAU-2026-01, thêm tài liệu TEST mô tả lô, rồi thêm mốc đóng gói. Chủ hồ sơ kiểm tra nội dung trước khi công khai QR. Bên mua mở hồ sơ chỉ đọc và tìm tài liệu đúng lô. Cuối video, HTX chuyển lại riêng tư để chặn lượt đọc mới. Video dùng ảnh chụp giao diện compact app local cùng con trỏ và highlight minh họa. Auth/API dùng fixture mô phỏng. Đây chưa phải ghi hình liên tục hoặc bằng chứng hoàn tất flow production. PDF là tài liệu demo, không phải phiếu kiểm nghiệm. Nếu PowerPoint không phát, dùng link video dự phòng hoặc file MP4 đi kèm.
 
 ## 11. Công nghệ và kiến trúc cloud (35s)
 
-Frontend dùng React 19 để dựng giao diện và Vite 8 để chạy development server, build website. Website deploy trên Vercel. Backend dùng Python với framework FastAPI, chạy bằng Uvicorn trên Render. Supabase Auth xử lý Google OAuth. Backend chuyển JWT người dùng tới Supabase Data API để PostgreSQL áp dụng Row Level Security theo tài khoản. Lô, lịch sử và metadata tài liệu nằm trong database; tệp đi trực tiếp từ browser tới Supabase Storage. Render Free có thể cần thời gian khởi động. Solana và AI chưa đồng bộ tự động vào hồ sơ cloud.
+Frontend dùng React 19 để dựng giao diện và Vite 8 để chạy development server, build website. Website deploy trên Vercel. Backend dùng Python với framework FastAPI, chạy bằng Uvicorn trên Render. Người dùng đăng nhập bằng Google. Supabase quản lý session và JWT phía sau Google login. Backend chuyển JWT người dùng tới Supabase Data API để PostgreSQL áp dụng Row Level Security theo tài khoản. Lô, lịch sử và metadata tài liệu nằm trong database; tệp đi trực tiếp từ browser tới Supabase Storage. Render Free có thể cần thời gian khởi động. Solana và AI chưa đồng bộ tự động vào hồ sơ cloud.
 
 ## 12. Bàn giao trên Solana (40s)
 
