@@ -1,16 +1,16 @@
-# DurianTrust - lời thuyết trình khoảng 10 phút (deck v9)
+# DurianTrust - lời thuyết trình khoảng 10 phút (deck v11)
 
-## 1. DurianTrust (22s)
+## 1. DurianTrust (35s)
 
-DurianTrust giúp nông hộ và hợp tác xã tập hợp thông tin của một lô sầu riêng thành hồ sơ có thể chia sẻ cho bên mua. Chúng tôi bắt đầu từ công việc cụ thể: lưu thông tin lô, đính kèm ảnh và tài liệu, rồi mở hồ sơ bằng QR. Phần Solana nghiên cứu bàn giao có chữ ký. Phần AI hỗ trợ thử nghiệm phân loại ảnh lá. Hai phần này có giới hạn riêng.
+Hãy hình dung một hợp tác xã ở Lâm Đồng chuẩn bị giao 850 ký sầu riêng. Bên mua hỏi: lô này của vườn nào, thu hoạch ngày nào, có tài liệu gì? Trong tình huống giả định này, câu trả lời nằm rải rác trong Zalo, Drive và sổ tay. DurianTrust gom chúng thành một hồ sơ theo từng lô. Chủ hồ sơ chọn công khai hồ sơ, bên mua mở bằng QR. Solana và AI là hai thử nghiệm riêng, chúng tôi sẽ nói rõ phạm vi ở phần sau.
 
-## 2. Vì sao DurianTrust ra đời? (45s)
+## 2. Vì sao DurianTrust ra đời? (40s)
 
 Trong tám tháng đầu năm 2026, khoảng 95% kim ngạch xuất khẩu sầu riêng Việt Nam đến từ Trung Quốc. Họp báo Chính phủ ngày 3 tháng 9 nêu khoảng 1,85 tỷ USD từ thị trường này trên tổng 1,95 tỷ USD ước tính. Mức phụ thuộc lớn khiến yêu cầu chất lượng và truy xuất của Trung Quốc đặc biệt quan trọng. DurianTrust chọn hỗ trợ phần hồ sơ: gắn thông tin vườn, phiếu lab và lịch sử với đúng lô để HTX và bên mua đối chiếu. Cadimi và Vàng O vẫn cần lấy mẫu, kiểm nghiệm. Nhóm chưa có pilot, nên tác động của website còn cần đo.
 
 ## 3. Người dùng đầu tiên (30s)
 
-Người dùng đầu tiên được đề xuất là nông hộ hoặc hợp tác xã chuẩn bị hồ sơ trước khi giao hàng. Họ tạo lô và chủ động chọn thông tin để chia sẻ. Bên mua mở QR để xem cùng hồ sơ mà không cần ví. Một đơn vị kiểm nghiệm có thể phát hành tài liệu, nhưng hệ thống hiện mới lưu tài liệu do chủ hồ sơ cung cấp. Chúng tôi chưa có xác nhận đối tác hay pilot thực địa.
+Người chuẩn bị hồ sơ dự kiến là nông hộ hoặc HTX; bên mua đầu tiên có thể là đơn vị thu mua hay doanh nghiệp xuất khẩu nhận lô từ HTX. Đây chưa phải khách hàng đã xác nhận. Zalo và Drive có thể đủ để trao đổi, lưu tệp. Điều nhóm muốn kiểm chứng là hồ sơ có cấu trúc theo lô giúp tìm và đối chiếu tài liệu dễ hơn. Đơn vị kiểm nghiệm có thể phát hành tài liệu; hệ thống hiện chỉ lưu tệp do chủ hồ sơ cung cấp.
 
 ## 4. Luồng hồ sơ lô (25s)
 
@@ -40,11 +40,11 @@ Hồ sơ mới riêng tư. Chủ hồ sơ có thể công khai, rồi chuyển l
 
 Bấm vào video 90 giây đã nhúng. HTX minh họa tạo lô riêng tư MAU-2026-01, thêm tài liệu TEST mô tả lô, rồi thêm mốc đóng gói. Chủ hồ sơ kiểm tra nội dung trước khi công khai QR. Bên mua mở hồ sơ chỉ đọc và tìm tài liệu đúng lô. Cuối video, HTX chuyển lại riêng tư để chặn lượt đọc mới. Video dùng ảnh chụp giao diện compact app local cùng con trỏ và highlight minh họa. Auth/API dùng fixture mô phỏng. Đây chưa phải ghi hình liên tục hoặc bằng chứng hoàn tất flow production. PDF là tài liệu demo, không phải phiếu kiểm nghiệm. Nếu PowerPoint không phát, dùng link video dự phòng hoặc file MP4 đi kèm.
 
-## 11. Công nghệ và kiến trúc cloud (35s)
+## 11. Công nghệ và kiến trúc cloud (25s)
 
-Frontend dùng React 19 để dựng giao diện và Vite 8 để chạy development server, build website. Website deploy trên Vercel. Backend dùng Python với framework FastAPI, chạy bằng Uvicorn trên Render. Người dùng đăng nhập bằng Google. Supabase quản lý session và JWT phía sau Google login. Backend chuyển JWT người dùng tới Supabase Data API để PostgreSQL áp dụng Row Level Security theo tài khoản. Lô, lịch sử và metadata tài liệu nằm trong database; tệp đi trực tiếp từ browser tới Supabase Storage. Render Free có thể cần thời gian khởi động. Solana và AI chưa đồng bộ tự động vào hồ sơ cloud.
+Giao diện dùng React 19 và Vite 8, triển khai trên Vercel. API Python dùng FastAPI trên Render. Google login qua Supabase cấp phiên đăng nhập; PostgreSQL áp dụng RLS theo tài khoản. Database giữ thông tin lô và lịch sử, còn ảnh và PDF ở Supabase Storage. Đây là luồng cloud, chưa tự đồng bộ với Solana hay AI.
 
-## 12. Bàn giao trên Solana (40s)
+## 12. Bàn giao trên Solana (34s)
 
 Program Solana viết bằng Rust với framework Anchor 0.31.1. Frontend gọi program qua Anchor JavaScript client và solana/web3.js; Wallet Adapter kết nối ví để ký. Người đang giữ lô ký đề xuất ví nhận, người nhận ký chấp nhận, rồi custody mới đổi. Chữ ký xác nhận trạng thái số, chưa thiết lập quyền sở hữu pháp lý hoặc chứng minh giao hàng vật lý. Luồng thử nghiệm cấu hình trên Devnet, không tự đồng bộ với cloud. Đã có kiểm thử local; chưa xác nhận binary Devnet khớp toàn bộ source hiện tại.
 
@@ -56,9 +56,9 @@ Chữ ký xác định ví nào đã gửi hoặc chấp nhận một bản ghi 
 
 API Python dùng Pillow/NumPy và ONNX Runtime để xử lý ảnh lá và đưa ra gợi ý trong năm nhóm đã định nghĩa. Giao diện hiển thị điểm của model và yêu cầu người có chuyên môn kiểm tra trước khi xử lý bệnh. Điểm model trên một ảnh chưa phải accuracy. Chúng tôi giữ model cũ; bản fine-tune chưa đáp ứng tiêu chí thay thế. Các phép đo, dataset và giới hạn nằm ở phụ lục để đối chiếu khi hỏi đáp. Ảnh lá không đo Cadimi hoặc Vàng O, và chưa có đánh giá độc lập theo vườn/cây để khẳng định hiệu quả ngoài thực tế.
 
-## 15. Các thử nghiệm dự đoán (25s)
+## 15. Các thử nghiệm dự đoán (18s)
 
-Hai thử nghiệm tabular dùng scikit-learn để huấn luyện, skl2onnx để xuất model và ONNX Runtime để inference. Script so sánh Random Forest với Logistic Regression. Dữ liệu là synthetic; không có cơ sở nói mô hình dự đoán đúng Cadimi thực tế. Bộ đối chiếu số đo với ngưỡng trong demo là quy tắc xác định, không phải AI. Ngưỡng minh họa chưa được xác minh pháp lý cho thị trường đích.
+Hai thử nghiệm dạng bảng dùng scikit-learn và ONNX Runtime, nhưng dữ liệu là synthetic, chưa chứng minh dự đoán đúng Cadimi thực tế. Phần đối chiếu số đo với ngưỡng demo là rule xác định, không phải AI. Nhóm chưa xác minh ngưỡng minh họa cho thị trường đích.
 
 ## 16. MVP hiện tại (35s)
 
@@ -72,9 +72,9 @@ MVP có website và API đã deploy. Người dùng đã xác nhận đăng nh�
 
 Ưu tiên gần nhất là kiểm thử end-to-end cloud trên production với hai tài khoản và một phiên ẩn danh. Tiếp theo là pilot để xác nhận người dùng thực sự cần quy trình nào. Giai đoạn sau cần đối tác phát hành tài liệu hoặc cơ chế attestation để kiểm tra nguồn bằng chứng. AI cần tập dữ liệu thực có provenance và đánh giá độc lập. Liên kết giữa cloud và Solana chỉ nên làm khi pilot chứng minh nhu cầu về bàn giao có chữ ký.
 
-## 19. Demo và mã nguồn (20s)
+## 19. Demo và mã nguồn (35s)
 
-Mời ban giám khảo mở hồ sơ mẫu bằng QR và xem repository công khai. DurianTrust tập trung vào một công việc có thể dùng thử: chuẩn bị và chia sẻ hồ sơ của một lô. Giá trị cần chứng minh bằng pilot là người dùng tìm được tài liệu đúng lô nhanh hơn và biết hồ sơ đang thiếu gì. Phần Solana nghiên cứu bàn giao có hai chữ ký, còn AI là thử nghiệm hỗ trợ. Chúng tôi mong nhận phản hồi về pilot và khả năng xác minh nguồn tài liệu.
+Chúng tôi xin để lại ba ý. Một: hồ sơ theo từng lô thay cho tài liệu rải rác. Hai: QR chỉ đọc, do chủ hồ sơ quyết định công khai. Ba: giá trị sẽ được đo bằng pilot, không phải bằng lời hứa. Bước tiếp theo là kiểm chứng luồng trên production và chạy thử với một hợp tác xã. Nếu ban giám khảo biết hợp tác xã sẵn sàng thử, hoặc đơn vị có thể phát hành tài liệu kiểm nghiệm, chúng tôi rất mong được kết nối. Xin cảm ơn.
 
 Tổng thời lượng dự kiến: 600 giây.
 

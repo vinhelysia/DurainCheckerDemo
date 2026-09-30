@@ -9,8 +9,8 @@ The practical workflow is for a grower or cooperative: create a private batch, r
 ## For team review
 
 - [Live web app](https://durian-web3.vercel.app/) and [Corelia project](https://app.corelia.academy/projects/duriantrust)
-- [Current 10-minute Morph deck (59 steps + AI appendix)](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v9.pptx), [short deck (19 slides + AI appendix)](submission/presentation/output/DurianTrust_Core_19_VI-HTX-v9.pptx), [speaker notes](submission/presentation/output/Speaker_Notes_VI_10min_HTX.md), and [Vietnamese script PDF](output/pdf/DurianTrust_Kich_ban_thuyet_trinh_10_phut_v6.pdf)
-- [90-second workflow video](public/submission/DurianTrust_HTX_Demo_90s.mp4): local UI with simulated auth/API, not a field pilot or verified production recording
+- [Current 10-minute Morph deck (59 steps + AI appendix)](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v11.pptx), [short deck (19 slides)](submission/presentation/output/DurianTrust_Core_19_VI-HTX-v11.pptx), [speaker notes](submission/presentation/output/Speaker_Notes_VI_10min_HTX.md), and [Vietnamese script PDF](output/pdf/DurianTrust_Kich_ban_va_Hoi_dap_giam_khao_v8.pdf)
+- [90-second workflow video with Vietnamese female AI narration](public/submission/DurianTrust_HTX_Demo_90s.mp4): local UI with simulated auth/API, not a field pilot or verified production recording
 - [External leaf-model evaluation](submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md) and [backend setup](backend/README.md)
 
 The leaf model file configured in this repo got 80/202 (39.6%) across three matched classes on the external-source check, including 0/59 Phomopsis. This is not a proven independent field test or a chemical safety assessment. The model running on Render has not been hash-verified against the repo file.
@@ -88,7 +88,7 @@ upload the local demo ledger. The diagram above describes the experimental path.
 
 **No wallet required to inspect the sample buyer record.** The production cloud workflow still needs an authenticated end-to-end check.
 
-Current pitch deck: [DurianTrust_Morph_59_VI-HTX-v9.pptx](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v9.pptx), with updated compact UI screenshots, an embedded 90-second video, technology logos and Google OAuth branding. Detailed AI evaluation is in the appendix after the 10-minute pitch. The v6 script PDF follows the refreshed compact UI and 90-second annotated TEST workflow. The root-level `DurianTrust_Pitch_Deck.pptx` is an older version.
+Current pitch deck: [DurianTrust_Morph_59_VI-HTX-v11.pptx](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v11.pptx), with updated compact UI screenshots, an embedded 90-second video with Vietnamese female AI narration, technology logos and Google OAuth branding. Detailed AI evaluation is in the appendix after the 10-minute pitch. The v8 script and judge Q&A PDF follows the refreshed compact UI and 90-second annotated TEST workflow. The root-level `DurianTrust_Pitch_Deck.pptx` is an older version.
 
 Current workflow video: [DurianTrust_HTX_Demo_90s.mp4](public/submission/DurianTrust_HTX_Demo_90s.mp4). It uses local simulated auth/API and does not demonstrate production access or a real HTX pilot.
 

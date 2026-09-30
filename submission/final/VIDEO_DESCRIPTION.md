@@ -15,6 +15,8 @@ Tài liệu minh họa không phải kết quả lab thật. QR và checklist ch
 
 Video: https://durian-web3.vercel.app/submission/DurianTrust_HTX_Demo_90s.mp4
 
+Thuyết minh: giọng nữ tổng hợp tiếng Việt Microsoft HoaiMyNeural; lời đọc đồng bộ theo từng cảnh, giữ chú thích, con trỏ và highlight.
+
 ## Mốc thời gian
 
 - 00:00 Đăng nhập minh họa

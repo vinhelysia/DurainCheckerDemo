@@ -35,7 +35,7 @@ QR liên kết đến hồ sơ do chủ lô cung cấp; checklist chỉ kiểm t
 
 Người dùng đã xác nhận Google sign-in vào được màn hình quản lý. Quy trình production đầy đủ — tạo lô, upload, kiểm tra riêng tư, công khai và thu hồi — **chưa được verify end to end**.
 
-Video 90 giây dùng ảnh chụp giao diện local có chú thích, dữ liệu TEST và Auth/API mô phỏng; không phải quay liên tục, bằng chứng production E2E hay pilot tại HTX. Website có hồ sơ mẫu chỉ đọc để xem không cần đăng nhập.
+Video 90 giây có thuyết minh nữ AI tiếng Việt (Microsoft HoaiMyNeural), dùng ảnh chụp giao diện local có chú thích, dữ liệu TEST và Auth/API mô phỏng; không phải quay liên tục, bằng chứng production E2E hay pilot tại HTX. Website có hồ sơ mẫu chỉ đọc để xem không cần đăng nhập.
 
 Chi tiết AI nằm trong model card và phụ lục: model API được cấu hình trong repo đạt **80/202 (39,6%)** trên ba nhãn được đối chiếu của Mendeley v2; Phomopsis **0/59**. Chưa xác minh provenance training hoặc hash model đang phục vụ trên Render, nên đây chưa phải independent field test. Candidate mới không vượt gate validation và chưa được promote. Các kết quả chỉ hỗ trợ nghiên cứu, cần manual review.
 
@@ -46,10 +46,10 @@ Verify production với hai tài khoản và một người xem ẩn danh; sau �
 ## Tài nguyên
 
 - [Website](https://durian-web3.vercel.app/) · [Hồ sơ mẫu](https://durian-web3.vercel.app/#/records/example)
-- [Video quy trình 90 giây](https://durian-web3.vercel.app/submission/DurianTrust_HTX_Demo_90s.mp4)
+- [Video 90 giây có giọng nữ tiếng Việt](https://durian-web3.vercel.app/submission/DurianTrust_HTX_Demo_90s.mp4)
 - [Source code](https://github.com/vinhelysia/DurainCheckerDemo)
-- [PowerPoint Morph v9](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v9.pptx) · [Bản Core 20 slide](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/presentation/output/DurianTrust_Core_19_VI-HTX-v9.pptx)
-- [Kịch bản thuyết trình 10 phút, PDF v6](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/output/pdf/DurianTrust_Kich_ban_thuyet_trinh_10_phut_v6.pdf)
+- [PowerPoint Morph v11](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v11.pptx) · [Bản Core 19 slide](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/presentation/output/DurianTrust_Core_19_VI-HTX-v11.pptx)
+- [Kịch bản 10 phút và 22 câu hỏi giám khảo, PDF v8](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/output/pdf/DurianTrust_Kich_ban_va_Hoi_dap_giam_khao_v8.pdf)
 - [Model card](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MODEL_CARD.md) · [External evaluation](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md)
 
 *Cập nhật 30/09/2026. Bộ trình bày có 19 ý chính và một phụ lục AI; bản Morph có 60 slide tổng cộng.*
