@@ -8,6 +8,7 @@ The practical workflow is for a grower or cooperative: create a private batch, r
 
 ## For team review
 
+- [Full Vietnamese project context for a new mobile chat](submission/context/DurianTrust_FULL_CONTEXT_VI.txt): current decisions, all 18 supporting documents, cloud/document source, and 22 judge Q&A. Upload the text file to the new chat; older source documents are labeled with their scope.
 - [Live web app](https://durian-web3.vercel.app/) and [Corelia project](https://app.corelia.academy/projects/duriantrust)
 - **Competition pitch (maximum 4 minutes):** [Core deck — 10 slides](submission/presentation/output/DurianTrust_Core_10_VI_4min.pptx), [Morph deck — 30 steps](submission/presentation/output/DurianTrust_Morph_30_VI_4min.pptx), [speaker notes](submission/presentation/output/Speaker_Notes_VI_4min_HTX.md), and [Vietnamese script PDF with AI appendix](output/pdf/DurianTrust_Kich_ban_4_phut_VI.pdf). Rehearsal target: 3:45 including the embedded 40-second video; verify by reading aloud with a timer. Slides advance manually; use the separate MP4 if embedded playback fails.
 - [40-second Vietnamese female AI narrated video](public/submission/DurianTrust_HTX_Demo_40s_VI.mp4): shortened TEST workflow with simulated auth/API.

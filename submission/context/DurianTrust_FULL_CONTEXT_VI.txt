@@ -1,0 +1,2328 @@
+DURIANTRUST — FULL PROJECT CONTEXT CHO CHAT MỚI
+Ngày chốt context: 30/09/2026. Snapshot source trước khi xuất: 8bffb19.
+
+Đây là gói context bàn giao gồm diễn giải các quyết định trong cuộc trò chuyện, toàn văn tài liệu kỹ thuật/nghiên cứu trong repo, kịch bản hiện hành, Q&A và cấu trúc dữ liệu. Không phải bản tóm tắt vài đoạn. Gói này không phải nguyên văn toàn bộ lịch sử chat, không bao gồm secret, hình dashboard, bản scan nhận xét hay transcript riêng tư. Những tài liệu đó không được phát hành công khai. Những gì nhóm không có hoặc chưa kiểm chứng được ghi rõ thay vì phục dựng.
+
+HƯỚNG DẪN CHO ASSISTANT NHẬN CONTEXT
+Người dùng đang chuẩn bị pitch DurianTrust tại UniHackFest 2026 và muốn hỏi trên điện thoại khi luyện Q&A. Hãy đọc toàn bộ file trước khi trả lời câu hỏi dự án. Chủ yếu giao tiếp tiếng Việt, dùng từ dễ hiểu, giữ technical terms thông dụng. HTX = hợp tác xã.
+Khi người dùng gửi câu hỏi giám khảo: trước hết viết một đoạn có thể nói trong 15–25 giây; sau đó chỉ thêm giải thích sâu nếu cần. Với câu hỏi gồm nhiều ý, trả lời từng ý. Không tự sửa repo hoặc triển khai thay đổi khi người dùng chỉ cần giải thích. Không bịa API, kết quả test, khách hàng, đối tác, mức giá, nghiên cứu mới hay chứng nhận.
+Phân biệt: chức năng trong source; kiểm thử local; kết quả deploy được ghi nhận; xác nhận của người dùng; production E2E; thử nghiệm ngoài thực địa. Đây là các mức bằng chứng khác nhau.
+Nếu không có dữ kiện, nói rõ chưa biết. Nếu cần thông tin pháp lý hoặc quy định nhập khẩu đang có hiệu lực, tra nguồn chính thức mới; bài báo bối cảnh trong file không thay văn bản pháp lý.
+
+THỨ TỰ ƯU TIÊN KHI CÁC TÀI LIỆU KHÁC THỜI ĐIỂM KHÔNG ĐỒNG NHẤT
+1. Phần tình trạng và các quyết định cập nhật trong đầu file này.
+2. Kịch bản 4 phút và bản Core 10 / Morph 30 hiện hành.
+3. Source code/schema và tài liệu backend hiện tại cho cơ chế kỹ thuật.
+4. Model card / external evaluation / Colab report đúng experiment, đúng ngày.
+5. Báo cáo góp ý 28/09 và nội dung Corelia/video 90 giây là tài liệu tham khảo có ngày, không phải pitch hiện hành.
+Không gộp metrics của hai candidate khác nhau hoặc dùng một phép đo trên nguồn ảnh này để thay phép đo trên nguồn ảnh khác.
+
+===============================================================================
+PHẦN A — ĐỊNH VỊ, QUYẾT ĐỊNH, LỊCH SỬ VÀ TÌNH TRẠNG HIỆN HÀNH
+===============================================================================
+
+A1. Danh tính và đường dẫn
+Tên sản phẩm: DurianTrust. Tên GitHub repo giữ cách viết cũ DurainCheckerDemo.
+Website: https://durian-web3.vercel.app/
+Repo public: https://github.com/vinhelysia/DurainCheckerDemo
+Corelia: https://app.corelia.academy/projects/duriantrust
+Hackathon: https://app.corelia.academy/hackathons/unihackfest-2026
+Backend công khai: https://duriantrust-api.onrender.com
+Người dùng đã tự chuyển repo sang public và yêu cầu đưa source/tài liệu cần review lên GitHub cho teammate. Đã yêu cầu không đăng ảnh dashboard Google OAuth, Render hoặc Supabase.
+Người dùng nói có quyền nộp trên Corelia và đã đăng nhập. Tên đội/thành viên chưa được cung cấp đầy đủ trong lịch sử hiện có; không tự điền. Từng có thông tin deadline/vòng thi khác nhau giữa các nguồn, nên không suy luận tình trạng dự thi hoặc xác nhận nộp cuối từ việc có trang dự án. Người dùng yêu cầu chọn Best AI Build vì dự án có AI; đây là ý muốn, không phải bằng chứng đủ điều kiện hoặc được trao giải.
+
+A2. Vì sao dự án tồn tại
+Động lực ban đầu là xuất khẩu sầu riêng, kiểm nghiệm, an toàn và truy xuất. Người dùng đặc biệt yêu cầu đưa bối cảnh Trung Quốc chiếm khoảng 95% kim ngạch xuất khẩu sầu riêng Việt Nam vào phần vấn đề. Số có nguồn là kỳ tám tháng đầu năm 2026, không phải 95% sản lượng hoặc tỷ lệ cố định qua mọi năm.
+Những lô bị trả/chờ do yêu cầu kiểm nghiệm hay hồ sơ là bối cảnh. Phần mềm không xử lý nguyên nhân hóa học hoặc quyết định thông quan. Giả thuyết công việc cần kiểm chứng là: chủ hồ sơ mất công gom thông tin, ảnh/tài liệu và lịch sử đúng lô; bên mua khó tìm và đối chiếu.
+Ví dụ Zalo, Drive và sổ tay trong mở bài là tình huống giả định, chưa xuất phát từ khảo sát một HTX cụ thể. Không gọi đó là phát hiện nghiên cứu đã khảo sát.
+Tình huống minh họa: hợp tác xã ở Lâm Đồng chuẩn bị giao 850 kg, mã MAU-2026-01. Đây không phải khách hàng thật, đơn hàng thật, sản lượng pilot hoặc phiếu lab thật.
+
+A3. Định vị sản phẩm sau khi người dùng yêu cầu tính thực dụng
+Sản phẩm chính là website hồ sơ theo lô, quyền truy cập theo tài khoản và QR cho bên mua. Solana và AI là thử nghiệm riêng. Luồng cloud dùng được mà không cần ví hoặc blockchain.
+Người dùng từng cân nhắc bỏ dự án để làm escrow hoặc ý tưởng web3 khác vì blockchain không bắt buộc. Cuối cùng quyết định tiếp tục DurianTrust và làm thực dụng hơn. Không có dự án escrow được coi là một phần của sản phẩm này.
+Người dùng dự kiến: nhà vườn, hợp tác xã, đơn vị thu mua tạo hồ sơ; người nhận trực tiếp từ HTX như đơn vị thu mua/doanh nghiệp xuất khẩu xem hồ sơ. Nhà nhập khẩu Trung Quốc có thể là nhóm xem tiếp theo, chưa có khách hàng xác nhận.
+Chưa có pilot, đối tác HTX, doanh nghiệp hoặc lab; chưa có doanh thu, hợp đồng, khảo sát willingness to pay hoặc giá được xác nhận. Giả thuyết trả phí: đơn vị quản lý nhiều lô có thể trả để tiết kiệm công sức. Nếu pilot không tạo giá trị hơn cách hiện tại, cần thu hẹp hoặc đổi giải pháp.
+
+A4. Luồng cloud hiện có
+Đăng nhập Google -> tạo lô riêng tư -> nhập thông tin lô -> thêm ảnh/PDF/tài liệu và nguồn/ngày -> thêm sự kiện hành trình -> checklist chỉ ra thông tin còn thiếu -> chủ hồ sơ công khai -> bên mua mở QR chỉ đọc -> có thể tải tài liệu -> chủ hồ sơ chuyển lại riêng tư.
+Hiện công khai toàn bộ hồ sơ, lịch sử và bằng chứng gắn với lô, chưa có chọn riêng từng trường/tệp để chia sẻ. Câu “chủ hồ sơ chọn thông tin để chia sẻ” trong ý tưởng mở bài cũ cần diễn đạt lại thành “chọn công khai hồ sơ”.
+Thu hồi quyền đọc chỉ chặn yêu cầu mới. Bản đã tải hoặc ảnh chụp màn hình không thể bị xóa từ xa.
+Checklist kiểm sự hiện diện/chất lượng nhập liệu cơ bản; không kiểm nghiệm hóa học, xác thực lab hoặc xác nhận đủ điều kiện xuất khẩu.
+Ngày sự kiện/ngày tài liệu là khai báo. created_at là lúc server ghi nhận. Cloud event bàn giao là khai báo một phía, không phải custody có chữ ký hai bên.
+Nguồn tài liệu do người upload khai báo. Có file PDF trong hệ thống không đồng nghĩa file đó do lab hợp lệ phát hành.
+
+A5. Màn hình và UI đã được yêu cầu
+Giữ logo và màu xanh. Hướng thiết kế sạch, đáng tin, compact, có khoảng thở, ảnh lớn ở phần giới thiệu, danh sách lô gọn và chọn lô để xem chi tiết.
+Đã yêu cầu polish toàn bộ app: trang chủ, giới thiệu, quản lý, hồ sơ bên mua, sign-in/onboarding. Login dùng Google với logo Google phổ biến; không thêm email/password chỉ để giống reference.
+Website không phải React framework server-rendered như Next.js: frontend là React + Vite SPA, dùng hash routes, CSS của repo. Tài liệu README cũ có cụm dark glassmorphism; đây không phải yêu cầu giao diện mới đã chốt.
+Routes chính hiện tại:
+- #/manage: cloud workspace.
+- #/manage/cloud: alias cloud.
+- #/records/example: hồ sơ mẫu chỉ đọc, không ghi database.
+- #/cloud?batchId=<uuid>: hồ sơ cloud theo UUID, truy cập tùy visibility.
+- #/manage/solana: công cụ Solana/AI thử nghiệm riêng.
+- #/unit/demo: lookup/đọc thử nghiệm chain hoặc mẫu có nhãn nguồn.
+- #/intro/problem và #/intro/solution: giới thiệu vấn đề/giải pháp.
+Một số đoạn App Flows cũ trong README mô tả #/manage là portal Phantom. Route đó đã chuyển sang cloud; Phantom hiện ở #/manage/solana.
+Giao diện có VI/EN. Đổi ngôn ngữ giao diện không dịch nội dung tự nhập hoặc tài liệu PDF. Chưa có hồ sơ tiếng Trung hoặc dịch chứng thực đã kiểm chứng.
+
+A6. Kiến trúc cloud và authentication
+Frontend React/Vite trên Vercel. Backend Python/FastAPI trên Render. Supabase cung cấp Auth, PostgreSQL/PostgREST và private Storage.
+Google OAuth đi qua Supabase Auth, callback PKCE. Việc người dùng yêu cầu bỏ chữ “Supabase Auth” trên slide/nhãn công nghệ không có nghĩa đã gỡ Supabase Auth khỏi source.
+Lô thuộc một tài khoản Supabase, không phải một team workspace dùng chung với quyền thành viên đã triển khai.
+Render forwards JWT của user tới Supabase. Dùng publishable key, không dùng service-role key để bypass RLS. Browser VITE_* là cấu hình public; không đặt secret ở đó.
+Email magic-link từng gặp email rate limit. Nhóm chưa có domain/SMTP riêng và đã chọn Google login để tiếp tục. Cooldown UI không tăng quota email. Không tắt verification để vượt lỗi email.
+Render Free được người dùng chấp nhận; có cold start/ngủ khi không hoạt động. Không cam kết SLA hoặc luôn trả lời tức thì. Theo tài liệu repo, frontend chờ tối đa khoảng 90 giây và báo lỗi thay vì giả thành công.
+Backend deploy dùng public Git connection; tài liệu repo yêu cầu Manual Deploy cho commit backend sau này, không giả định auto deploy đã bật.
+
+A7. Quyền dữ liệu, lưu tệp và ranh giới bảo mật
+RLS cho cloud_batches/cloud_events/cloud_evidence. Chủ hồ sơ xem/sửa trường được phép, append event/evidence và thay visibility. Anonymous xem khi public. Tài khoản B không có quyền owner của A.
+Column grants ngăn client đổi owner, backdate created_at, sửa/xóa event history. Administrator database vẫn có quyền quản trị: cloud không phải ledger bất biến chống cả administrator.
+Tệp bytes được upload thẳng Supabase Storage bằng JWT. Backend lưu/liên kết metadata qua API. Bucket batch-evidence private, JPG/PNG/PDF tối đa 5 MiB (5.242.880 bytes).
+Metadata evidence append-only. File đã liên kết không được client thay/xóa. Unlinked upload vẫn chỉ owner đọc và có thể cleanup theo policy.
+Hồ sơ có mã riêng trong mỗi owner; UUID phân biệt hai chủ hồ sơ có cùng mã lô.
+CORS hạn chế browser origin nhưng không thay authentication hoặc rate limit. AI endpoints public có giới hạn input và concurrency; chưa có claim chống abuse hoàn chỉnh.
+Chưa chứng minh quy trình backup/restore, retention/deletion, incident response, security audit độc lập, load test, cost per batch hoặc production SLA.
+
+A8. Document assistant (phần dễ bị bỏ sót khi giới thiệu AI)
+Có trợ lý đọc tài liệu chạy trong browser: Tesseract.js OCR cho ảnh tiếng Việt/English; PDF.js đọc text layer của PDF. Không phải LLM được nhóm fine-tune, không xác thực chứng thư.
+Chỉ đề xuất nguồn và ngày từ dòng có nhãn rõ ràng; không tự đưa vào form. User phải review và xác nhận Apply. Không đoán ngày dạng mơ hồ.
+PDF scan không có text chuyển sang nhập tay; chưa có pipeline OCR mọi trang PDF scan. Giới hạn đọc 5 trang, 20 triệu pixels, 50.000 ký tự; file vẫn theo 5 MiB.
+Có abort/reset khi thay/xóa tệp, tránh kết quả cũ ghi đè tệp mới. Parser không quyết định an toàn thực phẩm hay cho kết luận lab.
+Local QA thật đã đọc nguồn/ngày đúng từ các fixture ảnh Việt/English và PDF text. QA dùng tệp tự tạo có nhãn TEST, Auth/cloud fixture; không chứng minh accuracy trên chứng thư thực tế hoặc production E2E.
+Điểm số model lá trên một ảnh không phải accuracy. Confidence chưa được dùng làm bằng chứng ảnh là lá sầu riêng hoặc disease đúng. Manual review vẫn cần cả khi score cao.
+
+A9. Solana, roles và custody
+Smart contract Rust + Anchor; cluster dùng cho thử nghiệm là Solana Devnet, không mainnet.
+Canonical source program/programs/durian_trust/src/lib.rs; public source/IDL là snapshot sinh từ canonical, không chứng minh binary đang deploy tương ứng.
+Accounts liên quan: Batch, LabReport, TimelineEvent, CustodyRecord, Role và Config. PDA là địa chỉ account được derive theo program và seeds.
+Roles farmer/lab/logistics quyết định loại nghiệp vụ được ghi; custody là ví đang được ghi nhận giữ một lô. Hai quyền này độc lập.
+Current holder ký đề nghị người nhận; recipient phải ký accept thì holder mới đổi và có CustodyRecord. Authority không có đường đơn phương đổi holder trong instructions custody hiện tại. Role administration, upgrade authority và compromise key vẫn là governance risks khác.
+Custody chain-only, không có acceptance fallback local giả chữ ký. Các form ledger khác có thể dùng localStorage simulation riêng, phải hiện nhãn; không phải on-chain.
+Cloud/local/chain độc lập, không auto-sync. Solana không bảo vệ dữ liệu cloud bằng bất biến khi chưa liên kết.
+Chữ ký chứng minh ví ký payload/hành động số, không chứng minh lab pháp lý, sample thật, trái đúng lô, giao hàng vật lý hoặc quyền sở hữu pháp lý.
+Không mint SPL/Metaplex NFT: thêm mint/ATA/CPI không làm bằng chứng thực tế mạnh hơn. Không có tokenomics hoặc escrow trong sản phẩm hiện tại.
+Không benchmark Solana so với Fabric/permissioned ledger hoặc ordinary DB để chứng minh lựa chọn tối ưu. Lựa chọn production còn tùy governance, confidentiality, nhu cầu các bên và số đo.
+Chain accounts/transactions public. Cloud riêng tư không làm dữ liệu đã đưa lên Devnet bí mật.
+Attestation v2 có thiết kế và test local với native Ed25519, domain-separated Borsh payload. Frontend lab vẫn gọi legacy numeric-report; v2 chưa tích hợp toàn bộ UI và chưa được xác nhận deploy trong giai đoạn này. Không gọi upload PDF là attestation v2.
+Lookup thử nghiệm chain fetch matching accounts rồi cap hiển thị 200; không phải RPC pagination. Chưa có production indexer/scalability benchmark.
+
+A10. Rule engine và hai tabular AI
+Rule-based quality gate nhận giá trị Cadmium và threshold demo. Đây là deterministic rule, không phải ML đo hóa chất.
+Ngưỡng mặc định 0,05 ppm chỉ là demo chưa xác minh áp dụng pháp lý cho sản phẩm/thị trường hiện tại. Không dùng để cấp kết luận export-compliant.
+Parser dùng đơn vị nguyên 0,0001 ppm, từ chối excess precision, input sai, số âm; cùng units dùng transaction encoding. Đã kiểm các trường hợp như 0,045 ppm thay vì làm tròn sai.
+Hai model tabular là pipeline ONNX trên synthetic datasets: Cadmium risk và environmental disease risk. Không có ground truth kiểm nghiệm hoặc kết quả field-validation, không gọi là chemical detector.
+Training scripts tabular đã chỉnh split/leakage/output candidate; báo cáo nói chưa rerun synthetic training ở lượt đó. Không bịa accuracy mới.
+AI endpoints: /api/predict, /api/predict_disease, /api/predict_leaf. Vercel Python functions là path cũ/fallback khi không cấu hình Render base URL; primary deployment hiện dùng Render theo backend README. Diagram README về Vercel inference mô tả path thử nghiệm, không toàn bộ cloud hiện hành.
+
+A11. Leaf AI — phân biệt ba model/experiment
+Production-configured baseline file trong repo: api/leaf_disease_model.onnx. Training provenance cũ chưa xác minh đầy đủ. Chưa đối chiếu hash với model live Render.
+Output five-class: healthy, algal leaf spot, leaf blight, phomopsis leaf spot, allocaridara attack. Không có unknown/non-leaf class được kiểm chứng.
+Input contract RGB float32 NHWC [0,1], 224x224; candidate PyTorch đưa NCHW/ImageNet normalization vào graph. Không đổi preprocessing baseline nếu chưa parity/evaluation.
+
+Experiment 1 — candidate local 12 epochs:
+- DurianLDD v1, public CC BY 4.0; 4.437 ảnh theo tác giả, sau dedup 4.433.
+- Retained train/validation/test 3101/443/889; không có tree/orchard IDs.
+- MobileNetV3Small pretrained ImageNet; seed 1337, batch 64; RTX 4060 Laptop.
+- Chọn epoch 12 bằng validation macro-F1.
+- Candidate validation 82,84%, macro-F1 0,8244; baseline validation 87,58%, macro-F1 0,8726.
+- Candidate test 82,34%, macro-F1 0,8202; baseline test 85,38%, macro-F1 0,8509.
+- Gate validation: macro-F1 tăng >=0,02 và không recall lớp giảm >0,05. Candidate fail, không promote.
+- Có selective accuracy/coverage trong model card nhưng chỉ trong dataset five-class, không field/OOD guarantee; không lẫn selective accuracy với overall accuracy.
+
+Experiment 2 — Colab dài hơn theo yêu cầu user:
+- Thực sự chạy notebook Colab trên Tesla T4, không chỉ soạn notebook.
+- Protocol tối đa 24 epochs, early stop sau 4 epoch không cải thiện; thực tế dừng 23, chọn epoch 19.
+- Validation 443 ảnh: 85,33% accuracy, 0,8499 macro-F1.
+- Validation-only; không rerun test đã xem từ experiment trước, không fit calibration/abstention hoặc đo baseline lại trong lượt này.
+- ONNX parity trên 5 validation examples max abs diff 2,98e-6; parity không chứng minh accuracy ngoài thực địa.
+- Candidate chưa deploy.
+
+Experiment 3 — external-source check Mendeley v2:
+- Dataset public CC BY 4.0, khác source/taxonomy. Map chỉ Healthy, Algal, Phomopsis; không ép Colletotrichum/Rhizoctonia/Blight sang năm lớp hiện tại.
+- 207 ảnh selected source test, loại 5 ảnh gần trùng còn 202.
+- Candidate Colab: 72/202 = 35,6%; Healthy 24/73, Algal 31/70, Phomopsis 17/59.
+- Baseline repo: 80/202 = 39,6%; Healthy 44/73, Algal 36/70, Phomopsis 0/59.
+- Cùng preprocessing/output taxonomy cho hai model trong phép đối chiếu.
+- Không fine-tune hoặc chọn threshold theo kết quả external vừa xem.
+- dHash chỉ heuristic; không chứng minh độc lập theo cây/vườn; provenance baseline chưa rõ nên không gọi là proven independent field test.
+- 85,38% và 39,6% là hai phép đo của cùng baseline, không hai model. 85,33% là validation của candidate Colab, không baseline 85,38%.
+Người dùng từng yêu cầu “remove model 39,6” nhưng sau giải thích đã chốt GIỮ model, đưa kết quả chi tiết vào phụ lục slide/PDF. Không xóa hoặc che số 39,6%; không promote candidate kém hơn.
+Muốn nâng AI thực dụng: ảnh có quyền sử dụng, labels chuyên gia, ảnh ngoài taxonomy/ảnh mờ/nhiều bệnh, cây/vườn/ngày ID, holdout mới; không tiếp tục tune trên test đã nhìn.
+Ảnh lá không đo Cadmium/Auramine O. Hai synthetic tabular và OCR không bù được giới hạn đó.
+
+A12. Góp ý cuộc thi cũ và cách khắc phục
+User cung cấp PDF biên bản nhận xét và transcript. Không còn bản báo cáo gốc, không có phiếu lab thật, không có đối tác/pilot. Full report cũ không thể sửa bookmark/mục lục vì thiếu source. Không dựng thêm nội dung nghiên cứu để tăng số trang.
+Các nhóm góp ý: lý do đề tài, người dùng/quyền quản lý, tính mới, necessity của blockchain, public confidentiality, QR-physical binding, role/lab issuer, floating-point/parser, contract E2E, source Rust/IDL drift, attestation caller, synthetic datasets, provenance/accuracy AI, scalability/indexer, pilot và báo cáo/nguồn.
+Đã có sửa parser/units, canonical source sync, local native-validator checks, nội dung bối cảnh có nguồn, cloud Google login để giảm rào cản ví, private/public sharing rõ hơn, document review/manual fallback, dataset audit và thật sự train/evaluate candidate.
+Các phần chưa khắc phục bằng chứng: field pilot, xác thực issuer/lab/mẫu, lựa chọn chain theo benchmark, live contract binary equivalence, attestation-v2 UI integration, production E2E toàn bộ, valid independent field accuracy, tải/backup/restore/commercial demand.
+Không tuyên bố “đã khắc phục tất cả” chỉ vì UI/deck đã đẹp hơn.
+
+A13. Kiểm chứng đã biết và chưa biết
+- User confirmed Google login hiển thị tài khoản và Tạo lô; browser agent chưa independently thấy toàn bộ vì từng bị saved permissions chặn.
+- Backend docs ghi đã check health, ba ONNX endpoints, production-origin CORS, anonymous Data API empty, owner-list unauthenticated 401, unknown public UUID 404. Đây là kiểm tra được ghi trước đó, không phải vừa chạy lại khi xuất context.
+- Local unit/mock tests, OCR/PDF fixture QA, disposable PostgreSQL RLS checks là bằng chứng cơ chế; không thay production account isolation/file upload E2E.
+- Góp ý 28/09 ghi 72 parser/rule tests, 19 native-validator attestation, 20 custody/authority pass với binary local; không rebuild/deploy/verify Devnet binary trong lượt đó.
+- 30/09 vừa hoàn tất package/layout/import checks Core 10, Morph 30; PDF 5 trang đã render/kiểm phần thay đổi; video decode và duration 40,00 giây đã check.
+- Native PowerPoint playback/Morph và thời lượng người nói chưa đo. Không nói đã rehearsal 3:45 hoặc đã nghe QA toàn bộ audio nếu chưa.
+- Chưa có production live create/upload/publish/revoke toàn bộ, tài khoản thứ hai thật, lab thật, HTX pilot, chemical safety evaluation, SLA/load/cost hoặc disaster recovery evidence.
+
+A14. Bộ pitch hiện hành — tối đa 4 phút
+User đã sửa hiểu nhầm: 4 phút là MAX BTC cho phép, không phải muốn kéo dài bài hiện tại. Bản 10 phút / 19 slide / 59 bước là reference cũ.
+Current Core 10 slides: DurianTrust; vấn đề; người dùng; workflow; video; cloud stack; Solana; AI lá; trạng thái MVP/pilot; QR/repo/kết bài.
+Current Morph 30 steps: cùng 10 ý, nhấn mạnh từng thành phần bằng Morph, không hover hoặc navigation giả.
+Giữ nền/ảnh, dùng shapes/icons như vườn, tài liệu, QR, cloud, AI, bàn giao. Logos tech phản ánh technology, không logo khách hàng/đối tác.
+Video current pitch: DurianTrust_HTX_Demo_40s_VI.mp4, 40,00 giây, nữ tổng hợp vi-VN-HoaiMyNeural. Cut các cảnh tạo lô, thêm tài liệu TEST, share QR, buyer read, revoke từ video 90s; không speed-up. Clip vẫn là ảnh chụp local + cursor/highlight, auth/API fixture; không continuous production recording.
+Video embedded Core slide 5, Morph step 14. Manual advance; ghi 3:45 là target. 15s buffer trước giới hạn 4:00. Không nói đè lên narration.
+Timing: 00:00–00:15 mở đầu; 00:15–00:40 vấn đề; 00:40–00:55 người dùng; 00:55–01:15 workflow; 01:15–01:55 video; 01:55–02:20 cloud; 02:20–02:40 Solana; 02:40–03:00 AI; 03:00–03:25 MVP/pilot; 03:25–03:45 kết.
+Core file: submission/presentation/output/DurianTrust_Core_10_VI_4min.pptx.
+Morph file: submission/presentation/output/DurianTrust_Morph_30_VI_4min.pptx.
+Script: submission/presentation/output/Speaker_Notes_VI_4min_HTX.md.
+PDF: output/pdf/DurianTrust_Kich_ban_4_phut_VI.pdf (4 trang pitch + 1 AI appendix ngoài giờ).
+40s MP4: public/submission/DurianTrust_HTX_Demo_40s_VI.mp4.
+Commit đã push: 8bffb19. Không thay file deck v11 user đã chỉnh local; tạo bản mới riêng.
+Q&A v8 có 22 câu, được đưa nguyên lời đáp ở cuối context nhưng old slide/page pointers bị loại để tránh dùng nhầm. Các câu này là dự kiến, không phải BTC bảo đảm hỏi.
+Corelia text/video full vẫn mô tả 90 giây và 19/59-slide tài liệu dài; file đó được đánh dấu reference, chưa có bằng chứng đã thay link Corelia sang short pitch sau 8bffb19.
+
+A15. Pilot và cách nói về production
+Pilot đề xuất một HTX và một bên mua, khoảng 10–20 hồ sơ lô để thăm dò, không coi đủ chứng minh hiệu quả thống kê. Xin quyền tài liệu và dữ liệu trước.
+Đo cùng tác vụ theo cách cũ và website; đổi thứ tự để giảm bias do đã biết câu trả lời. Ghi thời gian từng lượt, số file thiếu/sai mã, số lần hỏi lại, lỗi thao tác/quyền. Báo số lượt hoàn tất, median/range, giới hạn mẫu; không tự đặt lời hứa tiết kiệm 50/80%.
+Production gate: A create/upload/readback cùng bytes; A thiết bị khác đọc được; B/anonymous không đọc private; public cho read record/files nhưng B không edit; revoke chặn reads/files mới; unlinked upload luôn private; Render restart dữ liệu còn; backup/restore, monitoring và vận hành cần kiểm thử trước dữ liệu thật.
+User chỉ có một tài khoản Google và không có phiếu lab thật; đã chọn TEST. Không tuyên bố đã kiểm B thật hoặc lab thật.
+
+A16. Cách ứng phó câu hỏi ngoài danh sách
+Hỏi đúng trọng tâm rồi trả lời bằng mức bằng chứng hiện có. Nếu chưa làm, nói “Phần này nhóm chưa triển khai/kiểm chứng; hướng tiếp theo là …” và nêu phép đo/cơ chế cụ thể.
+Không gọi prototype là service đã vận hành ngoài đời. Không nói blockchain làm đầu vào đúng, NFT bảo đảm quyền sở hữu, QR chống giả tuyệt đối, confidence = accuracy, OCR = xác thực lab, hoặc AI lá đo hóa chất.
+Một câu chưa có trong script có thể trả lời bằng kiến trúc/schema trong tài liệu đính kèm; khi source không đủ thì không suy đoán feature.
+Người dùng dùng Android. Pairing Remote từng bị login redirect loop; mục tiêu hiện tại là copy/upload file này vào chat điện thoại độc lập. Chat điện thoại không được giả định tự có quyền filesystem, Supabase, Render hoặc lịch sử Codex trên PC.
+
+===============================================================================
+PHẦN B — TOÀN VĂN TÀI LIỆU SOURCE VÀ BẰNG CHỨNG
+===============================================================================
+Các file bên dưới giữ nguyên nội dung để không bỏ kết quả, caveat hoặc protocol. Nội dung có ngày cũ cần đọc theo thứ tự ưu tiên ở đầu file. Repo paths là đường dẫn trong repo, không file tự có trong điện thoại.
+
+
+
+===============================================================================
+B01. FILE: README.md
+Phạm vi: Overview đầy đủ; route/design/inference path cũ được đính chính trong phần A
+Source SHA256: e9dc5e1c211be03c3da2266416125cf7f8689b7e5caa6064b27bb68a4089dada
+===============================================================================
+
+# DurianTrust
+
+**DurianTrust — batch records, declared evidence and buyer QR sharing, with separate Solana Devnet and AI experiments.**
+
+The practical workflow is for a grower or cooperative: create a private batch, record variety and weight, attach photos/documents with a source and date, add journey events, then publish a buyer QR. Files and statements are supplied by the owner; neither a QR nor the completeness checklist authenticates physical fruit, laboratory certificates or export eligibility.
+
+`#/manage` is the cloud workspace. `#/records/example` is a read-only sample, clearly labeled and never uploaded. `#/manage/solana` contains the separate custody and AI experiments; cloud batches do not sync to them. The user confirmed Google sign-in reaches the management screen. Email sign-in still needs SMTP for broader use. Authenticated creation, file upload and public/private access on production remain unverified end to end.
+
+## For team review
+
+- [Live web app](https://durian-web3.vercel.app/) and [Corelia project](https://app.corelia.academy/projects/duriantrust)
+- **Competition pitch (maximum 4 minutes):** [Core deck — 10 slides](submission/presentation/output/DurianTrust_Core_10_VI_4min.pptx), [Morph deck — 30 steps](submission/presentation/output/DurianTrust_Morph_30_VI_4min.pptx), [speaker notes](submission/presentation/output/Speaker_Notes_VI_4min_HTX.md), and [Vietnamese script PDF with AI appendix](output/pdf/DurianTrust_Kich_ban_4_phut_VI.pdf). Rehearsal target: 3:45 including the embedded 40-second video; verify by reading aloud with a timer. Slides advance manually; use the separate MP4 if embedded playback fails.
+- [40-second Vietnamese female AI narrated video](public/submission/DurianTrust_HTX_Demo_40s_VI.mp4): shortened TEST workflow with simulated auth/API.
+- Longer reference: [10-minute Morph deck](submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v11.pptx), [19-slide deck](submission/presentation/output/DurianTrust_Core_19_VI-HTX-v11.pptx), and [full script and judge Q&A PDF](output/pdf/DurianTrust_Kich_ban_va_Hoi_dap_giam_khao_v8.pdf)
+- [90-second workflow video with Vietnamese female AI narration](public/submission/DurianTrust_HTX_Demo_90s.mp4): local UI with simulated auth/API, not a field pilot or verified production recording
+- [External leaf-model evaluation](submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md) and [backend setup](backend/README.md)
+
+The leaf model file configured in this repo got 80/202 (39.6%) across three matched classes on the external-source check, including 0/59 Phomopsis. This is not a proven independent field test or a chemical safety assessment. The model running on Render has not been hash-verified against the repo file.
+
+## The problem
+
+Reports in 2025 describe contamination concerns and tighter controls affecting Vietnamese durian exports. Fragmented laboratory and origin records are a related software problem; this project does not establish what share of rejected shipments results from paperwork. Its research scope is managing, linking, authorizing and auditing evidence associated with a batch, rather than detecting chemicals.
+
+Market concentration is a central motivation: the [government briefing on 2026-09-03](https://baochinhphu.vn/hop-bao-chinh-phu-thuong-ky-thang-8-dai-dien-bo-cong-an-lam-ro-nhieu-van-de-duoc-quan-tam-102260903170016698.htm) estimated that China accounted for approximately 95% of Vietnam's durian export value in January–August 2026, around USD 1.85 billion out of USD 1.95 billion. This makes that market's quality and traceability requirements particularly important. These figures are period-specific estimates, not a permanent market share or evidence of this prototype's impact.
+
+The original motivation combines quality-control concerns with traceability requirements. The [Plant Protection Department's 2022 explanation](https://sansangxuatkhau.ppd.gov.vn/tin-tuc-su-kien/sau-rieng-duoc-xuat-khau-chinh-ngach-sang-trung-quoc.html) describes record keeping and traceability to growing areas. This motivates testing a batch dossier workflow; it does not prove demand for this website. The team confirmed on 2026-09-28 that it has no field pilot, original dataset provenance documentation or real laboratory measurements available. Proposed first users are growers/cooperatives preparing records for buyers. Time savings and business impact remain hypotheses.
+
+Sources: [VietnamPlus](https://en.vietnamplus.vn/vietnam-steps-up-quality-control-of-durian-exports-to-retain-billion-dollar-market-post321595.vnp) · [MOIT/VNTR](https://vntr.moit.gov.vn/news/china-tightens-import-rules-on-vietnamese-durians) · [Tuổi Trẻ](https://tuoitre.vn/sau-rieng-xuat-khau-sang-trung-quoc-giam-sau-bo-truong-do-duc-duy-chi-dao-loat-giai-phap-20250508164730467.htm) · [SGGP](https://en.sggp.org.vn/vietnams-durian-industry-reeling-as-china-rejects-shipments-over-contaminants-post117622.html)
+
+## The solution
+
+The cloud workspace provides private records, append-only evidence metadata and event history, and explicit QR publication using [Render + Supabase](backend/README.md). The following capabilities are separate research/demo tools:
+
+- **An append-only blockchain ledger.** Authorized users can record batch, lab and journey data through Solana transactions; those records preserve what was submitted, not whether physical claims were independently verified.
+- **A transferable custody record.** Each batch has an on-chain holder that can move along the supply chain. A handoff takes two signatures: the current holder nominates the next one, and *the recipient must sign to accept*. The program does not let its authority unilaterally change the recorded holder. This digital state does not establish legal title or physical delivery.
+- **A Rule-Based Quality Gate.** Entered Cadmium values are compared with a configured demo threshold (default 0.05 ppm). Its legal applicability has not been verified. The output is a deterministic below-threshold/review/hold rule result, not an official compliance decision. Decimal input uses integer units of 0.0001 ppm, rejects excess precision and invalid values, and uses exactly the same units for transaction encoding.
+- **AI-assisted screening.** Two tabular ONNX models use synthetic datasets to demonstrate a prediction pipeline; they are not evidence of real-world Cadmium prediction. The leaf classifier has a [cross-source check](submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md), but its original training provenance and field performance remain unresolved. Leaf images cannot detect Cadmium or Auramine O.
+- **One QR code per batch.** Scanning it opens the same verification page a judge, buyer, or customs officer would see, with the batch's full timeline, custody chain, and ledger proof.
+
+### Scope of digital custody
+
+A durian batch is a physical asset whose handoffs need a clear record. The Batch PDA links its submitted evidence and the wallet currently recorded as holder; the recipient must accept a proposed transfer. This gives the demo a verifiable digital custody trail. Legal title, liability and physical delivery require evidence outside the program.
+
+The batch is deliberately **not** minted as an SPL/Metaplex NFT. A mint would add mint accounts, ATAs and CPI plumbing while changing nothing about what is actually proven; an NFT would be a wrapper over exactly the state the program already enforces. The program constrains its digital custody state; this is not legal ownership or a guarantee that the correct physical lot was handed over.
+
+## Architecture
+
+The primary workspace uses React on Vercel, Google sign-in through Supabase Auth, a Render API forwarding each user's JWT, PostgreSQL with RLS, and private Supabase Storage. Buyers can read explicitly published batch records without a wallet. Batch owners manage their declared details and append evidence/events; database administrators retain administrative control. A cloud delivery event is a one-sided declaration.
+
+### Separate Solana and inference experiments
+
+```mermaid
+flowchart LR
+    subgraph Client["Browser — React 19 + Vite SPA"]
+        UI["Landing · #/unit/demo · #/manage"]
+        Phantom["Phantom Wallet Adapter"]
+    end
+
+    subgraph Devnet["Solana Devnet"]
+        Program["Anchor program: durian_trust"]
+        PDAs["Batch / LabReport / TimelineEvent /\nCustodyRecord / Role accounts"]
+    end
+
+    subgraph AI["Vercel Python Serverless Functions (ONNX)"]
+        Predict["/api/predict\nCadmium risk"]
+        Disease["/api/predict_disease\nEnvironmental disease risk"]
+        Leaf["/api/predict_leaf\nLeaf image classifier"]
+    end
+
+    Fallback[["Bundled demo data +\nlocalStorage fallback ledger"]]
+
+    UI -- "reads (getProgramAccounts)" --> Program
+    UI -- "signs writes via" --> Phantom
+    Phantom -- "sendAndConfirm" --> Program
+    Program --- PDAs
+    UI -- "synthetic risk demonstration" --> Predict
+    UI --> Disease
+    UI -- "sample or uploaded photo" --> Leaf
+    UI -. "devnet unreachable" .-> Fallback
+```
+
+The experimental views read batch state from Solana program accounts and call demonstration inference endpoints. Some ledger forms offer a separately labeled local simulation. Custody has no simulated acceptance path. Cloud records, local simulations and chain state are independent; the app does not synchronize them.
+
+The [Render + Supabase backend](backend/README.md) supports the primary workspace:
+Google sign-in, private off-chain batch records, evidence files, append-only event
+history, and public QR sharing. It does not replace Solana custody or silently
+upload the local demo ledger. The diagram above describes the experimental path.
+
+## Judge quickstart
+
+**No wallet required to inspect the sample buyer record.** The production cloud workflow still needs an authenticated end-to-end check.
+
+Current competition pitch: [10-slide Core deck](submission/presentation/output/DurianTrust_Core_10_VI_4min.pptx) or [30-step Morph deck](submission/presentation/output/DurianTrust_Morph_30_VI_4min.pptx). Both embed the 40-second Vietnamese narrated video and include timed speaker notes targeting 3:45 total. Detailed AI evaluation remains outside the timed speech in the [4-minute script PDF appendix](output/pdf/DurianTrust_Kich_ban_4_phut_VI.pdf). The 19/59-slide v11 decks remain longer references; the root-level `DurianTrust_Pitch_Deck.pptx` is an older version.
+
+Current workflow video: [DurianTrust_HTX_Demo_90s.mp4](public/submission/DurianTrust_HTX_Demo_90s.mp4). It uses local simulated auth/API and does not demonstrate production access or a real HTX pilot.
+
+Captioned product introduction: [DurianTrust_Intro_73s.mp4](public/DurianTrust_Intro_73s.mp4). This is a code-rendered explainer, not a recording of product interaction; the hackathon backup demo video must show real app use.
+
+Guided UI simulation: [DurianTrust_Guided_Walkthrough_72s.mp4](public/DurianTrust_Guided_Walkthrough_72s.mp4). A cursor and highlights walk through the real product flow using a code-rendered recreation of the interface. It is labeled as a simulation throughout and is not the required screen recording.
+
+1. Open `#/records/example` to inspect the sample buyer record without signing in. Use Google sign-in at `#/manage` for your own batches. To inspect the independent Solana demo, open `#/unit/demo`; its source badge distinguishes chain data from bundled samples.
+2. Look at the **chain of custody** panel next to the timeline. Inspect the selected batch and its data-source badge. Available records may change over time; use captured transaction evidence for a dated scenario. A pending recipient does not become the recorded holder until acceptance.
+3. Scroll to the **leaf disease scanner** and click one of the sample thumbnails — it runs the real ONNX model and returns a prediction in one click, no file upload needed.
+4. To take custody yourself, open `#/manage/solana` with [Phantom](https://phantom.app/) on **Devnet**. Select a batch for which your wallet is the nominated recipient; only that recipient can sign **Accept custody**. Accepting moves `Batch.owner` and appends a permanent `CustodyRecord`.
+5. To try the rest of the **write path** (registering a batch, submitting a lab report, logging a timeline event), grab free devnet SOL from **[faucet.solana.com](https://faucet.solana.com)**. The app detects a missing wallet or an empty devnet balance and tells you what to do. Every submitted form has a **"Fill sample data"** button so you don't have to invent realistic values by hand.
+
+**The rules worth testing.** Try to transfer a batch your wallet doesn't hold — the program rejects it. Current custody instructions do not grant the `config.authority` a unilateral reassignment path. Role administration, program upgrade authority, key compromise and future code changes remain separate governance risks.
+
+## What's on-chain vs. simulated
+
+We'd rather be upfront about this than have you find out mid-demo:
+
+| Feature | Status |
+|---|---|
+| Batch registration, lab reports, timeline events | **Real** — Solana devnet transactions via the `durian_trust` Anchor program, when a wallet is connected and devnet is reachable. Falls back to a localStorage-simulated ledger otherwise, always clearly badged. |
+| Chain of custody (recorded holder transfer) | **Real, and chain-only.** `transfer_custody` + `accept_custody` on devnet, both signatures required. There is deliberately **no fallback** for this one: the localStorage ledger cannot prove a signed custody handoff. Without devnet, the portal refuses and says why. |
+| Synthetic risk demonstration (`/api/predict`) | ONNX inference with a local JS fallback (badged). Training data are synthetic; no validated chemical prediction claim. |
+| Synthetic disease-risk demonstration (`/api/predict_disease`) | ONNX inference with a local JS fallback. Synthetic pipeline demonstration, not a field-validated risk estimate. |
+| Leaf disease image classifier (`/api/predict_leaf`) | ONNX classifier for screening only. The repo's API model file got 80/202 (39.6%) on three matched classes from Mendeley Data v2, with Phomopsis at 0/59; see the [protocol and limits](submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md). This does not establish field accuracy or identify the live Render model hash. |
+| Rule-based quality gate (Cadmium threshold check) | **Deterministic JS**, not AI — this is what actually gets written on-chain as the audit verdict, by design (auditable, not a black box). |
+| QR codes | **Real** — generated client-side and encode real deep links back into the app. |
+| Transaction proofs / Solana Explorer links | **Real** devnet signatures when on-chain; explicitly labeled `simulated, not on-chain` in fallback mode. |
+
+## Tech stack
+
+- **Frontend:** React 19, Vite, hash-based routing, `lucide-react` icons, hand-rolled dark glassmorphism design system (no CSS framework)
+- **Chain:** Solana (devnet), Anchor framework, `@coral-xyz/anchor` + `@solana/web3.js`, Phantom via `@solana/wallet-adapter-react`
+- **AI:** ONNX Runtime models served from Python functions on Vercel (Cadmium risk, disease risk, leaf image classification)
+- **QR:** `qrcode` for generation, `html5-qrcode` for camera scanning
+- **i18n:** Custom bilingual (VI/EN) copy system, no external i18n library
+
+## Setup
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a local environment file if you need a custom devnet RPC:
+
+```bash
+VITE_RPC_URL=https://api.devnet.solana.com
+```
+
+Run the app locally:
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173/` and connect Phantom on Solana devnet to submit signed transactions.
+
+Build for production:
+
+```bash
+npm run build
+```
+
+## Anchor Program
+
+The canonical Anchor source is `program/programs/durian_trust/src/lib.rs`. Build it with Anchor 0.31.1, then run `node scripts/sync-contract.mjs --write` from the app root to refresh the public source and generated IDL. Run `--check` to detect drift. These snapshots describe the local release candidate; they do not prove that this binary is deployed on devnet. See [the contract release guide](program/RELEASE.md) for testing and attestation v2 compatibility.
+
+Solana signing is handled by Phantom in the browser. The old EVM `.env` `PRIVATE_KEY` is no longer required and should not be used by this app.
+
+## App Flows
+
+- `#/`: bilingual product overview for durian traceability, AI screening, and blockchain verification.
+- `#/unit/demo`: batch lookup by QR or batch ID, journey timeline, chain of custody, lab report history, and Solana Explorer proof.
+- `#/manage`: operator portal for Phantom-signed batch registration, role management, lab report updates, timeline updates, custody handoff and acceptance, QR label generation, and AI model checks.
+
+## Roles vs. custody
+
+These are two different things, and the program treats them that way.
+
+**Roles** (`farmer`, `lab`, `logistics`) are grants from the program authority that say *what kind of write you may perform* — who can register a batch, who can file a lab report, who can log a timeline event. They are revocable and they are not scarce.
+
+**Custody** is the on-chain holder recorded for a specific batch. It is separate from roles and held by exactly one wallet at a time. An importer with no role grant can accept and later hand off a batch; a `logistics` role holder who is not the recorded holder cannot transfer it. This digital record does not establish legal ownership. The custody panel is in the experimental `#/manage/solana` workspace.
+
+## Testing
+
+Build the program, then run the native-validator suites from `program/`:
+
+```bash
+npm ci --legacy-peer-deps
+TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:attestation
+TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:panel
+```
+
+The suites use generated wallets and an isolated local validator to check native Ed25519 attestation, custody acceptance, role restrictions, pause and authority handover. On Windows PowerShell, set `$env:TEST_VALIDATOR_PATH` to the full path of `solana-test-validator.exe` before each command. The older `npm test` bankrun suite remains manual; its genesis-authority fixture requires a specific signer.
+
+
+## Research limitations after panel review
+
+- Frontend lab submissions currently call the legacy numeric-report instruction, not the attestation-v2 instruction. Contract-side v2 support alone does not mean certificate verification is integrated in the UI.
+- No authenticated official PUC registry, laboratory PDF verification, temperature sensor feed or customs-system connection is claimed. Yellow O results cannot be inferred from Cadmium or leaf AI.
+- QR labels contain unsigned lookup URLs and can be copied; label-to-physical-lot binding is unresolved.
+- Public lookup fetches matching chain accounts and then displays at most 200 summaries; this is a client cap, not RPC pagination. The management list fetches all current-layout batch accounts. No production indexer is implemented.
+- Browser unit/mock tests demonstrate code behavior, not real-wallet E2E, legal compliance or business impact. On 2026-09-28, the rule/unit regression tests passed (72 tests), source/IDL sync check passed, and the existing local binary passed native-validator attestation (19) and custody/authority (20) tests. No Devnet deployment was verified or changed in these checks.
+
+### Why Solana remains an experiment
+
+The current dossier workflow can use an ordinary database with access controls. Solana is used to explore a recipient-signed custody trail across wallets; this repository does not demonstrate that it is superior to a permissioned network such as Hyperledger Fabric or necessary for cooperative adoption. Selecting a production ledger requires partner governance, confidentiality requirements and a measured comparison. Current chain account fields and transaction data are public; private cloud records do not make that experimental chain data confidential. Do not submit business secrets to the Devnet demonstration. File hashes alone would not authenticate an issuer or physical sample.
+
+
+
+
+===============================================================================
+B02. FILE: backend/README.md
+Phạm vi: Thiết kế cloud, security boundaries, deploy và verification gates
+Source SHA256: 03d484a1197538e39bfbb4e488f50975bf43d5901b79a702f13941808b667caf
+===============================================================================
+
+# Render + Supabase deployment
+
+The Vercel frontend can call the Render API for all three ONNX endpoints and
+authenticated cloud records. Existing Vercel inference stays available when
+`VITE_API_BASE_URL` is unset. Solana and the local demo ledger remain separate.
+
+## Current deployment
+
+- Render Free, Singapore: `https://duriantrust-api.onrender.com`
+- Service ID: `srv-dars44vavr4c73fvgt20`
+- Verified live: health, all three ONNX endpoints, and production-origin CORS.
+- `.env.production` contains the public Render URL, Supabase URL and publishable key.
+  Hosting environment variables can override that value. Local Vite development
+  continues to use its own environment configuration.
+- Supabase project: `yexeietfcpucxvtpcflr`. Both cloud migrations were applied through
+  SQL Editor on 2026-09-27. Batches, events and evidence have RLS enabled.
+  The `batch-evidence` bucket is private and accepts JPG/PNG/PDF up to 5 MB.
+  Render has its URL/publishable key and reports `cloud_configured: true`.
+- Verified live: anonymous Data API reads return empty lists; Render rejects an
+  unauthenticated owner-list request with 401 and an unknown public record with 404.
+  These checks do not prove authenticated creation or account isolation in production.
+- Google OAuth is configured and the user confirmed reaching the management screen.
+  This is a user confirmation, not an independently observed production E2E run.
+  Email magic links also use PKCE. Site URL is
+  `https://durian-web3.vercel.app/?auth=callback`. Open the link in the same browser
+  that requested it. SMTP is not configured for wider email sign-in. The full live
+  create/upload/private/publish/revoke workflow still needs verification.
+- This service uses the public Git repository connection. Deploy later backend
+  commits with Render's Manual Deploy control; do not assume automatic deploys.
+
+## 1. Supabase (Free)
+
+1. Create a project in your account. Keep its database password in your password
+   manager; do not put it in the repository or chat.
+2. Run each SQL file in `supabase/migrations/` once, in filename order, in SQL Editor.
+   **Do not run `supabase/test_rls.sql` there**; that file creates fake Auth tables
+   and is only for an empty disposable database.
+3. Enable Email Auth and keep the default **Magic link or OTP** email template.
+   Set Site URL to `https://durian-web3.vercel.app/?auth=callback` (or your own
+   deployment's equivalent). The app exchanges the PKCE code once, removes it
+   from the URL, and opens the cloud portal. No tokens are routed through the hash.
+   Use the same browser for requesting and opening the link. Local development
+   needs its own exact callback URL in Supabase's redirect allowlist.
+4. Configure a real SMTP provider before inviting arbitrary users. Supabase's
+   default email service restricts recipients/rate; initially test with an allowed
+   team email. Do not disable verification to work around mail delivery.
+5. Copy the project URL and **publishable** key from project settings.
+
+### Google sign-in (no SMTP)
+
+The frontend supports Google OAuth using the existing PKCE callback. Keep
+`VITE_GOOGLE_AUTH_ENABLED` unset until the provider is configured; then set it to
+`true` and redeploy the frontend. No Google secret belongs in `VITE_*` variables.
+
+1. In Google Auth Platform, configure the consent screen and a **Web application**
+   OAuth client. Use only `openid`, email and profile scopes.
+2. Set the JavaScript origin to `https://durian-web3.vercel.app` and the authorized
+   redirect URI to `https://yexeietfcpucxvtpcflr.supabase.co/auth/v1/callback`.
+3. Enter the Client ID and Client Secret in Supabase's **Google provider** settings
+   and enable it. Keep the secret out of source control and chat.
+4. Keep the Supabase Site URL as `https://durian-web3.vercel.app/?auth=callback`.
+   Add that exact callback to the redirect allowlist if needed. Do not add a wildcard.
+5. If Google's audience is in Testing, add the intended test accounts there.
+   Complete the applicable Google publishing requirements before inviting others.
+6. Enable the frontend flag, sign in with Google, then test private creation,
+   evidence upload/download and publish/revoke from a signed-out browser.
+
+Google login does not use the email resend cooldown. Cancelled OAuth callbacks
+show a retry message and never create a local substitute session.
+
+Reference: [Supabase Google OAuth](https://supabase.com/docs/guides/auth/social-login/auth-google).
+
+## 2. Render (Free)
+
+Create a Blueprint from `https://github.com/vinhelysia/DurainCheckerDemo` using
+the root `render.yaml`. The Git repo root is `durian-web3`, not its parent local
+folder. There is no `rootDir` setting to add.
+
+Set these Render environment variables:
+
+| Variable | Value |
+|---|---|
+| `SUPABASE_URL` | Your Supabase project URL |
+| `SUPABASE_PUBLISHABLE_KEY` | Your publishable key; never a service/secret key |
+| `ALLOWED_ORIGIN` | `https://durian-web3.vercel.app` (no trailing slash) |
+
+Wait for `/health` to return `status: ok` and `cloud_configured: true`.
+This means models loaded and variables exist, not that database permissions or
+email delivery have been tested. The free service sleeps after inactivity; the
+frontend allows up to 90 seconds, then offers an error instead of false success.
+
+## 3. Vercel frontend
+
+Add these environment variables and redeploy:
+
+```text
+VITE_API_BASE_URL=https://YOUR-SERVICE.onrender.com
+VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+```
+
+`VITE_*` values are public in the browser bundle. No `service_role`, secret key,
+database password, wallet secret, or Render API token belongs here.
+
+The management portal is `#/manage` (`#/manage/cloud` remains an alias).
+`#/records/example` is a clearly labeled read-only sample with no database writes.
+Public QR records use
+`#/cloud?batchId=<uuid>` and are read anonymously. Their immutable UUIDs keep
+records distinct even when different users choose the same batch code.
+
+## Security and data boundaries
+
+- New cloud batches are private. The owner explicitly publishes all batch details
+  and event history plus attached evidence together. Making a record private revokes future anonymous
+  reads; it cannot erase copies or screenshots already taken.
+- Render forwards the user's Supabase JWT to PostgREST. It does not use a service
+  key that bypasses RLS. Direct Data API access is subject to the same policies.
+- Owners edit declared batch details (including variety and weight), append events
+  and attach evidence with a declared source/date. This presence checklist does not
+  verify the issuing lab, authenticity, quality or export eligibility.
+  Column grants prevent choosing a
+  different owner, backdating `created_at`, rewriting events, or deleting history.
+- Input dates are declared event dates; server `created_at` is the time recorded.
+  All measurements remain user-entered. Database administrators can change data;
+  this is not a tamper-proof blockchain ledger or an authenticated lab report.
+- Cloud ownership grants no Solana wallet role. Custody transfers still require
+  the existing on-chain signatures. No local demo data is uploaded automatically.
+  Experimental Solana and AI tools are at `#/manage/solana`; cloud batches do not
+  automatically sync to them. Cloud delivery events are one-sided declarations.
+- File bytes go directly to Supabase Storage using the user's JWT. Evidence
+  metadata is append-only, and attached files cannot be replaced or deleted by
+  clients. Unlinked uploads remain owner-only even if a batch is public. A narrow
+  security-definer helper checks object existence and caller ownership to avoid
+  recursive Storage/evidence RLS. Uploaded documents are downloaded as bytes,
+  never rendered as active content in the app. Review/redact files before upload.
+- No images are persisted by the AI endpoints. CORS restricts browser origins,
+  but is not authentication or a general abuse defense. AI remains public like
+  the existing demo, with bounded request sizes and one concurrent inference.
+  Add gateway rate limits if public usage grows.
+
+## Verify before announcing cloud is live
+
+1. Sign in as A via Google (or magic link if email delivery is configured). Create a private batch, append an event and attach
+   a JPG/PNG/PDF with its declared source/date. Download it and compare the bytes.
+2. Sign in on a second device as A; confirm both are visible.
+3. Signed out and as B: the private QR must show not found/private.
+4. Publish as A: anonymous QR opens the record, history and attached files;
+   B cannot edit any of them. An unlinked upload must remain inaccessible.
+5. Make private as A: anonymous record and file access must fail again.
+6. Call all three AI endpoints through the deployed frontend and inspect results.
+7. Restart Render: records must remain in Supabase.
+
+Local commands:
+
+```sh
+pip install -r backend/requirements.txt
+python -m unittest backend.test_app -v
+uvicorn backend.app:app --host 127.0.0.1 --port 8000
+npm run lint
+npm test
+npm run build
+```
+
+Use `ALLOWED_ORIGIN=http://127.0.0.1:5173` for a frontend at that origin.
+CI runs real ONNX inference and database isolation checks in disposable PostgreSQL.
+Cloud transport tests use mocks; live Auth/PostgREST still require the deployment
+checks above.
+The disposable database tests stub only Storage's tables to check SQL policies;
+they do not test the hosted Storage upload service or its MIME/size enforcement.
+The sign-in cooldown reduces retries; it does not increase Supabase's email quota.
+
+References: [Render Free](https://render.com/docs/free),
+[Blueprint schema](https://render.com/docs/blueprint-spec),
+[Supabase passwordless email](https://supabase.com/docs/guides/auth/auth-email-passwordless),
+[Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security).
+
+
+
+
+===============================================================================
+B03. FILE: submission/review/EXPORT_PROBLEM_SOURCES.md
+Phạm vi: Nguồn xuất khẩu và giới hạn diễn giải số 95%
+Source SHA256: 3ae0ce128630c3a8b5cb9f9f128f3ed973f7b3efbf14e7f71a5e0323030a7e44
+===============================================================================
+
+# Vấn đề xuất khẩu và phạm vi DurianTrust
+
+Đối chiếu nguồn ngày 29/09/2026. Đã thay phần **Vấn đề** trên [Corelia](https://app.corelia.academy/projects/duriantrust), lưu thành công và xác nhận nội dung trên trang công khai. [Ảnh xác nhận](corelia-export-story.png).
+
+## Nội dung đề xuất
+
+Sầu riêng Việt Nam phụ thuộc lớn vào thị trường Trung Quốc. Theo thông tin tại họp báo Chính phủ ngày 3/9/2026, trong 8 tháng đầu năm 2026, Trung Quốc chiếm khoảng **95% kim ngạch xuất khẩu sầu riêng Việt Nam**, tương đương khoảng 1,85 tỷ USD trên tổng 1,95 tỷ USD ước tính. [Nguồn: Báo Điện tử Chính phủ](https://baochinhphu.vn/hop-bao-chinh-phu-thuong-ky-thang-8-dai-dien-bo-cong-an-lam-ro-nhieu-van-de-duoc-quan-tam-102260903170016698.htm).
+
+Các sự cố trong năm 2025 cho thấy hậu quả khi lô hàng chưa đáp ứng yêu cầu kiểm nghiệm và hồ sơ. Báo Công Thương ngày 20/1/2025 ghi nhận một doanh nghiệp có 5 container bị trả về vì thiếu giấy kiểm định Vàng O, đồng thời chủ động quay đầu thêm 5 container; tổng cộng 170 tấn. VietnamPlus ngày 19/2/2025 dẫn cơ quan hải quan Tân Thanh cho biết 17 xe sầu riêng phải nhập trở lại Việt Nam vì chưa đáp ứng quy định phía Trung Quốc. Hàng chờ lâu có thể giảm chất lượng và làm tăng thiệt hại cho doanh nghiệp, nông dân. [Báo Công Thương](https://congthuong.vn/sau-rieng-gap-kho-khi-xuat-khau-sang-trung-quoc-370377.html) · [VietnamPlus / TTXVN](https://www.vietnamplus.vn/vi-sao-xuat-khau-sau-rieng-qua-cac-cua-khau-tai-lang-son-giam-manh-post1013155.amp).
+
+Từ bối cảnh đó, DurianTrust tập trung vào hồ sơ số theo lô: liên kết thông tin vùng trồng, tài liệu kiểm nghiệm do chủ lô cung cấp, nguồn/ngày của tài liệu và lịch sử bàn giao để HTX chuẩn bị, bên mua đối chiếu trước khi giao nhận. Kết quả hóa chất cần được xác định qua lấy mẫu và kiểm nghiệm phù hợp. Website, AI nhận diện ảnh lá và blockchain chưa xác nhận an toàn thực phẩm hoặc bảo đảm thông quan. Nhóm chưa có pilot; mức giảm sai sót và tiết kiệm thời gian còn cần đo thực tế.
+
+## Bằng chứng và cách dùng
+
+| Nguồn | Nội dung đã đọc | Giới hạn khi trình bày |
+|---|---|---|
+| [Chính phủ, 03/09/2026](https://baochinhphu.vn/hop-bao-chinh-phu-thuong-ky-thang-8-dai-dien-bo-cong-an-lam-ro-nhieu-van-de-duoc-quan-tam-102260903170016698.htm) | Phần trả lời của Thứ trưởng Đặng Ngọc Điệp nêu 1,95 / 1,85 tỷ USD và khoảng 95%; nhấn mạnh ATTP, truy xuất, dữ liệu và năng lực phòng kiểm nghiệm. | Gắn số với 8 tháng 2026 và kim ngạch; không gọi là tỷ trọng cố định hoặc thị phần của Việt Nam tại Trung Quốc. |
+| [Công Thương, 20/01/2025](https://congthuong.vn/sau-rieng-gap-kho-khi-xuat-khau-sang-trung-quoc-370377.html) | Một doanh nghiệp quay đầu 10 container/170 tấn; 5 bị trả do thiếu giấy Vàng O, 5 tự quay đầu. | Ví dụ được báo dẫn, không suy rộng mọi lô đều nhiễm hóa chất hay đều bị hải quan trả về. |
+| [VietnamPlus, 19/02/2025](https://www.vietnamplus.vn/vi-sao-xuat-khau-sau-rieng-qua-cac-cua-khau-tai-lang-son-giam-manh-post1013155.amp) | 17 xe tại Tân Thanh phải nhập trở lại vì chưa đáp ứng quy định; lô đủ điều kiện vẫn được xuất khẩu. | Bài báo không quy toàn bộ 17 xe cho một lỗi hồ sơ hay một chất cụ thể. |
+| [MOIT / VNTR](https://vntr.moit.gov.vn/news/china-tightens-import-rules-on-vietnamese-durians) | Tổng hợp việc kiểm tra ATTP theo lô và kết quả kiểm nghiệm kèm theo, tác động tới chuỗi cung ứng. | Thông tin mô tả bối cảnh 2025; không thay văn bản pháp lý hoặc xác minh yêu cầu cho một lô cụ thể hôm nay. |
+
+## Kết nối vấn đề với sản phẩm
+
+- Sự cố ATTP là động lực thực tế; giải quyết chất lượng hàng cần kiểm soát canh tác, lấy mẫu và phòng lab.
+- Phần phần mềm đang làm được: tổ chức hồ sơ do người dùng cung cấp, ghi nguồn/ngày, quản lý quyền xem và chia sẻ QR.
+- Chưa có bằng chứng xác định tỷ lệ lô bị trả do hồ sơ phân tán hoặc chứng minh DurianTrust giảm số lô bị trả. Đây là giả thuyết cần pilot với HTX/doanh nghiệp.
+
+
+
+
+===============================================================================
+B04. FILE: submission/review/KHAC_PHUC_GOP_Y.md
+Phạm vi: Đối chiếu đầy đủ góp ý hội đồng ngày 28/09; provenance dataset được bổ sung sau đó
+Source SHA256: 2c49d7f0a36af36e7ec44c22d8cc2d4a5fd3b8ae0e6b402a8376d1ac93bdd586
+===============================================================================
+
+# DurianTrust: đối chiếu và khắc phục góp ý
+
+Ngày đối chiếu: 28/09/2026. Đây là bản làm việc cho nhóm, chưa phải báo cáo nghiên cứu đã được nghiệm thu.
+
+## 1. Kết luận
+
+Website đã có phần lý do chọn đề tài, nhưng deck trước chỉ nói về hồ sơ rời rạc. Phần mở đầu chưa nối rõ bối cảnh kiểm soát chất lượng, yêu cầu truy xuất, công việc của người dùng và phạm vi phần mềm. Bản sửa bổ sung mối liên hệ đó vào website VI/EN, README và slide 3–6 của bản Morph (slide 2 của bản 18 slide).
+
+Hội đồng đánh giá có ý nghĩa thực tiễn và ghi nhận thiết kế PDA, phân tách quyền nghiệp vụ với custody, bàn giao hai bước. Tuy nhiên, kết hợp blockchain và AI trong truy xuất nông sản không đủ để chứng minh tính mới. Cần đánh giá cải tiến quy trình bằng phép so sánh có dữ liệu.
+
+Nhóm xác nhận không còn báo cáo gốc hoặc tài liệu nguồn dataset, không có dữ liệu kiểm nghiệm thật và chưa có đối tác/pilot. Vì vậy, chưa thể kết luận hiệu quả dự báo Cadimi, độ chính xác ngoài thực địa, nhu cầu mua hoặc mức tiết kiệm. Không thể xử lý các thiếu hụt này bằng thêm tính năng hay thêm số trang.
+
+## 2. Vấn đề ban đầu và lý do tạo website
+
+### Bối cảnh có nguồn
+
+VNTR thuộc Bộ Công Thương ghi nhận kiểm soát Cadimi và Vàng O chặt hơn từ năm 2025, kèm yêu cầu kiểm tra và hồ sơ kiểm nghiệm theo lô [1]. Bài giải thích của Cục BVTV năm 2022 nêu yêu cầu lưu hồ sơ và truy xuất về vùng trồng trong xuất khẩu sầu riêng [2]. Đây là bối cảnh của đề tài. Hai nguồn này không chứng minh bao nhiêu lô bị từ chối vì thiếu giấy tờ hoặc website sẽ giảm tỷ lệ bị từ chối.
+
+Bổ sung sau khi đối chiếu nguồn: tại họp báo Chính phủ ngày 03/09/2026, đại diện Bộ NN&MT nêu kim ngạch xuất khẩu sầu riêng trong 8 tháng đầu năm 2026 ước khoảng 1,95 tỷ USD, với khoảng 1,85 tỷ USD từ Trung Quốc, tương đương khoảng 95% [3]. Sự tập trung này làm rõ tính cấp thiết khi chất lượng, kiểm nghiệm và truy xuất trở thành điều kiện để tiếp cận thị trường chủ lực. Đây là tỷ trọng kim ngạch xuất khẩu theo kỳ thống kê, chưa phải số liệu cả năm 2026. Website và deck đã bổ sung số liệu cùng phạm vi, nguồn và nhãn ước tính.
+
+### Công việc phần mềm có thể hỗ trợ
+
+Người dùng đầu tiên đề xuất là người phụ trách hồ sơ của nông hộ/HTX nhỏ. Người đó tạo hồ sơ lô, đính kèm ảnh/tài liệu cùng nguồn và ngày khai báo, thêm các mốc hành trình, rồi chọn công khai cho bên mua mở bằng QR. Mục tiêu cần kiểm chứng là tìm đúng hồ sơ nhanh hơn và biết tài liệu nào còn thiếu.
+
+Giả thuyết còn thiếu khảo sát: tài liệu đang rời rạc gây tốn thời gian cho nhóm người dùng này; họ sẵn sàng dùng website để thay một phần cách làm hiện tại. Chưa ghi nhận khách hàng, khảo sát hay tác động kinh tế.
+
+Cadimi và Vàng O cần lấy mẫu, kiểm nghiệm phù hợp và xác nhận của đơn vị có thẩm quyền. AI ảnh lá hiện không đo hai chất này. Website lưu và liên kết thông tin, không cấp giấy chứng nhận chất lượng hay quyết định đủ điều kiện xuất khẩu.
+
+## 3. Bảng đối chiếu góp ý
+
+Số trang dưới đây là thứ tự trang của PDF nhận xét, không phải số trang báo cáo cũ.
+
+| Góp ý | Trạng thái kiểm tra ngày 28/09 | Đã xử lý hoặc hướng khắc phục | Phần còn thiếu |
+| --- | --- | --- | --- |
+| Tính cấp thiết, lý do chọn đề tài sơ sài (tr. 6, 11, transcript) | Website có bối cảnh, deck thiếu mối liên hệ | Sửa phần vấn đề VI/EN và deck, thêm nguồn chính thức về truy xuất | Phỏng vấn người phụ trách hồ sơ, bằng chứng nhu cầu thực |
+| Mục tiêu sử dụng và người quản lý dữ liệu chưa rõ (tr. 3, 13) | Cloud gắn lô với tài khoản, mặc định riêng tư | README làm rõ chủ hồ sơ, bên mua và quyền quản trị database | Kiểm thử hai tài khoản và phiên ẩn danh trên production |
+| Lỗi số thực tại 0,045 ppm, chuỗi sai thành 0, số âm thành rủi ro thấp (tr. 7–8) | Bản sửa đã có trước lần đối chiếu này | Chạy lại 72 test: parser và rule đều pass; quy đổi bằng đơn vị nguyên 0,0001 ppm, từ chối đầu vào sai | Ngưỡng 0,05 ppm vẫn là ngưỡng demo chưa xác minh pháp lý |
+| Contract E2E chưa chạy, bằng chứng chỉ ở tiện ích/PDA (tr. 8) | Có binary và test native validator local | Chạy lại 19 test attestation và 20 test custody/authority, đều pass | Chưa rebuild binary trong lần kiểm tra này; chưa xác nhận binary Devnet và luồng ví production |
+| Hai bản Rust không đồng nhất (tr. 8) | Có source canonical và public snapshot sinh từ source | Kiểm tra sync source, generated IDL và program ID: pass | Đồng bộ source/IDL không chứng minh binary đang deploy tương ứng |
+| Attestation có trong contract nhưng thiếu caller frontend/API (tr. 8) | Giao diện lab còn gửi numeric report bằng instruction cũ | Ghi rõ giới hạn, không gọi upload PDF là xác thực chứng thư | Caller v2, UX ký, xác minh issuer và kiểm thử toàn bộ flow |
+| Hai dataset tabular synthetic, không có đo Cadimi thật (tr. 8) | Repo có script sinh dữ liệu và mô hình demo | Giữ nhãn thử nghiệm synthetic, không công bố khả năng dự báo thực tế | Dataset đo lường, định nghĩa target, dữ liệu độc lập và baseline |
+| Nguồn, giấy phép, gán nhãn 4.437 ảnh lá chưa rõ (tr. 8, 12) | Không có hồ sơ nguồn đủ để xác minh; nhóm xác nhận không còn tài liệu | Không khẳng định số ảnh, quyền sử dụng hoặc accuracy đã được kiểm định | Khôi phục nguồn và giấy phép hoặc thay bằng dataset có chứng cứ sử dụng |
+| Không có đánh giá ML độc lập mới (tr. 8) | Notebook phân biệt validation với test, chưa có tập test thực địa được xác nhận | Không dùng score một ảnh làm accuracy | Test độc lập, confusion matrix, macro F1, kết quả từng lớp và kiểm tra leakage |
+| Blockchain/AI giải quyết Cadimi, Vàng O đến mức nào? (tr. 12) | Không có phép đo hóa học tự động | Phần mở đầu, notes và copy làm rõ website hỗ trợ hồ sơ | Phiếu đo có sample ID và xác nhận của lab; Vàng O chưa tích hợp vào flow đánh giá |
+| Vì sao Solana thay vì Fabric? Public có lộ bí mật? (tr. 6) | Cloud và Solana độc lập; dữ liệu account/transaction của thử nghiệm chain là public | README ghi cloud dùng DB/RLS; Solana nghiên cứu custody ký bởi bên nhận | So sánh phương án theo governance, quyền đọc, chi phí và công việc thực; chưa có benchmark lựa chọn |
+| Khó dùng ví, khóa cá nhân, phí với nông dân/HTX (tr. 8) | Cloud dùng Google login, buyer đọc QR không cần ví | Giảm yêu cầu ví ở luồng hồ sơ chính | Google login chỉ được người dùng xác nhận; chưa hoàn tất production E2E và usability pilot |
+| Ai xác minh phòng kiểm nghiệm và mẫu? (tr. 14) | Contract kiểm tra chữ ký số của ví được cấp role | Test chữ ký/payload local pass | Role không tự chứng minh danh tính pháp lý lab. Cần đối chiếu issuer, sample ID, batch ID, kết quả và cơ chế thu hồi |
+| QR bị dán lại hoặc đầu vào sai (tr. 14) | QR chứa URL tra cứu, có thể copy | Ghi rõ QR mở hồ sơ khai báo, không xác thực hàng vật lý | Quy trình đóng gói, seal/serial, ảnh lúc bàn giao và người chịu trách nhiệm. Chữ ký cũng không tự ngăn tráo hàng |
+| Giới hạn 200 lô, thiếu indexer (tr. 8) | Lookup chain có client cap 200; management vẫn fetch account, chưa có indexer | Nêu đúng giới hạn, không gọi cap là pagination hay test tải | Chỉ thêm indexer/pagination khi có quy mô cần đo. Chưa có kết quả scalability |
+| Tính mới chưa rõ (tr. 8, 13–14) | Không có thuật toán hoặc chuẩn truy xuất mới | Định vị đóng góp ở thiết kế quyền/custody và quy trình hồ sơ có kiểm thử | So sánh với quy trình hiện tại và hệ thống tương đương; chưa có kết quả vượt trội |
+| Báo cáo quá mỏng, 11 nguồn, lỗi bookmark/bảng/đầu mục 4.1 (tr. 9, 14) | Không có file báo cáo gốc để sửa | Transcript làm rõ 22 trang tổng, khoảng 14 trang nội dung. Có thể viết lại từ bằng chứng hiện có | Chưa sửa được bookmark hay mục lục của bản cũ; cần báo cáo mới và nguồn có liên quan, không tăng trang bằng nội dung đệm |
+| Cần đơn vị tiếp nhận và thử nghiệm thực tế (tr. 11–12, transcript) | Nhóm xác nhận chưa có đối tác | Giữ pilot là kế hoạch, xác định việc cần đo bên dưới | HTX/doanh nghiệp/lab đồng ý tham gia, hồ sơ thật và kết quả thực nghiệm |
+
+## 4. Bằng chứng kỹ thuật vừa chạy
+
+Các lệnh sử dụng runtime Node hiện có. Không dùng ví thật, tiền thật hoặc key production. Contract tests dùng key sinh cho test và validator trên localhost.
+
+| Kiểm tra | Kết quả thực tế |
+| --- | --- |
+| `node node_modules/vitest/vitest.mjs run src/lib/ruleAuditor.test.js src/lib/units.test.js` | 2 file, 72 test pass |
+| `node scripts/sync-contract.mjs --check` | Source snapshot, generated IDL và program IDs đồng bộ |
+| Trong `program/`: native validator + `tests/attestation_v2.test.mjs` | 19 pass: chữ ký Ed25519, sai payload, sai signer, replay, tạo/đọc v1/v2 |
+| Trong `program/`: native validator + `tests/panel_custody.test.mjs` | 20 pass: tạo lô, role, đề nghị/chấp nhận, ví sai, pause và handover authority |
+| `node node_modules/eslint/bin/eslint.js src/data/copy.js` | Không báo lỗi trong file copy đã sửa |
+| `node node_modules/vite/bin/vite.js build` | Build pass; còn cảnh báo chunk Solana lớn hơn 500 kB |
+
+Binary local được dùng: `program/target/deploy/durian_trust.so`.
+
+SHA-256: `8C868D087953A2A860DB4B203919F1DA1EFEA498CAE151F1D20D570DCC09EB83`.
+
+Lần đối chiếu này không rebuild hoặc deploy smart contract. Test trên binary local không chứng minh nó trùng binary Devnet. Source sync kiểm tra source/IDL, không kiểm tra reproducible build hoặc deployment. Các kết quả trên không phải kiểm định chất lượng nông sản, độ chính xác AI hay hiệu quả kinh doanh.
+
+## 5. Cách trả lời các câu hỏi của hội đồng
+
+### Vì sao chọn Solana?
+
+Nhóm sử dụng Solana để thử nghiệm bàn giao trạng thái số giữa các ví, trong đó bên nhận phải ký chấp thuận. Repo hiện chưa chứng minh lựa chọn này tốt hơn Fabric hoặc cần thiết cho HTX. Luồng chuẩn bị hồ sơ hiện dùng database và quyền truy cập. Quyết định nền tảng production cần đơn vị tham gia, yêu cầu bảo mật và phép so sánh cụ thể. Không nên dùng lý do “nhanh, rẻ” làm kết luận khi chưa đo cùng workload.
+
+### Dữ liệu có bảo mật không?
+
+Hồ sơ cloud mặc định riêng tư, chủ hồ sơ chọn công khai, RLS áp dụng quyền đọc/ghi. Tài liệu public có thể bị tải và giữ bản sao, kể cả sau khi thu hồi quyền. Dữ liệu thử nghiệm đưa lên Solana phải được coi là public. Cloud riêng tư không bảo vệ thông tin đã gửi lên chain. Chưa có cơ chế đưa dữ liệu bí mật lên chain an toàn được triển khai ở flow này.
+
+### Chữ ký xác minh được gì?
+
+Attestation kiểm tra ví được cấp role đã ký đúng payload trong phạm vi contract. Để gắn với kết quả lab thật, cần xác minh tổ chức đứng sau ví, mã mẫu, mã lô, chỉ tiêu, đơn vị đo, thời điểm lấy mẫu và tệp chứng thư. Chưa có đối tác lab; chưa tích hợp attestation-v2 qua giao diện. Upload PDF hiện chỉ là lưu bằng chứng do chủ hồ sơ khai báo.
+
+### QR có chống tráo hàng không?
+
+QR hiện là đường dẫn tới hồ sơ. Tem có thể sao chép hoặc dán lên lô khác. Một pilot có thể thử serial/seal và ghi nhận người kiểm tra khi giao nhận, nhưng không nên tuyên bố “chống giả” trước khi kiểm tra tình huống tráo hàng. Đầu vào sai vẫn cần trách nhiệm của người khai báo và đối chiếu ngoài hệ thống.
+
+### AI có phát hiện Cadimi/Vàng O không?
+
+Không có bằng chứng cho khả năng đó. Hai model tabular đang minh họa inference bằng dữ liệu synthetic. Classifier ảnh lá trả gợi ý bệnh lá, chưa có hồ sơ nguồn và đánh giá thực địa độc lập. Bộ so số Cadimi với ngưỡng là quy tắc xác định, không phải ML. Kết quả hóa học phải đến từ phép kiểm nghiệm.
+
+## 6. Thử nghiệm nhỏ để tạo bằng chứng thực dụng
+
+Đây là đề xuất, chưa diễn ra.
+
+1. Chọn một HTX/doanh nghiệp nhỏ và người phụ trách hồ sơ cùng một bên mua. Hỏi công việc nào đang làm, tệp nào cần tìm, bên nào xác nhận dữ liệu. Xin đồng ý dùng dữ liệu, ẩn thông tin kinh doanh trước demo.
+2. Chọn khoảng 10–20 hồ sơ lô để thăm dò khả năng sử dụng, không coi số lượng này là đủ chứng minh hiệu quả thống kê. Định nghĩa checklist theo công việc thực và yêu cầu của đối tác trước khi đo.
+3. Cho người phụ trách tìm tài liệu theo cách hiện tại và bằng website với nhiệm vụ tương đương. Đổi thứ tự sử dụng giữa các lượt để giảm lợi thế do đã biết câu trả lời. Ghi thời gian từng lượt, tệp thiếu/sai mã lô, số lần hỏi lại và lỗi thao tác. Chưa đặt tỷ lệ cải thiện để tránh chọn kết quả theo kỳ vọng.
+4. Kiểm thử riêng quyền dữ liệu: A tạo/đính kèm, B không đọc hoặc sửa khi riêng tư, anonymous đọc khi công khai, thu hồi chặn lượt đọc mới. Kiểm tra cả record và file.
+5. Báo cáo số lượt thực sự hoàn tất, median và khoảng thời gian, lỗi cụ thể và lời góp ý. Giữ dữ liệu từng lượt để đối chiếu. Chỉ kết luận trong phạm vi mẫu và công việc đã thử.
+
+AI cần một kế hoạch khác: nguồn/giấy phép, nhãn được kiểm tra, tách test độc lập theo cây/vườn/ngày chụp và kiểm tra ảnh trùng. Nếu chưa thu được dữ liệu này, giữ AI ở phạm vi demo hoặc bỏ khỏi luận điểm hiệu quả. Không dùng synthetic để chứng minh dự báo hóa chất.
+
+## 7. Cấu trúc báo cáo có thể viết lại
+
+- Đặt vấn đề: bối cảnh có nguồn, người dùng và vấn đề công việc cần khảo sát.
+- Tổng quan: các giải pháp tương đương và khoảng trống cần kiểm chứng; định nghĩa thuật ngữ nhất quán.
+- Mục tiêu/phạm vi: hồ sơ cloud, custody thử nghiệm, giới hạn AI và tiêu chí đo.
+- Phương pháp: phân tích quy trình, thiết kế quyền/dữ liệu, test kỹ thuật và thiết kế pilot.
+- Kết quả: chỉ đưa kết quả thực sự chạy, môi trường, phiên bản, binary hash và dữ liệu đi kèm.
+- Thảo luận: dữ liệu public/private, lab issuer, QR-vật lý, synthetic và rào cản sử dụng.
+- Kết luận/kiến nghị: phần đã chứng minh, phần chưa đo và yêu cầu đối tác.
+- Phụ lục: lệnh test, hình trạng thái, protocol pilot và dữ liệu đã được phép sử dụng.
+
+Chưa viết một báo cáo đầy đủ thay thế bản cũ trong lần này. Nội dung nghiên cứu thiếu dữ liệu phải ghi là chưa có, không dựng thêm kết quả để đủ dung lượng.
+
+## Nguồn và giới hạn tài liệu
+
+- Biên bản/nhận xét do nhóm cung cấp: đọc đủ 14 trang scan.
+- Transcript do nhóm cung cấp: có đoạn ghi “không nghe rõ”. Dùng để làm rõ diễn giải và số trang báo cáo; không phục hồi phần lời nói thiếu hoặc coi là chứng cứ thí nghiệm độc lập.
+- [1] [VNTR/Bộ Công Thương: China Tightens Import Rules on Vietnamese Durians](https://vntr.moit.gov.vn/news/china-tightens-import-rules-on-vietnamese-durians), đã đọc 28/09/2026.
+- [2] [Cục BVTV: Sầu riêng được xuất khẩu chính ngạch sang Trung Quốc](https://sansangxuatkhau.ppd.gov.vn/tin-tuc-su-kien/sau-rieng-duoc-xuat-khau-chinh-ngach-sang-trung-quoc.html), bài ngày 15/07/2022, đã đọc 28/09/2026.
+- [3] [Báo Điện tử Chính phủ: Họp báo Chính phủ thường kỳ tháng 8](https://baochinhphu.vn/hop-bao-chinh-phu-thuong-ky-thang-8-dai-dien-bo-cong-an-lam-ro-nhieu-van-de-duoc-quan-tam-102260903170016698.htm), ngày 03/09/2026, phần đại diện Bộ NN&MT trả lời về xuất khẩu sầu riêng, đã đọc 28/09/2026.
+
+Số liệu 8 tháng 2026 và khoảng 95% đã được đối chiếu với thông tin do Bộ NN&MT nêu tại họp báo Chính phủ, vẫn ghi rõ là ước tính. Chưa xác minh Công văn 8958 được nêu trong nhận xét, chưa sử dụng văn bản này làm căn cứ pháp lý. Ngưỡng demo 0,05 ppm cũng chưa xác minh áp dụng cho sản phẩm và thị trường cụ thể. Không phát hành công khai bản scan hoặc transcript trong lần đối chiếu này.
+
+
+
+
+===============================================================================
+B05. FILE: submission/review/ai-training/DATASET_AUDIT.md
+Phạm vi: Nguồn, taxonomy, license và preprocessing
+Source SHA256: fb7bf442ee8c975a090f4095eba5e87d22b2535978295c2d358591b80b9a861a
+===============================================================================
+
+# Audit dataset lá sầu riêng — 29/09/2026
+
+## Source phù hợp five-class hiện tại
+
+[DurianLDD, ĐứcThắng123 / cthng123](https://www.kaggle.com/datasets/cthng123/durian-leaf-disease-dataset), version 1, cập nhật 29/01/2025. Public metadata API xác nhận 49.808.769 bytes và **CC BY 4.0**. Dataset công bố 4.437 ảnh, chụp bằng điện thoại trực tiếp tại vườn miền Đông Nam Bộ Việt Nam; hai chuyên gia gán nhãn độc lập và loại mẫu bất đồng. Đây là mô tả của tác giả, chưa phải kiểm chứng độc lập của repository này.
+
+Classes gốc: `ALGAL_LEAF_SPOT`, `ALLOCARIDARA_ATTACK`, `HEALTHY_LEAF`, `LEAF_BLIGHT`, `PHOMOPSIS_LEAF_SPOT`. Pipeline phải khóa thứ tự production: healthy, algal, blight, phomopsis, allocaridara; không dùng thứ tự alphabetical mặc định.
+
+Ảnh được resize 224×224 JPG. Tác giả chia random train/validation/test 70/10/20; không công bố orchard/tree/leaf ID. Cùng lá hoặc cùng cây có thể xuất hiện ở nhiều split. Vì vậy pipeline phải deduplicate trước khi chia split và không gọi kết quả image-level là kết quả trên vườn mới.
+
+[Paper gốc, Nguyen-Tat & Nong, Displays 93 (2026), 103451](https://www.sciencedirect.com/science/article/abs/pii/S0141938226001149). Accuracy 93,82% trong paper là kết quả của tác giả, **không phải kết quả model trong repository**.
+
+## Source khác taxonomy
+
+[Mendeley pxzvksbwnj, version 4, DOI 10.17632/pxzvksbwnj.4](https://data.mendeley.com/datasets/pxzvksbwnj/4), 182.920.568 bytes, **CC BY 4.0**, 2.595 ảnh. Six-class: Healthy 484, Algal 462, Colletotrichum 400, Phomopsis 411, Rhizoctonia 398, Blight 440.
+
+[Paper mô tả](https://pmc.ncbi.nlm.nih.gov/articles/PMC12272783/): thu tháng 1/2025 từ bốn vườn tại Bình Phước/Tiền Giang; iPhone 14, Ri6/Monthong; crop và resize 400×400; train/val/test 1814/387/394. Nhãn dựa triệu chứng và expert review, không có xác nhận xét nghiệm tác nhân. `Blight` bao gồm nguyên nhân chưa xác định. Dataset này không có Allocari­dara. **Không map Colletotrichum/Rhizoctonia vào class có sẵn để giả tính tương thích.**
+
+DOI `10.1016/j.dib.2022.108320` được một benchmark durian trích dẫn sai: thực tế là [nghiên cứu bạo lực giới tại Colombia](https://pubmed.ncbi.nlm.nih.gov/35707245/). Không dùng làm provenance dataset lá.
+
+## License và giới hạn
+
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) cho phép copy, sửa đổi và sử dụng thương mại với attribution, link license và mô tả thay đổi. Candidate/model card phải giữ tên tác giả, dataset/version và thay đổi preprocessing/split. Public access không tự chứng minh nguồn của mọi ảnh; nếu có nội dung bên thứ ba phải kiểm quyền tương ứng.
+
+Không dùng `ml/dataset.csv` và `ml/disease_dataset.csv` synthetic như ground truth ngoài thực tế. Không retrain OCR khi chưa có corpus tài liệu được phép dùng cùng nhãn thật và test set độc lập.
+
+## Lỗi preprocessing cần sửa cho lần train kế tiếp
+
+Notebook hiện tại truyền RGB `/255` vào Keras MobileNetV3Small `include_preprocessing=False`. [Keras documentation](https://keras.io/api/applications/mobilenet/mobilenet_models/) yêu cầu `[-1, 1]` khi tắt preprocessing. Đặt layer `Rescaling(2, offset=-1)` **bên trong candidate mới**, vẫn giữ external RGB `[0,1]`. Không thay preprocessing production model cũ khi chưa có parity/evaluation; model cũ có thể đã học trên contract sai.
+
+## Gate trước production
+
+Chỉ lưu candidate vào `tmp/ai-training`. SHA256 khóa archive, từng ảnh và manifest; remove ảnh trùng byte/pixel, group near-duplicate trước split; checkpoint/temperature/abstention chỉ chọn bằng validation; test dùng đúng một lần sau khi khóa lựa chọn. Báo accuracy, macro-F1, per-class recall, confusion matrix, NLL/Brier/ECE và coverage/accuracy sau abstention. Confidence cao không chứng minh ảnh là lá sầu riêng; cần corpus ngoài taxonomy, ảnh mờ và field test theo orchard/tree độc lập trước claim thực tế hoặc tự động xác nhận.
+
+
+
+
+===============================================================================
+B06. FILE: submission/review/ai-training/MODEL_CARD.md
+Phạm vi: Candidate LOCAL 12 epochs; không nhầm với candidate Colab
+Source SHA256: 217da88bb97a990b282f66a0de56fd210d3d639d9841ea095ddac93c0daa4adc
+===============================================================================
+
+# Model card: leaf candidate — 29/09/2026
+
+**Kết luận: không promote.** Candidate không vượt baseline theo gate validation đã đặt; giữ model cũ và yêu cầu manual review. Training thật có kết quả thấp hơn, không gọi đây là cải thiện accuracy. Baseline có provenance training chưa biết và có thể đã thấy ảnh source holdout; số baseline dưới đây chỉ là so sánh mô tả, không xác nhận hiệu năng độc lập của model cũ.
+
+## Dataset / training
+
+[DurianLDD v1, cthng123](https://www.kaggle.com/datasets/cthng123/durian-leaf-disease-dataset), CC BY 4.0. Attribution: ĐứcThắng123, Thien B. Nguyen-Tat, Duc Thang Nong; [paper gốc](https://www.sciencedirect.com/science/article/abs/pii/S0141938226001149). 4.437 ảnh thật theo tác giả; 4.433 ảnh sau dedup. Original train/val/test: 3104/443/890; retained: **3101/443/889**. Loại ba train near-duplicates vượt split và một test exact duplicate; đã nhìn kiểm hai cặp near-duplicate thấy cùng lá/khung cảnh. Exact pixel + dHash distance≤4 vẫn có thể bỏ sót cùng cây/lá. Không có orchard/tree ID; kết quả chỉ là image holdout từ cùng source, chưa phải field test.
+
+RTX 4060 Laptop 8GB; PyTorch 2.8.0+cu128 / torchvision 0.23.0+cu128; pretrained MobileNetV3Small ImageNet1K_V1. Seed 1337, batch64, 12 epochs, training khoảng210 giây sau load/model setup. Hai epoch classifier-only; sau đó fine-tune bốn feature blocks cuối, BatchNorm stats cố định. Chọn epoch12 bằng **validation macro-F1**. Test dùng sau khi khóa config, không dùng để chọn epoch/hyperparameters; không train thêm sau test.
+
+External input float32 NHWC RGB `[0,1]`, 224×224 BILINEAR/EXIF orientation; NCHW + ImageNet mean/std nằm trong graph. Output order: healthy, algal, leaf blight, phomopsis, allocaridara. Không có class unknown/non-leaf; softmax confidence không đủ phát hiện ngoài taxonomy.
+
+## Kết quả thật
+
+| Split / model | Accuracy | Macro-F1 | NLL | Brier | ECE (10 bins) |
+|---|---:|---:|---:|---:|---:|
+| Validation candidate (443) | 82.84% | 0.8244 | 0.4736 | 0.2486 | 0.0228 |
+| Validation baseline (443) | 87.58% | 0.8726 | 0.4180 | 0.2029 | 0.0385 |
+| Test candidate (889) | 82.34% | 0.8202 | 0.4804 | 0.2508 | 0.0207 |
+| Test baseline (889) | 85.38% | 0.8509 | 0.4161 | 0.2104 | 0.0473 |
+
+Gate: validation macro-F1 phải tăng≥0.02 và không class validation recall giảm>0.05. Thực tế macro-F1 giảm0.0482, Healthy recall giảm0.0928 và Algal giảm0.0822. **Gate fail.** ECE nhỏ hơn baseline không bù việc classification kém hơn.
+
+| Class | Candidate val recall | Baseline val recall | Candidate test recall | Baseline test recall |
+|---|---:|---:|---:|---:|
+| HEALTHY_LEAF | 89.69% | 98.97% | 91.33% | 97.45% |
+| ALGAL_LEAF_SPOT | 76.71% | 84.93% | 80.27% | 89.12% |
+| LEAF_BLIGHT | 85.11% | 87.23% | 79.68% | 80.75% |
+| PHOMOPSIS_LEAF_SPOT | 70.45% | 70.45% | 69.89% | 66.48% |
+| ALLOCARIDARA_ATTACK | 90.11% | 94.51% | 89.07% | 92.35% |
+
+Confusion matrix candidate test, rows=true / columns=predicted; columns theo fixed class order phía trên:
+
+| True class | Healthy | Algal | Blight | Phomopsis | Allocari­dara |
+|---|---:|---:|---:|---:|---:|
+| HEALTHY_LEAF | 179 | 3 | 6 | 7 | 1 |
+| ALGAL_LEAF_SPOT | 6 | 118 | 4 | 6 | 13 |
+| LEAF_BLIGHT | 13 | 10 | 149 | 11 | 4 |
+| PHOMOPSIS_LEAF_SPOT | 24 | 10 | 10 | 123 | 9 |
+| ALLOCARIDARA_ATTACK | 5 | 6 | 5 | 4 | 163 |
+
+## Calibration / abstention
+
+Temperature search trên validation chọn **T=1.0**: không đổi raw probabilities và **không có calibration gain**. Fit trên cùng validation chọn checkpoint nên validation calibration có selection optimism; test vẫn là final heldout của candidate.
+
+Threshold confidence≥0.76 và top1-top2 margin≥0.2 được chọn bằng validation với Wilson lower bound95% accepted accuracy≥90%, tối thiểu30 mẫu. Validation giữ303/443 (68.40%), accepted accuracy93.73%. Locked policy trên test giữ631/889 (70.98%), accepted accuracy93.19%; 258 ảnh (29.02%) abstain. Đây là selective accuracy **chỉ trong five-class dataset**, không chứng minh xử lý non-leaf, disease mới, nhiều bệnh hoặc tài liệu. Trong sản phẩm mọi diagnosis vẫn cần manual review; không lấy threshold này để tự xác nhận.
+
+Baseline dùng threshold0.8/margin0.2 cho số mô tả; khác threshold candidate nên không coi selective metrics là comparison có cùng operating point.
+
+## Export / artifact
+
+Candidate ONNX: `tmp/ai-training/run-1/candidate.onnx`, 6.108.597 bytes, **không thay API model**. Lần export đầu fail parity do outer wrapper ở training mode, làm bật lại Dropout/BatchNorm khi exporter restore mode. Đã sửa outer `.eval()` và force eval trước parity. Re-export từ checkpoint giữ nguyên, không retrain và không evaluate candidate test lần nữa.
+
+PyTorchCPU↔ONNXCPU max absolute probability difference **1.31e-6** trên5validationảnh; tất cả modules eval. So với logits validation GPU đã lưu, max probability difference0.00362 và logit difference0.01785 trên5ảnh. Metrics training/test ở bảng là checkpoint GPU, không phải full-test ONNX benchmark. Vì candidate không được promote, không thêm test evaluation cho mục đích tuning/export.
+
+Archive SHA256: `d90b6f9d856d3f48016d78a205bc028d113e848fce1e07a072d1fe03ae0ce3bd`
+
+Manifest SHA256: `4ecbefbaf4759d9c6e817390b5eb818f28bc0a0fc964286dfac98e99b4f8317f`
+
+Candidate ONNX SHA256: `1e277e7793822a7990898ea6c3121f4e09979ab7f9cd3c0a1aefdc49f887cbde`
+
+Baseline ONNX SHA256: `2b61ebcc9bd9c993e6071500d88c2aed5467c4eba19a15053d6010ee7a23c8f4`
+
+Pretrained weights: `mobilenet_v3_small-047dcff4.pth`, SHA256 `047dcff4addef86ea5bc2eff13c9614dc11f47ab1160d0a71a25e7db994f4e1f`.
+
+Artifacts đủ trong local ignored `tmp/ai-training/run-1`: manifest/config/history/checkpoint/predictions/metrics/export. Metrics đầy đủ cùng baseline warning, exclusions và hash được lưu tại [metrics.json](metrics.json); môi trường [environment.txt](environment.txt); lệnh tái lập [LEAF_TRAINING.md](../../../ml/LEAF_TRAINING.md). Self-check đã pass, Python source compile pass. Hai synthetic tabular scripts đã sửa leakage/output candidate; **không rerun synthetic training** và không dùng làm ground truth Cd/disease ngoài thực tế.
+
+Trước lần nghiên cứu tiếp theo: đặt protocol mới trước khi train; thu expert-reviewed field/OOD corpus có orchard/tree/leaf IDs và test mới. Không tối ưu tiếp bằng kết quả test đã nhìn thấy của run này.
+
+
+
+
+===============================================================================
+B07. FILE: submission/review/ai-training/colab-validation-24/README.md
+Phạm vi: Candidate COLAB validation-only dài hơn
+Source SHA256: 429e068802bb53bbbd7f61f8065d51be965bf99d576cf06cef6c38135ef92dff
+===============================================================================
+
+# Colab leaf candidate — 29/09/2026
+
+[Executed Colab notebook](https://colab.research.google.com/drive/1uBulFs99ehLKmqRAECy3fHu24sAUVOBe) · [Screenshot](colab-validation-result.png) · [Validation metrics](metrics.json) · [History](history.json) · [ONNX export check](export.json)
+
+MobileNetV3Small was fine-tuned on a free Tesla T4 with PyTorch 2.8.0+cu128. The fixed protocol allowed up to 24 epochs, seed 1337, batch 64, and four stale epochs. Training stopped after **23 epochs** and selected **epoch 19** by validation macro-F1. The 443-image validation split gave **85.33% accuracy** and **0.8499 macro-F1**. See `colab-protocol.json` and `training-config.json` for the exact run settings.
+
+The public DurianLDD v1 dataset (CC BY 4.0; Đức Thắng 123 / Thien B. Nguyen-Tat / Duc Thang Nong) contained 4,437 images; 4 near or exact duplicates were excluded. The locked manifest SHA256 is `afd8dc64cb655767b4afea35a0befe6bc1160d8cb273d481473e178fd3e3ad1f`. Source train/validation/test splits were retained, but orchard or tree IDs were unavailable.
+
+**Evaluation scope:** This was validation-only tuning. The earlier test split had already been inspected in a separate experiment; this run did not evaluate test, baseline, calibrated confidence, or abstention. The candidate is **not deployed**. ONNX CPU output matched PyTorch on five validation examples with maximum absolute difference `2.98e-6`; this checks export consistency, not field accuracy. A new independent holdout and field review are required before promotion.
+
+The complete ZIP, including candidate ONNX/checkpoint, is saved locally at `tmp/ai-training/colab-validation-24/durian-leaf-colab-validation-24.zip` (SHA256 `c08b9a1de970f9f54036e82b887d4ae4d27bf8017c86280b8935bd4301f41515`). The ZIP is intentionally excluded from Git. Its downloaded contents were checked for the expected validation-only keys, 23 epochs, ONNX hash, and parity status.
+
+
+
+
+===============================================================================
+B08. FILE: submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md
+Phạm vi: External-source comparison Colab và baseline repo
+Source SHA256: 5ca344eac7c68866683aefb9faec6343140183034126e81c5155df08fdfb2087
+===============================================================================
+
+# External check cho hai model lá — 29/09/2026
+
+## Nguồn và quyền dùng
+
+[Nguyen Thanh Truong và Nguyen Xuan Linh, *A Vietnamese Durian Leaf Disease Image Dataset for Agricultural Diagnosis*, Mendeley Data v2](https://data.mendeley.com/datasets/pxzvksbwnj/2), DOI [10.17632/pxzvksbwnj.2](https://doi.org/10.17632/pxzvksbwnj.2), công bố 10/04/2025, **CC BY 4.0**. [License](https://creativecommons.org/licenses/by/4.0/) cho phép sử dụng và chỉnh sửa, kể cả thương mại, khi ghi công, dẫn license và nêu thay đổi. [Ảnh chụp metadata/license](mendeley-license-v2.png). Dataset đã được tác giả chia `train/validation/test`; phép đo này chỉ dùng `test`.
+
+Archive gốc 334.201.946 bytes, SHA256 `5e271cfd89e8a738ef760aa48bb1081e68e0f6f2c53e689566a7920a09be8dce`. File lưu local trong `tmp/ai-training/mendeley-pxzvksbwnj-v2.zip`, không đưa ảnh lên Git. Đã kiểm ZIP CRC; không có entry hỏng. Ảnh được đọc theo EXIF và resize 224×224 để đưa vào ONNX. Đây là thay đổi preprocessing cho phép đo, không sửa ảnh gốc.
+
+## Giao thức
+
+Hai model đã tồn tại trước khi tải dữ liệu này: ONNX từ [lượt Colab 24 epochs tối đa](colab-validation-24/README.md), SHA256 `35ba652c6e88232819387b6c9757cc4e6db97a3ea58f00259fe5aa764f361e21`; và model được repo cấu hình cho API tại `api/leaf_disease_model.onnx`, SHA256 `2b61ebcc9bd9c993e6071500d88c2aed5467c4eba19a15053d6010ee7a23c8f4`. Chưa đối chiếu hash với bản Render đang phục vụ. Không fine-tune, chọn threshold hay đổi model theo kết quả Mendeley. Script: [`ml/external_leaf_eval.py`](../../../ml/external_leaf_eval.py); [JSON candidate](mendeley-v2-external-test.json), [JSON model API trong repo](mendeley-v2-production-model-test.json).
+
+Chỉ đối chiếu ba nhãn đủ gần về tên: `Leaf_Healthy` → `HEALTHY_LEAF`, `Leaf_Algal` → `ALGAL_LEAF_SPOT`, `Leaf_Phomopsis` → `PHOMOPSIS_LEAF_SPOT`. Không ép `Colletotrichum`, `Rhizoctonia` và `Blight` vào taxonomy năm lớp hiện tại. Ba nhãn được chọn có 207 ảnh trong source test. So với manifest DurianLDD đã dùng để train/validate, không thấy ảnh trùng pixel, nhưng loại 4 ảnh có dHash distance ≤4; loại thêm 1 ảnh gần trùng trong chính tập external đã chọn. Còn 202 ảnh. dHash là heuristic, không chứng minh độc lập theo cây/vườn.
+
+## Kết quả
+
+| Nhãn gốc đối chiếu | Đúng / số ảnh | Recall |
+| --- | ---: | ---: |
+| Healthy | 24 / 73 | 32,9% |
+| Algal | 31 / 70 | 44,3% |
+| Phomopsis | 17 / 59 | 28,8% |
+| **Tổng ba nhãn** | **72 / 202** | **Accuracy 35,6%** |
+
+Model API trong repo, trên **cùng 202 ảnh**: Healthy 44/73 (60,3%), Algal 36/70 (51,4%), Phomopsis **0/59 (0%)**; tổng **80/202 (39,6%)**. Hai model có output taxonomy giống nhau và được đo bằng cùng preprocessing. Chỉ số chung nhỉnh hơn không bù được failure ở Phomopsis.
+
+Đây là **accuracy trên ba nhãn được map của nguồn khác**, không phải accuracy năm lớp hay kết quả thử nghiệm tại vườn. Validation nội bộ của lượt Colab là 85,33% trên 443 ảnh DurianLDD, nhưng chênh lệch với external check cho thấy khả năng chuyển sang nguồn ảnh khác kém. Khác biệt quy trình chụp/crop, nhãn bệnh và quần thể cây có thể góp phần; phép đo này không xác định nguyên nhân riêng lẻ. Model không có lớp `unknown` và có thể gán nhãn sai cho ảnh ngoài taxonomy. Provenance training của model API trong repo chưa được xác minh; sàng lọc trùng với manifest DurianLDD không bảo đảm ảnh Mendeley chưa từng có trong training của model đó. Vì thế kết quả model API là phép dò chéo nguồn, **chưa phải independent test đã chứng minh**.
+
+**Quyết định:** không đưa candidate vào production; model API trong repo cũng chỉ nên hiển thị như gợi ý cần kiểm tra thủ công, đặc biệt không dùng để xác nhận không có Phomopsis. Không dùng điểm Mendeley vừa xem để tune rồi gọi lại là independent test. Muốn cải thiện để dùng thật: thu ảnh mới có quyền sử dụng và nhãn được chuyên gia xác nhận, bổ sung ảnh ngoài taxonomy/ảnh chất lượng kém, chia holdout theo vườn hoặc cây, rồi đánh giá lại một lần trên holdout mới.
+
+Chạy lại từ project root (cần Python với `numpy`, `Pillow`, `onnxruntime`):
+
+```powershell
+python ml/external_leaf_eval.py --dataset tmp/ai-training/mendeley-pxzvksbwnj-v2.zip --candidate tmp/ai-training/colab-validation-24/durian-leaf-colab-validation-24.zip --output submission/review/ai-training/mendeley-v2-external-test.json
+python ml/external_leaf_eval.py --dataset tmp/ai-training/mendeley-pxzvksbwnj-v2.zip --candidate tmp/ai-training/colab-validation-24/durian-leaf-colab-validation-24.zip --model-file api/leaf_disease_model.onnx --output submission/review/ai-training/mendeley-v2-production-model-test.json
+```
+
+
+
+
+===============================================================================
+B09. FILE: ml/LEAF_TRAINING.md
+Phạm vi: Protocol và lệnh tái lập, candidate chưa promote
+Source SHA256: be1e3912241bbfebcde735e3bec896e91cb1bea8f5fcb30344742355f5c4c57b
+===============================================================================
+
+# Train candidate lá sầu riêng
+
+Nguồn, license và giới hạn: [dataset audit](../submission/review/ai-training/DATASET_AUDIT.md). Giữ attribution ĐứcThắng123 / Thien B. Nguyen-Tat / Duc Thang Nong, DurianLDD version 1, CC BY 4.0. Thay đổi: dedup/group holdout, ImageNet preprocessing, fine-tune MobileNetV3Small và calibration validation.
+
+Chạy tại project root, dùng Python 3.12. Dependencies riêng cho leaf training: `torch==2.8.0`, `torchvision==0.23.0` từ official cu128 index, `onnx==1.19.0`, `onnxruntime==1.23.0`, numpy/Pillow do torchvision cài. Không thêm vào backend runtime.
+
+```powershell
+python -m venv tmp/ai-training/venv
+tmp/ai-training/venv/Scripts/python.exe -m pip install torch==2.8.0 torchvision==0.23.0 --index-url https://download.pytorch.org/whl/cu128
+tmp/ai-training/venv/Scripts/python.exe -m pip install onnx==1.19.0 onnxruntime==1.23.0
+Invoke-WebRequest 'https://www.kaggle.com/api/v1/datasets/download/cthng123/durian-leaf-disease-dataset?datasetVersionNumber=1' -OutFile tmp/ai-training/durian-leaf-v1.zip
+Get-FileHash tmp/ai-training/durian-leaf-v1.zip -Algorithm SHA256
+Expand-Archive tmp/ai-training/durian-leaf-v1.zip tmp/ai-training/dataset
+tmp/ai-training/venv/Scripts/python.exe ml/leaf_training.py self-check
+tmp/ai-training/venv/Scripts/python.exe ml/leaf_training.py prepare
+$env:TORCH_HOME = "$PWD/tmp/ai-training/torch-cache"
+tmp/ai-training/venv/Scripts/python.exe ml/leaf_training.py train --epochs 12 --minutes 12
+```
+
+Archive kiểm 29/09/2026: `d90b6f9d856d3f48016d78a205bc028d113e848fce1e07a072d1fe03ae0ce3bd`. Phải dừng nếu hash đổi, xác minh version/source trước khi dùng. CLI không tải dataset tự động; `prepare` khóa hash archive + từng ảnh + manifest; `train` kiểm integrity trước training. Không giải CAPTCHA hoặc tải qua account không được phép.
+
+Source split được giữ. Exact RGB pixel duplicates bị loại, dHash 64-bit distance ≤4 tạo group. Nếu group nằm ở nhiều split thì giữ test trước validation trước train; loại ảnh ở split thấp hơn. Near-duplicate heuristic không đảm bảo phát hiện mọi ảnh cùng lá/cây. Không có orchard/tree ID để chứng minh độc lập theo vườn.
+
+Hai epoch đầu train classifier; các epoch còn lại fine-tune bốn feature blocks cuối, BatchNorm statistics cố định. Chọn checkpoint theo validation macro-F1. Temperature và confidence/margin threshold dùng cùng validation (có selection optimism); threshold yêu cầu Wilson lower bound 95% của accepted accuracy ≥90% trên ≥30 mẫu. Test chỉ evaluate sau khi khóa config. Pipeline từ chối rerun test khi metrics đã tồn tại.
+
+Artifacts trong `tmp/ai-training/run-1`: locked manifest, config, epoch history, checkpoint, metrics/predictions, candidate ONNX và parity result. ONNX nhận float32 NHWC RGB `[0,1]`, reshape + ImageNet normalize trong graph, trả five-class calibrated softmax theo thứ tự production. Artifact không tự thay production. Cùng API contract không đủ để promote; cần kiểm ngoài taxonomy, field test mới và chuyên gia review. `self-check` dùng ảnh/records tạo tại runtime để kiểm holdout priority, leakage, metrics và notebook preprocessing; không giả metrics training.
+
+`ml/train.py` / `ml/train_disease.py` chỉ là demo synthetic: stratified 60/20/20, chọn model bằng validation, test một lần, output tmp candidate. Chúng không đo Cd, không chứng minh disease risk ngoài thực tế và không overwrite API model.
+
+## Fine-tune trên Colab
+
+Mở [notebook Colab](durian_leaf_colab_reproduce.ipynb), chọn **T4 GPU / runtime 2025.10**, chạy bốn code cells theo thứ tự. Notebook khóa dependency versions, SHA256 pipeline/dataset và tự tải dataset public; không cần mount Drive. Cell cuối tải ZIP gồm checkpoint, ONNX, log và metrics.
+
+Cấu hình: tối đa **24 epochs**, seed 1337, batch 64, giới hạn 30 phút; early stopping sau bốn epochs không cải thiện validation macro-F1. `--validation-only` chỉ load train/validation, không evaluate test hoặc baseline, không fit temperature/threshold. ONNX xuất với temperature 1, score chưa calibration.
+
+Test cũ đã được xem ở lượt 12 epochs; lượt này chỉ là tuning trên validation, không phải bằng chứng accuracy mới trên dữ liệu độc lập. Cần holdout mới trước khi quyết định thay model production. Notebook kiểm protocol và không có test/baseline metrics trước khi tải artifacts.
+
+Lượt Colab 29/09/2026 đã hoàn tất trên Tesla T4: dừng sau 23 epochs, chọn epoch 19, validation accuracy 85,33% và macro-F1 0,8499 trên 443 ảnh. [Báo cáo và artifact checks](../submission/review/ai-training/colab-validation-24/README.md). Candidate ONNX chưa được đưa vào production.
+
+[External check trên Mendeley Data v2](../submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md): candidate đúng 72/202 ảnh (35,6%); model API trong repo đúng 80/202 (39,6%), trong đó Phomopsis 0/59. Đây chỉ là ba class đối chiếu sau sàng lọc ảnh gần trùng; chưa xác minh model đang chạy trên Render có cùng hash. Không promote candidate hoặc dùng model API để kết luận bệnh; cần dữ liệu thực địa có nhãn xác nhận và holdout mới theo vườn/cây.
+
+
+
+
+===============================================================================
+B10. FILE: submission/review/ai-improvements/README.md
+Phạm vi: OCR/document/leaf UI QA: real OCR, fixtures cloud và leaf
+Source SHA256: d24d8bfd9aade00e0d6ae195e4be29e51b2e8e59998cfd55c1beede678e6fabe
+===============================================================================
+
+# Local AI UI QA
+
+Kết quả cuối: **PASS** trong `checks.json` và `lifecycle-checks.json`, không có app exception hoặc upload/cloud write.
+
+## Chạy lại
+
+Trong PowerShell, tại `C:/Stuff/DurianBlockchainWeb3/durian-web3`:
+
+```powershell
+& 'C:/Users/Vinh/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe' submission/review/ai-improvements/check-ai-improvements.mjs
+& 'C:/Users/Vinh/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe' submission/review/ai-improvements/check-ai-improvements.mjs --document-lifecycle
+```
+
+Script tự mở Vite local ở port 5178, headless Chromium và đóng cả hai khi hoàn tất. Cần runtime Node/Playwright, Python/ReportLab và Chromium theo đường dẫn trong script. Startup local có thể mất khoảng 90 giây.
+
+Lệnh `--document-lifecycle` dùng và bổ sung `checks.json` từ full run đã có; hãy chạy lệnh đầu trước. Full run trả exit khác 0 nếu actual OCR không chạy được, dù manual fallback vẫn đúng.
+
+## Phạm vi đã kiểm tra
+
+- UI VI/EN, desktop 1440 và mobile 390; không horizontal overflow trong ảnh component.
+- Leaf responses là fixture: score 97% vẫn yêu cầu manual review, điểm chưa hiệu chuẩn, blank image chưa đủ tin cậy. Notes reset khi đổi ảnh; không gửi trong request hoặc lưu vào browser storage. Loading/error/giới hạn 5 MB có xử lý.
+- OCR ảnh và PDF text extraction chạy **thật**. Tài liệu Việt trả đúng `HTX Kiểm thử QA`, `2026-09-27`; ảnh English trả đúng `QA English Lab`, `2026-09-27`.
+- Đọc tài liệu không tự điền form. Apply cần checkbox xác nhận, chỉ điền source/date, giữ metadata sau resize 1440/390, không upload. Form trợ lý chỉ xuất hiện trong workspace owner fixture; public/sample không có.
+- Ngày mơ hồ không được đoán; PDF scan chuyển sang nhập thủ công. Tệp HTML, empty, corrupt và trên 5 MB bị từ chối; metadata vẫn nhập tay được.
+- Targeted lifecycle giữ model GET để kiểm tra đổi/xóa tệp giữa lúc đọc. Kết quả cũ không ghi đè replacement PDF, abandoned worker kết thúc và reset form xóa tệp/kết quả/metadata.
+
+## Dữ liệu và network
+
+Mọi ảnh/PDF trong `fixtures/` là dữ liệu QA tự tạo, có nhãn test; không phải phiếu lab hoặc mẫu lá thật. Auth/cloud dùng fixture local, mọi thao tác ghi bị chặn. Chỉ cho phép GET hai OCR model từ URL CDN có Git commit cố định; cả hai trả 200. Network khác, gồm Solana RPC và fonts, bị chặn.
+
+Các kiểm tra này xác nhận workflow UI và OCR trên fixture; không đo độ chính xác bệnh lá, OCR thực địa hoặc kiểm soát quyền backend. Ảnh component có thể ẩn Header cố định để tránh overlay do cách chụp phần tử dài.
+
+
+
+
+===============================================================================
+B11. FILE: program/RELEASE.md
+Phạm vi: Contract release candidate, encoding v2 và deployment gates
+Source SHA256: 3ee4412551f8cf615b23a4b1ad59e89aba4c23bf2e00cf441573f214b3191d6f
+===============================================================================
+
+# Contract release candidate
+
+The canonical source is `programs/durian_trust/src/lib.rs`. The files in
+`../public/solana/` are generated snapshots, not evidence of a deployed binary.
+Attestation v2 was built and tested locally; it has not been deployed in this phase.
+
+## Build and verify
+
+Use Anchor 0.31.1 and the Solana toolchain. CI pins Solana 2.1.21; the local
+Windows verification used Solana test-validator 2.1.0.
+
+From `program/`:
+
+```sh
+anchor build
+cargo test --lib
+npm ci --legacy-peer-deps
+TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:attestation
+TEST_VALIDATOR_PATH="$(command -v solana-test-validator)" npm run test:panel
+```
+
+On Windows PowerShell, set `$env:TEST_VALIDATOR_PATH` to the full path of
+`solana-test-validator.exe`, then run both native-validator scripts. The runner uses
+localhost port 18999, generated test wallets, seeded fixtures and a fresh ledger
+under `target/`. It needs no devnet SOL or production authority key. It waits for
+post-genesis slots before invoking preloaded programs and uses native Ed25519
+verification, not a mocked signature verifier. Omit the environment variable to
+use the bankrun backend on supported systems; that backend was not run on Windows.
+
+From the app root after a successful build:
+
+```sh
+node scripts/sync-contract.mjs --write
+node scripts/sync-contract.mjs --check
+npm test
+npm run lint
+npm exec tsc -- --noEmit
+npm run build
+```
+
+Review the source and generated IDL together. The sync check checks source
+snapshots, IDL contents and declared program addresses; it does not check the
+on-chain deployment. CI runs the attestation and custody/authority suites on a
+local validator. The older `npm test` bankrun suite remains manual because its
+genesis-authority fixture needs a specific signer and some cases are skipped.
+
+## Attestation v2 encoding
+
+SHA-256 hashes this Borsh serialization, in order:
+
+| Field | Encoding |
+| --- | --- |
+| Domain | Fixed 31 bytes: `durian-trust:lab-attestation:v2` |
+| Program ID | 32 public-key bytes |
+| Batch ID | UTF-8 string with u32 little-endian byte-length prefix |
+| Report index | u32 little-endian |
+| Cadmium, threshold, confidence | Three u64 little-endian values, using stored units |
+| Risk level | u8 enum discriminant (Safe 0, Low 1, Medium 2, High 3, Critical 4) |
+| AI result, risk cause | Two independently length-prefixed Borsh strings |
+| Reporter | 32 public-key bytes |
+
+The Ed25519 instruction at transaction index 0 signs the 32-byte hash. The
+attestation signer must hold the lab role or be the authority; the signature
+public key must match that signer. This does not require signer = report author.
+The Rust unit tests and `tests/attestation_payload.mjs` share a golden hash vector.
+
+V2 uses PDA seeds `attestation_v2`, batch ID, report index (u32 LE). V1 retains
+`attestation`, its existing instruction names and account layout. Existing v1
+attestations remain readable; their unprefixed text hashing limitations are not
+retroactively repaired. Use v2 for new attestations only after the corresponding
+binary has been deployed and verified. No automatic migration is performed.
+
+## Deployment gate
+
+Before a contract upgrade, verify the target cluster genesis hash, program ID,
+upgrade authority, payer balance and exact built binary hash. Preserve the prior
+binary and deployment evidence. Upgrade only through the authorized authority;
+do not create new keys or change declared IDs merely to satisfy legacy tests.
+After deployment, run signed v2 creation/verification and v1 compatibility checks
+on that cluster and record transaction signatures before enabling v2 callers.
+The public frontend currently continues to use its existing instructions.
+
+
+
+
+===============================================================================
+B12. FILE: submission/presentation/output/Speaker_Notes_VI_4min_HTX.md
+Phạm vi: Kịch bản pitch HIỆN HÀNH, đọc đúng bản này
+Source SHA256: ffb1cd8895b0613ebcffc78ea4674facce82e511bed0e600e8668179e878fece
+===============================================================================
+
+# DurianTrust - kịch bản cho giới hạn 4 phút
+
+Mục tiêu: 3 phút 45 giây, gồm video 40 giây; còn 15 giây dự phòng. Các mốc dưới đây là mục tiêu luyện tập, chưa phải thời lượng đọc đã đo. Đọc thành tiếng một lượt với đồng hồ trước khi thi. Hộp thao tác trong PDF không đọc thành lời.
+
+## 1. DurianTrust (15s)
+
+Hãy hình dung một hợp tác xã chuẩn bị giao 850 ký sầu riêng. Bên mua hỏi: vườn nào, thu hoạch khi nào, tài liệu đâu? DurianTrust gom thông tin thành hồ sơ theo lô, để chủ hồ sơ chia sẻ bằng QR. Đây là tình huống minh họa.
+
+## 2. Vì sao DurianTrust ra đời? (25s)
+
+Theo họp báo Chính phủ ngày 3 tháng 9, Trung Quốc chiếm khoảng 95% kim ngạch xuất khẩu sầu riêng Việt Nam trong tám tháng đầu năm 2026. Yêu cầu kiểm nghiệm và truy xuất khiến hồ sơ đúng lô rất quan trọng. DurianTrust hỗ trợ chuẩn bị và đối chiếu hồ sơ. Cadimi và Vàng O vẫn cần kiểm nghiệm; website chưa chứng minh giúp giảm lô bị trả.
+
+## 3. Người dùng đầu tiên (15s)
+
+Người dùng dự kiến là nhà vườn, HTX và bên mua như đơn vị thu mua hoặc doanh nghiệp xuất khẩu. Zalo và Drive giúp trao đổi tệp. Nhóm muốn kiểm chứng giá trị của việc gắn tài liệu và lịch sử vào cùng một lô để đối chiếu thuận tiện hơn.
+
+## 4. Luồng hồ sơ lô (20s)
+
+Chủ hồ sơ đăng nhập Google, tạo lô riêng tư, thêm tài liệu có nguồn và ngày, rồi ghi các mốc hành trình. Checklist chỉ rõ phần còn thiếu và mở đúng form để bổ sung. Khi sẵn sàng, họ công khai toàn bộ hồ sơ qua QR. Chuyển lại riêng tư chặn lượt đọc mới, nhưng không thu hồi bản đã tải.
+
+## 5. HTX chuẩn bị hồ sơ cho bên mua (40s)
+
+[THAO TÁC, KHÔNG ĐỌC] Bấm video 40 giây. Clip có giọng nữ tiếng Việt; không nói chồng lên clip. Video dùng giao diện local, dữ liệu TEST và Auth/API mô phỏng. Nếu không phát được, dành tối đa 15 giây tóm tắt: nhập thông tin lô, thêm tài liệu, công khai QR, bên mua đọc, rồi chuyển lại riêng tư. Sau đó sang slide 6.
+
+## 6. Công nghệ và kiến trúc cloud (25s)
+
+Giao diện dùng React và Vite trên Vercel. API Python dùng FastAPI trên Render. Google OAuth qua Supabase cấp phiên đăng nhập; PostgreSQL áp dụng RLS để kiểm tra quyền theo tài khoản. Supabase Storage giữ ảnh và PDF trong bucket riêng tư. Lô mới mặc định riêng tư; khi công khai, bên mua đọc qua QR. Hồ sơ đủ thông tin chưa đồng nghĩa tài liệu đã xác thực hay lô đủ điều kiện xuất khẩu.
+
+## 7. Bàn giao trên Solana (20s)
+
+Thử nghiệm Solana dùng Rust và Anchor trên Devnet. Người đang giữ lô ký đề xuất ví nhận; bên nhận ký chấp nhận thì trạng thái custody mới đổi. Cơ chế này ghi nhận bàn giao giữa ví, chưa chứng minh giao hàng vật lý hoặc quyền sở hữu pháp lý. Luồng cloud hiện chưa tự đồng bộ với Solana.
+
+## 8. AI gợi ý từ ảnh lá (20s)
+
+AI dùng ONNX Runtime để gợi ý một trong năm nhóm ảnh lá và yêu cầu chuyên gia đối chiếu. Điểm model trên một ảnh chưa phải accuracy. Nhóm giữ model cũ vì bản fine-tune chưa tốt hơn; chi tiết đánh giá nằm trong tài liệu phụ lục. Ảnh lá không đo Cadimi hoặc Vàng O và không chứng nhận an toàn thực phẩm.
+
+## 9. Pilot với một hợp tác xã (25s)
+
+Website và API đã deploy. Kiểm thử local và quyền database trên CI đã pass; quy trình production đầy đủ vẫn cần kiểm chứng. Nhóm chưa có pilot HTX hay phiếu lab thật. Bước tiếp theo là thử với một HTX và nhóm lô nhỏ, đo thời gian tìm hồ sơ, tài liệu thiếu và số lần bên mua hỏi lại. Việc trả phí chỉ là giả thuyết cần kiểm tra.
+
+## 10. Demo và mã nguồn (20s)
+
+DurianTrust giúp chuẩn bị hồ sơ theo lô và chia sẻ QR chỉ đọc, do chủ hồ sơ quyết định công khai. Giá trị thực tế sẽ được đo bằng pilot. QR trên màn hình mở hồ sơ mẫu; mã nguồn đã công khai. Chúng tôi mong được kết nối với HTX sẵn sàng thử và đơn vị phát hành tài liệu kiểm nghiệm. Xin cảm ơn.
+
+Tổng thời lượng mục tiêu: 225 giây. Giới hạn tối đa: 240 giây.
+
+Mốc kiểm soát: bắt đầu video lúc 01:15, hết video lúc 01:55, hết phần công nghệ lúc 02:20, bắt đầu kết bài lúc 03:25, kết thúc khoảng 03:45.
+
+Nếu chậm hơn đồng hồ: bỏ câu giải thích Zalo/Drive ở slide 3 và câu cuối về trả phí ở slide 9. Luôn giữ phần kết và giới hạn của Solana/AI. Không mở bài nói AI chi tiết hoặc phần hỏi đáp trong 4 phút.
+
+Nguồn bối cảnh: https://baochinhphu.vn/hop-bao-chinh-phu-thuong-ky-thang-8-dai-dien-bo-cong-an-lam-ro-nhieu-van-de-duoc-quan-tam-102260903170016698.htm
+
+Đối chiếu kỹ thuật: https://github.com/vinhelysia/DurainCheckerDemo ; https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md
+
+
+
+
+===============================================================================
+B13. FILE: submission/final/CORELIA.md
+Phạm vi: Nội dung submission dài tham khảo; thời lượng/tài nguyên 90s/19-slide đã cũ đối với pitch
+Source SHA256: bc4926937990dd9ef8bcc00c87155b8c5e0eb0f2d7da8698b5fcbffe723cc79f
+===============================================================================
+
+# DurianTrust — Hồ sơ lô sầu riêng từ HTX đến bên mua
+
+## Mô tả ngắn
+
+DurianTrust là prototype giúp nhà vườn và hợp tác xã (HTX) chuẩn bị hồ sơ theo từng lô sầu riêng: tạo riêng tư, thêm ảnh/tài liệu và lịch sử, rồi chủ động công khai qua QR để bên mua đối chiếu. Solana Devnet và AI là các thử nghiệm riêng, chưa tự đồng bộ với hồ sơ cloud.
+
+## Vấn đề
+
+Xuất khẩu sầu riêng Việt Nam phụ thuộc lớn vào Trung Quốc. Theo họp báo Chính phủ ngày 3/9/2026, trong **8 tháng đầu năm 2026**, thị trường này đóng góp khoảng **95% kim ngạch xuất khẩu sầu riêng Việt Nam**, tương đương 1,85 tỷ USD trên tổng 1,95 tỷ USD ước tính. Đây là số liệu theo giai đoạn, không phải tỷ trọng cố định. [Nguồn: Báo Điện tử Chính phủ](https://baochinhphu.vn/hop-bao-chinh-phu-thuong-ky-thang-8-dai-dien-bo-cong-an-lam-ro-nhieu-van-de-duoc-quan-tam-102260903170016698.htm).
+
+Yêu cầu về chất lượng, kiểm nghiệm và truy xuất khiến việc chuẩn bị hồ sơ đúng lô trở nên quan trọng. DurianTrust thử giải quyết phần quản lý và chia sẻ hồ sơ; chưa có bằng chứng xác định bao nhiêu lô bị trả do hồ sơ phân tán hay chứng minh website giúp giảm số lô bị trả.
+
+Các sự cố năm 2025 cho thấy hậu quả khi lô hàng chưa đáp ứng yêu cầu. Báo Công Thương ngày 20/1/2025 ghi nhận một doanh nghiệp có 5 container bị trả vì thiếu giấy kiểm định Vàng O, đồng thời chủ động quay đầu thêm 5 container. VietnamPlus ngày 19/2/2025 dẫn Hải quan Tân Thanh cho biết 17 xe sầu riêng phải nhập trở lại Việt Nam vì chưa đáp ứng quy định phía Trung Quốc. Không thể quy tất cả các trường hợp này cho cùng một lỗi hồ sơ hoặc một chất cụ thể. [Công Thương](https://congthuong.vn/sau-rieng-gap-kho-khi-xuat-khau-sang-trung-quoc-370377.html) · [VietnamPlus/TTXVN](https://www.vietnamplus.vn/vi-sao-xuat-khau-sau-rieng-qua-cac-cua-khau-tai-lang-son-giam-manh-post1013155.amp).
+
+## Giải pháp và người dùng
+
+Người dùng dự kiến là nhà vườn/HTX chuẩn bị tài liệu cho bên mua. Quy trình chính:
+
+1. Đăng nhập và tạo lô riêng tư với thông tin vườn, ngày thu hoạch, giống và khối lượng.
+2. Đính kèm ảnh/tài liệu, khai báo nguồn và ngày tài liệu; thêm sự kiện vào lịch sử lô.
+3. Kiểm tra nội dung rồi công khai hồ sơ cùng bằng chứng. Bên mua mở QR để đọc và tải tài liệu, không cần ví blockchain.
+4. Chuyển về riêng tư để chặn lượt truy cập công khai mới. Bản đã tải và ảnh chụp màn hình không bị thu hồi.
+
+Giá trị cần kiểm chứng là giảm công sức gom tài liệu và giúp bên mua đối chiếu trước giao nhận. Nhóm chưa có pilot, tài liệu lab thật hay số đo hiệu quả kinh doanh. Tất cả dữ liệu lô và tài liệu TEST trong demo đều là minh họa.
+
+## Công nghệ và phạm vi
+
+- **Ứng dụng chính:** React + Vite trên Vercel; API Python/FastAPI trên Render; Google OAuth qua Supabase Auth; PostgreSQL với Row Level Security và private Supabase Storage. Hồ sơ mới mặc định riêng tư. Khi công khai, người có QR/đường dẫn có thể xem toàn bộ hồ sơ, lịch sử và bằng chứng đính kèm.
+- **Thử nghiệm Solana:** Anchor trên Solana Devnet nghiên cứu lịch sử bàn giao giữa ví; bên nhận phải ký chấp nhận. Đây là trạng thái người giữ được ghi nhận, chưa chứng minh quyền sở hữu pháp lý hoặc giao hàng vật lý. Hồ sơ cloud chưa tự ghi lên blockchain.
+- **Thử nghiệm AI:** ONNX Runtime cho phân loại ảnh lá và hai pipeline tabular dùng dữ liệu synthetic. AI không phát hiện Cadmium/Vàng O từ ảnh lá, không xác thực tài liệu lab và không chứng nhận an toàn hay đủ điều kiện xuất khẩu. Rule so sánh Cadmium với ngưỡng demo là logic xác định, không phải AI hay kết luận pháp lý.
+
+QR liên kết đến hồ sơ do chủ lô cung cấp; checklist chỉ kiểm tra sự hiện diện của thông tin. Chúng chưa xác thực người phát hành tài liệu, mã vùng trồng hay sự gắn kết nhãn với lô vật lý. QR có thể bị sao chép; database administrators vẫn có quyền quản trị dữ liệu.
+
+## Trạng thái demo và giới hạn
+
+Người dùng đã xác nhận Google sign-in vào được màn hình quản lý. Quy trình production đầy đủ — tạo lô, upload, kiểm tra riêng tư, công khai và thu hồi — **chưa được verify end to end**.
+
+Video 90 giây có thuyết minh nữ AI tiếng Việt (Microsoft HoaiMyNeural), dùng ảnh chụp giao diện local có chú thích, dữ liệu TEST và Auth/API mô phỏng; không phải quay liên tục, bằng chứng production E2E hay pilot tại HTX. Website có hồ sơ mẫu chỉ đọc để xem không cần đăng nhập.
+
+Chi tiết AI nằm trong model card và phụ lục: model API được cấu hình trong repo đạt **80/202 (39,6%)** trên ba nhãn được đối chiếu của Mendeley v2; Phomopsis **0/59**. Chưa xác minh provenance training hoặc hash model đang phục vụ trên Render, nên đây chưa phải independent field test. Candidate mới không vượt gate validation và chưa được promote. Các kết quả chỉ hỗ trợ nghiên cứu, cần manual review.
+
+## Bước tiếp theo
+
+Verify production với hai tài khoản và một người xem ẩn danh; sau đó thử nghiệm với HTX tự nguyện bằng tài liệu có quyền sử dụng. Đo thời gian chuẩn bị, số tài liệu thiếu và khả năng bên mua đối chiếu. Đánh giá AI cần bộ ảnh mới được chuyên gia gán nhãn, chia holdout theo cây/vườn và có ảnh ngoài taxonomy.
+
+## Tài nguyên
+
+- [Website](https://durian-web3.vercel.app/) · [Hồ sơ mẫu](https://durian-web3.vercel.app/#/records/example)
+- [Video 90 giây có giọng nữ tiếng Việt](https://durian-web3.vercel.app/submission/DurianTrust_HTX_Demo_90s.mp4)
+- [Source code](https://github.com/vinhelysia/DurainCheckerDemo)
+- [PowerPoint Morph v11](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/presentation/output/DurianTrust_Morph_59_VI-HTX-v11.pptx) · [Bản Core 19 slide](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/presentation/output/DurianTrust_Core_19_VI-HTX-v11.pptx)
+- [Kịch bản 10 phút và 22 câu hỏi giám khảo, PDF v8](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/output/pdf/DurianTrust_Kich_ban_va_Hoi_dap_giam_khao_v8.pdf)
+- [Model card](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MODEL_CARD.md) · [External evaluation](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md)
+
+*Cập nhật 30/09/2026. Bộ trình bày có 19 ý chính và một phụ lục AI; bản Morph có 60 slide tổng cộng.*
+
+
+
+
+===============================================================================
+B14. FILE: submission/final/VIDEO_DESCRIPTION.md
+Phạm vi: Mô tả video 90s reference, không mô tả cut 40s như continuous production
+Source SHA256: fe724d7daf532b417f98e15be10ba0a8e34784fe4f6e07cb755f41a6fa04b9df
+===============================================================================
+
+# DurianTrust — HTX chuẩn bị hồ sơ, bên mua đọc qua QR | Demo 90 giây
+
+DurianTrust giúp nhà vườn và HTX giữ thông tin, ảnh/tài liệu và lịch sử theo từng lô sầu riêng, rồi chủ động chia sẻ cho bên mua.
+
+Video minh họa quy trình: **tạo lô riêng tư → thêm tài liệu TEST có nguồn/ngày → thêm lịch sử → công khai QR → bên mua đọc hồ sơ → chuyển về riêng tư**. Thu hồi chia sẻ chặn lượt truy cập mới; không xóa bản đã tải hoặc ảnh chụp màn hình.
+
+**Đây là demo bằng ảnh chụp giao diện local có chú thích, sử dụng dữ liệu TEST và Auth/API mô phỏng.** Không phải bản quay liên tục, pilot HTX hay bằng chứng quy trình production đã hoạt động end to end. Google sign-in đã được người dùng xác nhận; các bước production tạo lô, upload và kiểm tra quyền truy cập vẫn cần verify.
+
+Tài liệu minh họa không phải kết quả lab thật. QR và checklist chưa xác thực tài liệu, lô vật lý, an toàn thực phẩm hoặc điều kiện xuất khẩu. AI và bàn giao có chữ ký Solana Devnet là thử nghiệm riêng, chưa tự đồng bộ với hồ sơ cloud; AI ảnh lá không phát hiện Cadmium hay Vàng O.
+
+- [Mở website](https://durian-web3.vercel.app/)
+- [Xem hồ sơ mẫu không cần đăng nhập](https://durian-web3.vercel.app/#/records/example)
+- [Source code và giới hạn kỹ thuật](https://github.com/vinhelysia/DurainCheckerDemo)
+- [Model card](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MODEL_CARD.md) · [External evaluation](https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md)
+
+Video: https://durian-web3.vercel.app/submission/DurianTrust_HTX_Demo_90s.mp4
+
+Thuyết minh: giọng nữ tổng hợp tiếng Việt Microsoft HoaiMyNeural; lời đọc đồng bộ theo từng cảnh, giữ chú thích, con trỏ và highlight.
+
+## Mốc thời gian
+
+- 00:00 Đăng nhập minh họa
+- 00:07 Nhập thông tin lô
+- 00:15 Hồ sơ mặc định riêng tư
+- 00:22 Đính kèm tài liệu TEST
+- 00:31 Tìm tài liệu theo loại
+- 00:39 Ghi nhận mốc đóng gói
+- 00:48 Đối chiếu lịch sử
+- 00:55 Kiểm tra trước khi công khai
+- 01:03 Chia sẻ QR
+- 01:11 Bên mua đọc hồ sơ
+- 01:21 Chuyển lại riêng tư
+
+Ảnh đăng nhập: Sodanie Chea, Wikimedia Commons, CC BY 2.0; cắt khung hiển thị. Nguồn: https://commons.wikimedia.org/wiki/File:Durian_(8425934020).jpg .
+
+
+
+
+===============================================================================
+B15. FILE: supabase/migrations/202609260001_cloud_ledger.sql
+Phạm vi: Schema/policies ledger cloud đầy đủ
+Source SHA256: ac64af5dbf9f230419b5b94dd67faca2e36b2a84150f0f29aec0f9120c53a81f
+===============================================================================
+
+-- Off-chain, user-entered records. No wallet roles or chain ownership are inferred here.
+begin;
+
+create table public.cloud_batches (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null default auth.uid() references auth.users(id),
+  code text not null check (code ~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$'),
+  farm text not null check (length(trim(farm)) between 1 and 160),
+  province text not null check (length(trim(province)) between 1 and 160),
+  harvest_date date not null,
+  is_public boolean not null default false,
+  created_at timestamptz not null default now(),
+  unique (owner_id, code)
+);
+
+create table public.cloud_events (
+  id uuid primary key default gen_random_uuid(),
+  batch_id uuid not null references public.cloud_batches(id),
+  stage text not null check (length(trim(stage)) between 1 and 160),
+  location text not null check (length(trim(location)) between 1 and 160),
+  occurred_on date not null,
+  notes text not null default '' check (length(notes) <= 2000),
+  cadmium_ppm numeric check (cadmium_ppm between 0 and 100),
+  threshold_ppm numeric check (threshold_ppm > 0 and threshold_ppm <= 100),
+  created_at timestamptz not null default now(),
+  check ((cadmium_ppm is null) = (threshold_ppm is null))
+);
+create index cloud_events_batch_created on public.cloud_events(batch_id, created_at, id);
+create index cloud_batches_owner_created on public.cloud_batches(owner_id, created_at desc, id desc);
+
+alter table public.cloud_batches enable row level security;
+alter table public.cloud_events enable row level security;
+
+-- Explicit grants also protect direct Data API access, bypassing our Render API.
+revoke all on public.cloud_batches, public.cloud_events from anon, authenticated;
+grant select on public.cloud_batches, public.cloud_events to anon, authenticated;
+grant insert (code, farm, province, harvest_date) on public.cloud_batches to authenticated;
+grant update (is_public) on public.cloud_batches to authenticated;
+grant insert (batch_id, stage, location, occurred_on, notes, cadmium_ppm, threshold_ppm)
+  on public.cloud_events to authenticated;
+
+create policy batches_read on public.cloud_batches for select to anon, authenticated
+  using (is_public or owner_id = (select auth.uid()));
+create policy batches_create on public.cloud_batches for insert to authenticated
+  with check (owner_id = (select auth.uid()));
+create policy batches_publish on public.cloud_batches for update to authenticated
+  using (owner_id = (select auth.uid())) with check (owner_id = (select auth.uid()));
+create policy events_read on public.cloud_events for select to anon, authenticated
+  using (exists (select 1 from public.cloud_batches b where b.id = batch_id));
+create policy events_append on public.cloud_events for insert to authenticated
+  with check (exists (select 1 from public.cloud_batches b
+    where b.id = batch_id and b.owner_id = (select auth.uid())));
+
+commit;
+
+
+
+
+===============================================================================
+B16. FILE: supabase/migrations/202609270002_practical_records.sql
+Phạm vi: Schema evidence/Storage và quyền metadata đầy đủ
+Source SHA256: f4b072107b791bbc21a778d5b9c439f72ef28046cbffe53a5c83e9861f8498ca
+===============================================================================
+
+begin;
+
+alter table public.cloud_batches
+  add column variety text check (length(trim(variety)) between 1 and 100),
+  add column weight_kg numeric check (weight_kg > 0 and weight_kg <= 1000000);
+grant insert (variety, weight_kg) on public.cloud_batches to authenticated;
+grant update (farm, province, harvest_date, variety, weight_kg) on public.cloud_batches to authenticated;
+
+create table public.cloud_evidence (
+  id uuid primary key,
+  batch_id uuid not null references public.cloud_batches(id),
+  kind text not null check (kind in ('photo', 'lab_report', 'other')),
+  source text not null check (length(trim(source)) between 1 and 160),
+  document_date date not null,
+  filename text not null check (length(filename) between 1 and 180),
+  file_path text not null unique check (file_path = batch_id::text || '/' || id::text),
+  created_at timestamptz not null default now()
+);
+create index cloud_evidence_batch_created on public.cloud_evidence(batch_id, created_at desc, id desc);
+alter table public.cloud_evidence enable row level security;
+revoke all on public.cloud_evidence from anon, authenticated;
+grant select on public.cloud_evidence to anon, authenticated;
+grant insert (id, batch_id, kind, source, document_date, filename, file_path)
+  on public.cloud_evidence to authenticated;
+
+create policy evidence_read on public.cloud_evidence for select to anon, authenticated
+  using (exists (select 1 from public.cloud_batches b where b.id = batch_id));
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('batch-evidence', 'batch-evidence', false, 5242880,
+  array['image/jpeg', 'image/png', 'application/pdf']);
+
+-- Unlinked uploads remain visible only to the batch owner, even for public batches.
+create policy batch_evidence_files_read on storage.objects for select to anon, authenticated
+  using (bucket_id = 'batch-evidence' and (
+    exists (select 1 from public.cloud_batches b
+      where b.id::text = split_part(name, '/', 1) and b.owner_id = (select auth.uid()))
+    or exists (select 1 from public.cloud_evidence e where e.file_path = name)
+  ));
+create policy batch_evidence_files_upload on storage.objects for insert to authenticated
+  with check (bucket_id = 'batch-evidence'
+    and name ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}$'
+    and exists (select 1 from public.cloud_batches b
+      where b.id::text = split_part(name, '/', 1) and b.owner_id = (select auth.uid())));
+-- Only failed/unlinked uploads may be cleaned up. Attached evidence is append-only.
+create policy batch_evidence_files_cleanup on storage.objects for delete to authenticated
+  using (bucket_id = 'batch-evidence'
+    and exists (select 1 from public.cloud_batches b
+      where b.id::text = split_part(name, '/', 1) and b.owner_id = (select auth.uid()))
+    and not exists (select 1 from public.cloud_evidence e where e.file_path = name));
+-- Avoid a recursive evidence -> storage -> evidence policy expansion. This
+-- narrow function only confirms an existing object belonging to the caller's batch.
+create function public.owns_evidence_upload(batch uuid, file uuid)
+returns boolean language sql stable security definer set search_path = '' as $$
+  select exists (select 1 from storage.objects o
+    join public.cloud_batches b on b.id = batch
+    where b.owner_id = (select auth.uid()) and o.bucket_id = 'batch-evidence'
+      and o.name = batch::text || '/' || file::text)
+$$;
+revoke all on function public.owns_evidence_upload(uuid, uuid) from public, anon;
+grant execute on function public.owns_evidence_upload(uuid, uuid) to authenticated;
+create policy evidence_append on public.cloud_evidence for insert to authenticated
+  with check (
+    exists (select 1 from public.cloud_batches b
+      where b.id = batch_id and b.owner_id = (select auth.uid()))
+    and public.owns_evidence_upload(batch_id, id)
+  );
+
+commit;
+
+
+
+
+===============================================================================
+B17. FILE: package.json
+Phạm vi: Dependency ranges và scripts frontend; ranges không phải phiên bản tất cả package đã resolve
+Source SHA256: 208abb0613a7b929532abe2d359c52b4085805445552ad2cb0f0d51426e07910
+===============================================================================
+
+{
+  "name": "durian-web3",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "seed:devnet": "node scripts/seed-devnet.mjs",
+    "smoke:farmer": "node scripts/smoke-farmer-only.mjs",
+    "smoke:lab": "node scripts/smoke-lab-only.mjs"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.0",
+    "@solana/wallet-adapter-react": "^0.15.39",
+    "@solana/wallet-adapter-react-ui": "^0.9.39",
+    "@solana/web3.js": "^1.98.4",
+    "@supabase/supabase-js": "^2.117.2",
+    "html5-qrcode": "^2.3.8",
+    "lenis": "^1.3.23",
+    "lucide-react": "^1.18.0",
+    "pdfjs-dist": "6.3.289",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "tesseract.js": "7.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.12",
+    "vite-plugin-node-polyfills": "^0.28.0",
+    "vitest": "^2.1.9"
+  }
+}
+
+
+
+
+===============================================================================
+B18. FILE: backend/requirements.txt
+Phạm vi: Pinned runtime dependencies backend hiện tại
+Source SHA256: 7aafcffc9d01b31ae08bcc6260d98c2335fd05f19bdc4e178adc9dffeb98805b
+===============================================================================
+
+onnxruntime==1.30.0
+numpy==2.5.3
+Pillow==12.3.0
+fastapi==0.141.1
+uvicorn==0.54.0
+httpx==0.28.1
+
+
+
+
+===============================================================================
+PHẦN C — BACKEND ROUTES VÀ CƠ CHẾ DOCUMENT READER TỪ SOURCE
+===============================================================================
+
+
+--- SOURCE CODE: backend/app.py ---
+"""Render API. Supabase enforces permissions using the caller's JWT, never a service key."""
+from datetime import date
+import json
+import logging
+import os
+from threading import Lock
+from typing import Annotated, Literal
+from uuid import UUID
+
+import httpx
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from starlette.concurrency import run_in_threadpool
+
+from api import predict, predict_disease, predict_leaf
+
+SUPABASE_URL = os.environ.get('SUPABASE_URL', '').rstrip('/')
+SUPABASE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY', '')
+INFERENCE_LOCK = Lock()
+
+
+# Optional models load inside inference, so an AI failure cannot block batch records.
+app = FastAPI(title='DurianTrust API')
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[os.environ.get('ALLOWED_ORIGIN', 'http://localhost:5173')],
+    allow_methods=['GET', 'POST', 'PATCH'],
+    allow_headers=['Authorization', 'Content-Type'],
+)
+
+
+@app.middleware('http')
+async def private_record_cache(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith('/api/cloud/'):
+        response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+@app.exception_handler(HTTPException)
+async def http_error(_request, exc):
+    return JSONResponse({'error': exc.detail}, status_code=exc.status_code)
+
+
+@app.exception_handler(ValidationError)
+async def validation_error(_request, _exc):
+    return JSONResponse({'error': 'Invalid fields or values.'}, status_code=422)
+
+
+@app.exception_handler(Exception)
+async def unexpected_error(_request, exc):
+    logging.error('API request failed', exc_info=exc)
+    return JSONResponse({'error': 'Service temporarily unavailable.'}, status_code=503)
+
+
+@app.get('/health')
+def health():
+    return {'status': 'ok', 'cloud_configured': bool(SUPABASE_URL and SUPABASE_KEY)}
+
+
+async def limited_body(request, limit):
+    body = bytearray()
+    async for chunk in request.stream():
+        if len(body) + len(chunk) > limit:
+            raise HTTPException(413, 'Request is too large.')
+        body.extend(chunk)
+    return bytes(body)
+
+
+async def json_body(request):
+    if request.headers.get('content-type', '').split(';')[0].strip().lower() != 'application/json':
+        raise HTTPException(415, 'Content-Type must be application/json.')
+    try:
+        payload = json.loads(await limited_body(request, 16_384))
+    except (ValueError, UnicodeDecodeError):
+        raise HTTPException(400, 'Invalid JSON.') from None
+    if not isinstance(payload, dict):
+        raise HTTPException(400, 'JSON must be an object.')
+    return payload
+
+
+def inference(fn, *args):
+    # ponytail: one inference at a time on the free instance; add workers only with more RAM.
+    if not INFERENCE_LOCK.acquire(blocking=False):
+        raise HTTPException(503, 'AI is busy. Please retry shortly.')
+    try:
+        return fn(*args)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    finally:
+        INFERENCE_LOCK.release()
+
+
+@app.post('/api/predict')
+async def batch_prediction(request: Request):
+    try:
+        args = predict.parse_predict_payload(await json_body(request))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    return await run_in_threadpool(inference, predict.predict_batch, *args)
+
+
+@app.post('/api/predict_disease')
+async def disease_prediction(request: Request):
+    try:
+        args = predict_disease.parse_disease_payload(await json_body(request))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    return await run_in_threadpool(inference, predict_disease.predict_disease, *args)
+
+
+def classify_leaf(content_type, body):
+    image = predict_leaf.extract_multipart_image(content_type, body)
+    return predict_leaf.predict_leaf(predict_leaf.image_to_array(image))
+
+
+@app.post('/api/predict_leaf')
+async def leaf_prediction(request: Request):
+    content_type = request.headers.get('content-type', '')
+    if not content_type.lower().startswith('multipart/form-data;'):
+        raise HTTPException(415, 'Content-Type must be multipart/form-data.')
+    body = await limited_body(request, predict_leaf.MAX_BODY_BYTES)
+    return await run_in_threadpool(inference, classify_leaf, content_type, body)
+
+
+Text = Annotated[str, Field(min_length=1, max_length=160)]
+
+
+class BatchDetailsInput(BaseModel):
+    model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
+    farm: Text
+    province: Text
+    harvest_date: date
+    variety: Annotated[str, Field(min_length=1, max_length=100)]
+    weight_kg: Annotated[float, Field(gt=0, le=1000000, allow_inf_nan=False, strict=True)]
+
+
+class BatchInput(BatchDetailsInput):
+    code: Annotated[str, Field(pattern=r'^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$')]
+
+
+class EvidenceInput(BaseModel):
+    model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
+    id: UUID
+    kind: Literal['photo', 'lab_report', 'other']
+    source: Text
+    document_date: date
+    filename: Annotated[str, Field(min_length=1, max_length=180)]
+
+
+class EventInput(BaseModel):
+    model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
+    stage: Text
+    location: Text
+    occurred_on: date
+    notes: Annotated[str, Field(max_length=2000)] = ''
+    cadmium_ppm: Annotated[float, Field(ge=0, le=100, allow_inf_nan=False, strict=True)] | None = None
+    threshold_ppm: Annotated[float, Field(gt=0, le=100, allow_inf_nan=False, strict=True)] | None = None
+
+    @model_validator(mode='after')
+    def paired_measurements(self):
+        if (self.cadmium_ppm is None) != (self.threshold_ppm is None):
+            raise ValueError('Both measurement and reference threshold are required.')
+        return self
+
+
+class VisibilityInput(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True)
+    is_public: bool
+
+
+def authorization(request, required=False):
+    value = request.headers.get('authorization', '')
+    if value and (not value.startswith('Bearer ') or not value[7:].strip()):
+        raise HTTPException(401, 'Invalid authentication.')
+    if required and not value:
+        raise HTTPException(401, 'Sign in first.')
+    return value
+
+
+def supabase(method, path, auth='', *, params=None, payload=None):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        raise HTTPException(503, 'Cloud storage has not been configured.')
+    headers = {'apikey': SUPABASE_KEY, 'Prefer': 'return=representation'}
+    if auth:
+        headers['Authorization'] = auth
+    try:
+        response = httpx.request(method, SUPABASE_URL + path, headers=headers,
+                                 params=params, json=payload, timeout=15)
+    except httpx.RequestError:
+        raise HTTPException(503, 'Cannot reach cloud storage.') from None
+    if response.status_code in (401, 403):
+        raise HTTPException(response.status_code, 'Sign in with an authorized account.')
+    if response.status_code == 409:
+        raise HTTPException(409, 'This batch code already exists in your account.')
+    if response.is_error:
+        raise HTTPException(502, 'Cloud storage rejected the request.')
+    return response.json()
+
+
+BATCH_FIELDS = 'id,code,farm,province,harvest_date,variety,weight_kg,is_public,created_at'
+EVENT_FIELDS = 'id,batch_id,stage,location,occurred_on,notes,cadmium_ppm,threshold_ppm,created_at'
+EVIDENCE_FIELDS = 'id,batch_id,kind,source,document_date,filename,file_path,created_at'
+
+
+@app.get('/api/cloud/batches')
+def list_batches(request: Request, offset: int = 0):
+    if offset < 0 or offset > 100000:
+        raise HTTPException(400, 'Invalid page.')
+    auth = authorization(request, required=True)
+    user = supabase('GET', '/auth/v1/user', auth)
+    return supabase('GET', '/rest/v1/cloud_batches', auth, params={
+        'select': BATCH_FIELDS, 'owner_id': f'eq.{UUID(user["id"])}',
+        'order': 'created_at.desc,id.desc', 'limit': '50', 'offset': str(offset),
+    })
+
+
+@app.post('/api/cloud/batches', status_code=201)
+async def create_batch(request: Request):
+    auth = authorization(request, required=True)
+    data = BatchInput.model_validate(await json_body(request)).model_dump(mode='json')
+    rows = await run_in_threadpool(supabase, 'POST', '/rest/v1/cloud_batches', auth, payload=data,
+                                  params={'select': BATCH_FIELDS})
+    return rows[0]
+
+
+@app.get('/api/cloud/batches/{batch_id}')
+def get_batch(batch_id: UUID, request: Request):
+    auth = authorization(request)
+    rows = supabase('GET', '/rest/v1/cloud_batches', auth,
+                    params={'select': BATCH_FIELDS, 'id': f'eq.{batch_id}'})
+    if not rows:
+        raise HTTPException(404, 'Batch not found or private.')
+    return rows[0]
+
+
+@app.get('/api/cloud/batches/{batch_id}/events')
+def get_events(batch_id: UUID, request: Request, offset: int = 0):
+    if offset < 0 or offset > 100000:
+        raise HTTPException(400, 'Invalid page.')
+    auth = authorization(request)
+    get_batch(batch_id, request)
+    return supabase('GET', '/rest/v1/cloud_events', auth, params={
+        'select': EVENT_FIELDS, 'batch_id': f'eq.{batch_id}',
+        'order': 'created_at.asc,id.asc', 'limit': '50', 'offset': str(offset),
+    })
+
+
+@app.patch('/api/cloud/batches/{batch_id}')
+async def publish_batch(batch_id: UUID, request: Request):
+    auth = authorization(request, required=True)
+    data = VisibilityInput.model_validate(await json_body(request)).model_dump()
+    rows = await run_in_threadpool(supabase, 'PATCH', '/rest/v1/cloud_batches', auth,
+                                  params={'id': f'eq.{batch_id}', 'select': BATCH_FIELDS}, payload=data)
+    if not rows:
+        raise HTTPException(404, 'Batch not found or not owned by you.')
+    return rows[0]
+
+
+@app.patch('/api/cloud/batches/{batch_id}/details')
+async def update_details(batch_id: UUID, request: Request):
+    auth = authorization(request, required=True)
+    data = BatchDetailsInput.model_validate(await json_body(request)).model_dump(mode='json')
+    rows = await run_in_threadpool(supabase, 'PATCH', '/rest/v1/cloud_batches', auth,
+                                  params={'id': f'eq.{batch_id}', 'select': BATCH_FIELDS}, payload=data)
+    if not rows:
+        raise HTTPException(404, 'Batch not found or not owned by you.')
+    return rows[0]
+
+
+@app.get('/api/cloud/batches/{batch_id}/evidence')
+def get_evidence(batch_id: UUID, request: Request, offset: int = 0):
+    if offset < 0 or offset > 100000:
+        raise HTTPException(400, 'Invalid page.')
+    get_batch(batch_id, request)
+    return supabase('GET', '/rest/v1/cloud_evidence', authorization(request), params={
+        'select': EVIDENCE_FIELDS, 'batch_id': f'eq.{batch_id}',
+        'order': 'created_at.desc,id.desc', 'limit': '50', 'offset': str(offset),
+    })
+
+
+@app.post('/api/cloud/batches/{batch_id}/evidence', status_code=201)
+async def attach_evidence(batch_id: UUID, request: Request):
+    auth = authorization(request, required=True)
+    data = EvidenceInput.model_validate(await json_body(request)).model_dump(mode='json')
+    data.update(batch_id=str(batch_id), file_path=f'{batch_id}/{data["id"]}')
+    rows = await run_in_threadpool(supabase, 'POST', '/rest/v1/cloud_evidence', auth,
+                                  payload=data, params={'select': EVIDENCE_FIELDS})
+    return rows[0]
+
+
+@app.post('/api/cloud/batches/{batch_id}/events', status_code=201)
+async def append_event(batch_id: UUID, request: Request):
+    auth = authorization(request, required=True)
+    data = EventInput.model_validate(await json_body(request)).model_dump(mode='json')
+    data['batch_id'] = str(batch_id)
+    rows = await run_in_threadpool(supabase, 'POST', '/rest/v1/cloud_events', auth,
+                                  payload=data, params={'select': EVENT_FIELDS})
+    return rows[0]
+
+
+
+--- SOURCE CODE: src/lib/cloudClient.js ---
+import { createClient } from '@supabase/supabase-js'
+import { apiFetch } from './api'
+
+const url = import.meta.env.VITE_SUPABASE_URL
+const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+export const googleLoginEnabled = import.meta.env.VITE_GOOGLE_AUTH_ENABLED === 'true'
+export const supabase = url && key ? createClient(url, key, {
+  auth: { flowType: 'pkce', detectSessionInUrl: false },
+}) : null
+// Public QR reads must stay anonymous even if this browser belongs to the owner.
+const publicStorage = url && key ? createClient(url, key, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'durian-public-read' },
+}) : null
+
+export function cloudError(error) {
+  if (error.code === 'over_email_send_rate_limit') return 'Đã hết lượt gửi email của hệ thống. Hãy chờ khoảng một giờ hoặc liên hệ người quản lý. / Email quota reached; wait about an hour or contact the operator.'
+  if (error.status === 429) return 'Bạn đang gửi quá nhanh. Hãy chờ trước khi thử lại. / Too many requests. Please wait before retrying.'
+  if (error.name === 'TimeoutError') return 'Máy chủ đang khởi động hoặc chưa phản hồi. Thử lại sau. / Server is starting or unavailable. Try again shortly.'
+  return error.message || 'Không thể hoàn thành thao tác. / Could not complete this action.'
+}
+
+export function validateEvidenceFile(file) {
+  if (!file || !['image/jpeg', 'image/png', 'application/pdf'].includes(file.type)) {
+    throw new Error('Chọn ảnh JPG, PNG hoặc tài liệu PDF. / Choose a JPG, PNG or PDF file.')
+  }
+  if (!file.size || file.size > 5 * 1024 * 1024) throw new Error('Tệp phải từ 1 byte đến 5 MB. / File must be between 1 byte and 5 MB.')
+}
+
+export async function uploadEvidence(batchId, file, metadata) {
+  validateEvidenceFile(file)
+  const id = crypto.randomUUID()
+  const { error } = await supabase.storage.from('batch-evidence').upload(`${batchId}/${id}`, file, {
+    contentType: file.type, cacheControl: '0', upsert: false,
+  })
+  if (error) throw error
+  // An interrupted attachment may leave a private unlinked file; never claim it was attached.
+  return cloudRequest(`/batches/${batchId}/evidence`, {
+    method: 'POST', body: JSON.stringify({ ...metadata, id, filename: file.name.slice(0, 180) }),
+  })
+}
+
+export async function downloadEvidence(record, publicRead) {
+  const client = publicRead ? publicStorage : supabase
+  const { data, error } = await client.storage.from('batch-evidence').download(record.file_path, {}, { cache: 'no-store' })
+  if (error) throw error
+  // Download as bytes, never execute/render uploaded HTML or active PDF content in our page.
+  const objectUrl = URL.createObjectURL(new Blob([data], { type: 'application/octet-stream' }))
+  const link = document.createElement('a')
+  link.href = objectUrl
+  link.download = record.filename.replace(/[\\/]/g, '_')
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000)
+}
+
+export async function signInWithGoogle() {
+  if (!googleLoginEnabled || !supabase) throw new Error('Google login chưa được bật. / Google login is not enabled.')
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}?auth=callback` },
+  })
+  if (error) throw error
+}
+
+let signInCompletion
+export function completeCloudSignIn() {
+  // Share the exchange across React StrictMode mounts: a code is single-use.
+  if (signInCompletion) return signInCompletion
+  const callback = new URL(window.location.href)
+  if (callback.searchParams.get('auth') !== 'callback') return Promise.resolve()
+  window.history.replaceState(window.history.state, '', `${callback.pathname}#/manage/cloud`)
+  window.dispatchEvent(new Event('hashchange'))
+  signInCompletion = (async () => {
+    const code = callback.searchParams.get('code')
+    if (!code || callback.searchParams.has('error') || new URLSearchParams(callback.hash.slice(1)).has('error')) {
+      throw new Error('Đăng nhập đã bị hủy hoặc phiên xác thực hết hạn. Hãy bắt đầu đăng nhập lại. / Sign-in was cancelled or expired. Start sign-in again; email links must be opened in the same browser.')
+    }
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) throw new Error('Không thể hoàn tất đăng nhập. Hãy thử lại trong cùng trình duyệt. / Could not complete sign-in. Try again in the same browser; request a new email link if needed.')
+  })()
+  return signInCompletion
+}
+
+export async function cloudRequest(path, options = {}, publicRead = false) {
+  const headers = new Headers(options.headers)
+  if (options.body) headers.set('Content-Type', 'application/json')
+  if (!publicRead) {
+    const { data, error } = await supabase.auth.getSession()
+    if (error) throw error
+    if (!data.session) throw new Error('Please sign in. / Vui lòng đăng nhập.')
+    headers.set('Authorization', `Bearer ${data.session.access_token}`)
+  }
+  const response = await apiFetch(`/api/cloud${path}`, { ...options, headers, cache: 'no-store' })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`)
+  return data
+}
+
+
+
+--- SOURCE CODE: src/lib/documentReader.js ---
+import { validateEvidenceFile } from './cloudClient'
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+
+// Classic workers and importScripts require raw assets, without Vite's module transforms.
+const ocrWorkerUrl = `${import.meta.env.BASE_URL}ocr/tesseract-7.0.0-worker.min.js`
+const ocrCoreUrl = `${import.meta.env.BASE_URL}ocr/tesseract-7.0.0-core-lstm.wasm.js`
+
+export const DOCUMENT_LIMITS = { pages: 5, pixels: 20_000_000, characters: 50_000 }
+// Both pretrained languages share a pinned upstream folder; use Tesseract's documented string API.
+export const OCR_MODEL_PATH = 'https://cdn.jsdelivr.net/gh/naptha/tessdata@806cd9adc8c6e8abc11c782db1818c990576bebc/4.0.0_best_int'
+// ponytail: one pending Tesseract initializer; reload a stalled boot, isolate bootstrap if startup cancellation is needed.
+let initializationPending = false
+
+function failure(code) { return Object.assign(new Error(code), { code }) }
+function abortError() { return new DOMException('Document reading cancelled', 'AbortError') }
+function checkAbort(signal) { if (signal?.aborted) throw abortError() }
+function abortable(promise, signal) {
+  if (!signal) return promise
+  checkAbort(signal)
+  return new Promise((resolve, reject) => {
+    const abort = () => reject(abortError())
+    signal.addEventListener('abort', abort, { once: true })
+    Promise.resolve(promise).then(resolve, reject).finally(() => signal.removeEventListener('abort', abort))
+  })
+}
+
+function validDate(value) {
+  const date = new Date(`${value}T00:00:00Z`)
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value
+}
+
+export function parseDocumentDate(value) {
+  const raw = value.trim()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return validDate(raw) ? raw : ''
+  const match = raw.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/)
+  if (!match) return ''
+  const [, day, month, year] = match
+  // Without a declared format, only a day above 12 is accepted as day/month/year.
+  if (Number(day) <= 12 || Number(month) > 12) return ''
+  const date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+  return validDate(date) ? date : ''
+}
+
+export function parseDocumentText(input) {
+  const text = String(input || '').slice(0, DOCUMENT_LIMITS.characters).replace(/\r/g, '').replace(/\p{Cc}/gu, character => '\n\t'.includes(character) ? character : '')
+  const result = { status: 'needs_review', text, source: '', documentDate: '', sourceExcerpt: '', dateExcerpt: '', issues: [] }
+  if ((text.match(/[\p{L}\p{N}]/gu) || []).length < 20) {
+    result.issues.push('unreadable')
+    return result
+  }
+  const sources = []
+  const dates = []
+  for (const line of text.split('\n')) {
+    const normalized = line.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').trim()
+    const sourceMatch = normalized.match(/^(?:nguon(?: khai bao)?|don vi phat hanh|phong (?:thi|thu) nghiem|source|issued by|issuing (?:organization|organisation)|laboratory|lab name)\s*[:：]\s*(.+)$/i)
+    const dateMatch = normalized.match(/^(?:ngay(?: tai lieu| bao cao| phat hanh| cap)?|date|document date|report date|issue date|issued on)\s*[:：]\s*(.+)$/i)
+    if (sourceMatch) {
+      const value = line.slice(line.search(/[:：]/) + 1).trim()
+      sources.push({ value: value.length <= 160 && !/[<>]/.test(value) ? value : '', excerpt: line.trim() })
+    }
+    if (dateMatch) dates.push({ value: parseDocumentDate(dateMatch[1]), excerpt: line.trim() })
+  }
+  const sourceValues = [...new Set(sources.map(item => item.value))]
+  const dateValues = [...new Set(dates.map(item => item.value))]
+  if (sourceValues.length === 1 && sourceValues[0]) {
+    result.source = sourceValues[0]
+    result.sourceExcerpt = sources[0].excerpt
+  } else result.issues.push(sources.length ? 'source_ambiguous' : 'source_missing')
+  if (dateValues.length === 1 && dateValues[0]) {
+    result.documentDate = dateValues[0]
+    result.dateExcerpt = dates[0].excerpt
+  } else result.issues.push(dates.length ? 'date_ambiguous' : 'date_missing')
+  return result
+}
+
+export function validateDocumentBytes(bytes, type) {
+  const data = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+  if (type === 'application/pdf') {
+    if (new TextDecoder().decode(bytes.subarray(0, 5)) !== '%PDF-') throw failure('invalid_file')
+    return
+  }
+  let width = 0
+  let height = 0
+  if (type === 'image/png') {
+    const signature = [137, 80, 78, 71, 13, 10, 26, 10]
+    if (bytes.length < 24 || !signature.every((byte, index) => bytes[index] === byte) || new TextDecoder().decode(bytes.subarray(12, 16)) !== 'IHDR') throw failure('invalid_file')
+    width = data.getUint32(16)
+    height = data.getUint32(20)
+  } else if (type === 'image/jpeg') {
+    if (bytes[0] !== 255 || bytes[1] !== 216) throw failure('invalid_file')
+    let offset = 2
+    while (offset + 3 < bytes.length) {
+      if (bytes[offset++] !== 255) throw failure('invalid_file')
+      while (bytes[offset] === 255) offset++
+      const marker = bytes[offset++]
+      if (marker === 217 || marker === 218) break
+      if (marker === 1 || (marker >= 208 && marker <= 215)) continue
+      if (offset + 2 > bytes.length) throw failure('invalid_file')
+      const length = data.getUint16(offset)
+      if (length < 2 || offset + length > bytes.length) throw failure('invalid_file')
+      if ([192, 193, 194, 195, 197, 198, 199, 201, 202, 203, 205, 206, 207].includes(marker)) {
+        if (length < 7) throw failure('invalid_file')
+        height = data.getUint16(offset + 3)
+        width = data.getUint16(offset + 5)
+        break
+      }
+      offset += length
+    }
+  } else throw failure('invalid_file')
+  if (!width || !height) throw failure('invalid_file')
+  if (width * height > DOCUMENT_LIMITS.pixels) throw failure('image_too_large')
+}
+
+async function readPdf(bytes, { signal, onProgress }) {
+  const pdfjs = await import('pdfjs-dist/build/pdf.mjs')
+  checkAbort(signal)
+  pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl
+  const task = pdfjs.getDocument({ data: bytes, isEvalSupported: false, disableFontFace: true, enableXfa: false, useWorkerFetch: false, useWasm: false, stopAtErrors: true, maxImageSize: DOCUMENT_LIMITS.pixels })
+  const cancel = () => { task.destroy().catch(() => {}) }
+  signal?.addEventListener('abort', cancel, { once: true })
+  try {
+    const pdf = await abortable(task.promise, signal)
+    if (pdf.numPages > DOCUMENT_LIMITS.pages) throw failure('pdf_too_long')
+    let text = ''
+    let scannedPages = 0
+    for (let index = 1; index <= pdf.numPages; index++) {
+      checkAbort(signal)
+      const page = await abortable(pdf.getPage(index), signal)
+      try {
+        const content = await abortable(page.getTextContent(), signal)
+        let pageText = ''
+        for (const item of content.items) {
+          if (typeof item.str === 'string') pageText += item.str + (item.hasEOL ? '\n' : ' ')
+          if (text.length + pageText.length > DOCUMENT_LIMITS.characters) throw failure('text_too_long')
+        }
+        if (!pageText.trim()) scannedPages++
+        text += pageText + '\n'
+        onProgress?.(index / pdf.numPages)
+      } finally { page.cleanup() }
+    }
+    return { ...parseDocumentText(text), method: 'pdf_text', pages: pdf.numPages, scannedPages }
+  } finally {
+    signal?.removeEventListener('abort', cancel)
+    await task.destroy()
+  }
+}
+
+async function readImage(file, { signal, onProgress }) {
+  if (initializationPending) throw failure('reader_busy')
+  await abortable(createImageBitmap(file).then(bitmap => {
+    try {
+      if (!bitmap.width || !bitmap.height) throw failure('invalid_file')
+      if (bitmap.width * bitmap.height > DOCUMENT_LIMITS.pixels) throw failure('image_too_large')
+    } finally { bitmap.close() }
+  }), signal)
+  checkAbort(signal)
+  const { createWorker } = await import('tesseract.js')
+  checkAbort(signal)
+  let worker
+  let abandoned = false
+  const cancel = () => { worker?.terminate() }
+  signal?.addEventListener('abort', cancel, { once: true })
+  try {
+    if (initializationPending) throw failure('reader_busy')
+    let rejectInitialization
+    const initializationError = new Promise((_resolve, reject) => { rejectInitialization = reject })
+    // ponytail: portable LSTM core; bundle SIMD variants if OCR profiling warrants them.
+    initializationPending = true
+    const initializing = createWorker('vie+eng', 1, {
+      workerPath: ocrWorkerUrl, corePath: ocrCoreUrl, workerBlobURL: false, cacheMethod: 'none',
+      langPath: OCR_MODEL_PATH, gzip: true,
+      logger: event => { if (event.status === 'recognizing text') onProgress?.(event.progress) },
+      errorHandler: () => rejectInitialization(failure('ocr_failed')),
+    }).then(created => {
+      initializationPending = false
+      if (abandoned || signal?.aborted) { created.terminate(); throw abortError() }
+      worker = created
+      return worker
+    }, error => {
+      initializationPending = false
+      throw error
+    })
+    await abortable(Promise.race([initializing, initializationError]), signal)
+    const { data } = await abortable(worker.recognize(file), signal)
+    checkAbort(signal)
+    return { ...parseDocumentText(data.text), method: 'image_ocr', pages: 1, scannedPages: 0 }
+  } finally {
+    abandoned = true
+    signal?.removeEventListener('abort', cancel)
+    await worker?.terminate()
+  }
+}
+
+export async function readDocument(file, options = {}) {
+  validateEvidenceFile(file)
+  checkAbort(options.signal)
+  const bytes = new Uint8Array(await abortable(file.arrayBuffer(), options.signal))
+  validateDocumentBytes(bytes, file.type)
+  return file.type === 'application/pdf' ? readPdf(bytes, options) : readImage(file, options)
+}
+
+
+
+
+===============================================================================
+PHẦN D — ĐẦY ĐỦ 22 CÂU HỎI VÀ LỜI ĐÁP ĐÃ SOẠN
+===============================================================================
+Nguồn: PDF v8, trang 8–13. Giữ toàn bộ câu hỏi/lời đáp; bỏ ghi nhớ dẫn slide/page cũ. Theo phần A nếu thông tin khác thời điểm. Không coi đây là câu BTC chắc chắn hỏi.
+
+HỎI ĐÁP: VẤN ĐỀ VÀ NGƯỜI DÙNG
+Câu hỏi dự kiến để luyện tập, không phải danh sách chính thức của BTC. Trả lời ngắn trước, mở bằng chứng khi được hỏi
+sâu. Phần này nằm ngoài bài pitch 4 phút hiện tại.
+01. Vì sao nhóm làm DurianTrust? Ai cần nó nhất?
+Nhóm tập trung vào nhà vườn và HTX chuẩn bị hồ sơ từng lô để gửi bên mua. Vấn đề nhóm đặt ra là tài liệu
+và lịch sử khó đối chiếu khi nằm rải rác. DurianTrust gom chúng theo lô và cho chủ hồ sơ chủ động chia sẻ.
+Đây vẫn là giả thuyết nhu cầu; nhóm chưa khảo sát hoặc pilot để lượng hóa mức độ.
+
+02. Website có giúp sầu riêng hết bị trả ở cửa khẩu không?
+Chưa có bằng chứng để khẳng định điều đó. Phần mềm hỗ trợ chuẩn bị và đối chiếu hồ sơ; không lấy mẫu,
+đo hóa chất hay quyết định thông quan. Lô hàng vẫn phải đáp ứng yêu cầu thực tế của thị trường nhập khẩu.
+Nhóm sẽ đo thời gian chuẩn bị và tài liệu còn thiếu trước khi nói đến tác động xa hơn.
+
+03. Con số Trung Quốc chiếm 95% lấy từ đâu?
+Đây là khoảng 95% kim ngạch xuất khẩu sầu riêng Việt Nam trong 8 tháng đầu năm 2026, theo thông tin họp
+báo Chính phủ ngày 3/9/2026: khoảng 1,85 trên tổng 1,95 tỷ USD. Không phải 95% sản lượng, toàn bộ thị
+trường sầu riêng trong nước hoặc tỷ trọng cố định qua mọi năm.
+
+04. Sao không dùng Zalo, Google Drive hoặc Excel?
+Các công cụ đó có thể đủ cho nhóm nhỏ. Điểm nhóm muốn thử là một hồ sơ có cấu trúc theo lô, tài liệu có
+nguồn/ngày, lịch sử và trang chỉ đọc qua QR. Nếu pilot không cho thấy người dùng tiết kiệm thời gian hoặc
+đối chiếu dễ hơn cách hiện tại, nhóm phải thu hẹp hoặc đổi giải pháp.
+
+
+
+
+HỎI ĐÁP: BLOCKCHAIN VÀ ĐỘ TIN CẬY
+Câu hỏi dự kiến để luyện tập, không phải danh sách chính thức của BTC. Trả lời ngắn trước, mở bằng chứng khi được hỏi
+sâu. Phần này nằm ngoài bài pitch 4 phút hiện tại.
+05. Dự án có thực sự cần blockchain không?
+Luồng hồ sơ cloud hiện tại hoạt động không cần blockchain. Nhóm dùng database cho luồng này. Solana là
+thử nghiệm riêng cho tình huống nhiều bên cần cùng xác nhận bàn giao mà không chỉ dựa vào một đơn vị
+giữ database. Nếu người dùng không có nhu cầu đó, nhóm không bắt họ dùng ví.
+
+06. Tại sao chọn Solana? Smart contract làm gì?
+Nhóm đã triển khai thử nghiệm bằng Anchor trên Solana Devnet, tận dụng chữ ký ví và chương trình ghi
+nhận trạng thái bàn giao. Người đang giữ đề xuất, người nhận ký chấp nhận. Nhóm chưa benchmark chi phí
+và tải để chứng minh Solana tốt hơn các lựa chọn khác; hiện chưa triển khai mainnet.
+
+07. Cloud và blockchain đã đồng bộ chưa? Lưu tài liệu ở đâu?
+Chưa đồng bộ tự động. Hồ sơ lô và lịch sử cloud nằm trong Supabase PostgreSQL; tệp ở private Storage.
+Luồng Solana có trạng thái riêng. Nhóm chưa thể khẳng định hồ sơ cloud hiện tại được bảo vệ bằng tính bất
+biến của blockchain. Thiết kế liên kết hai luồng chỉ nên làm khi đã xác định nhu cầu và cách đối chiếu phiên
+bản.
+
+08. Nhập dữ liệu giả hoặc dán QR lên lô khác thì sao?
+Hệ thống hiện chưa ngăn được việc khai sai hoặc sao chép QR. Chữ ký ví xác nhận hành động của ví, không
+chứng minh nội dung đúng hay nhãn gắn đúng lô vật lý. Checklist cũng chỉ kiểm tra thông tin có mặt. Muốn
+dùng thật cần xác minh đơn vị phát hành, quy trình kiểm tra tại điểm bàn giao và cơ chế xử lý sai lệch.
+
+
+
+
+HỎI ĐÁP: AI: KẾT QUẢ VÀ GIỚI HẠN
+Câu hỏi dự kiến để luyện tập, không phải danh sách chính thức của BTC. Trả lời ngắn trước, mở bằng chứng khi được hỏi
+sâu. Phần này nằm ngoài bài pitch 4 phút hiện tại.
+09. AI của nhóm làm gì? Nó liên quan thế nào đến xuất khẩu?
+AI ảnh lá thử phân loại dấu hiệu bệnh từ ảnh để hỗ trợ kiểm tra ở vườn. Hai pipeline dạng bảng hiện dùng dữ
+liệu synthetic để minh họa kỹ thuật. Những phần này chưa xác nhận an toàn xuất khẩu. So sánh một giá trị
+Cadmium với ngưỡng demo là rule xác định, không phải AI đo được hóa chất.
+
+10. Tại sao có cả accuracy 85,38% và 39,6%?
+Đó là hai phép đo của model cũ trên hai nguồn ảnh và phạm vi nhãn khác nhau. DurianLDD có 5 nhãn, 889
+ảnh; Mendeley đối chiếu 3 nhãn, 202 ảnh, đúng 80 ảnh và Phomopsis đúng 0/59. Provenance training chưa
+rõ nên không lấy số cao hơn làm bằng chứng dùng tốt ngoài vườn. Phụ lục ghi rõ giới hạn.
+
+11. Fine-tune rồi vì sao không dùng model mới?
+Candidate chưa vượt gate validation đặt trước nên nhóm không promote. Phép đo trên cùng 202 ảnh
+Mendeley cũng chỉ đạt 72/202, tức 35,6%. Train lâu hơn không bảo đảm tốt hơn. Hướng tiếp theo là dữ liệu
+hợp lệ và đa dạng hơn, nhãn chuyên gia, holdout theo cây/vườn và một tập đánh giá mới để tránh tối ưu theo
+test đã xem.
+
+12. AI gặp ảnh mờ, ảnh không phải lá hoặc dự đoán sai thì sao?
+Hướng xử lý của sản phẩm là báo chưa đủ tin cậy và yêu cầu kiểm tra hoặc nhập tay. Tuy vậy confidence
+cao không chứng minh ảnh hợp lệ; model hiện chưa có lớp unknown/non-leaf được kiểm chứng. Nhóm chưa
+thể cam kết phát hiện mọi ảnh ngoài phạm vi. AI chỉ nên là gợi ý và không tự quyết định xử lý bệnh hay xuất
+khẩu.
+
+
+
+
+HỎI ĐÁP: SẢN PHẨM, QUYỀN TRUY CẬP VÀ DEMO
+Câu hỏi dự kiến để luyện tập, không phải danh sách chính thức của BTC. Trả lời ngắn trước, mở bằng chứng khi được hỏi
+sâu. Phần này nằm ngoài bài pitch 4 phút hiện tại.
+13. Đã có người dùng thật hoặc HTX thử nghiệm chưa?
+Chưa có pilot HTX, phiếu lab thật hay số liệu hiệu quả kinh doanh. Google login đã được người dùng xác
+nhận vào được màn quản lý, nhưng flow production tạo lô, upload, công khai và thu hồi chưa được kiểm
+chứng trọn vẹn. Nhóm trình bày đây là prototype đã triển khai, không phải dịch vụ đã được xác thực ngoài
+thực địa.
+
+14. Video có phải hệ thống chạy thật không?
+Clip dùng ảnh chụp giao diện app local với chú thích, con trỏ và highlight; Auth/API mô phỏng, dữ liệu và tài
+liệu được đánh dấu TEST. Nó minh họa quy trình, không phải quay liên tục hoặc bằng chứng production end
+to end. Nhóm ghi nhãn này xuyên suốt clip và chưa có phiếu kiểm nghiệm thật trong demo.
+
+15. Ai xem được dữ liệu? Thu hồi QR có xóa được bản đã tải không?
+Hồ sơ mới riêng tư theo tài khoản; thiết kế dùng RLS và private Storage. Khi chủ hồ sơ công khai, người có
+link/QR xem được hồ sơ, lịch sử và bằng chứng đính kèm. Chuyển lại riêng tư chặn lượt đọc mới, không xóa
+bản đã tải hay ảnh chụp màn hình. Cần kiểm thử hai tài khoản và người xem ẩn danh trên production.
+
+16. Tài liệu bị sửa, thất lạc hoặc dịch vụ ngừng hoạt động thì sao?
+Nhóm chưa chứng minh một quy trình backup/restore và ứng phó sự cố hoàn chỉnh. Trước khi nhận hồ sơ
+thật, cần thử khôi phục dữ liệu, xác định lưu giữ/xóa, giám sát lỗi và đối chiếu phiên bản tài liệu. Luồng cloud
+hiện không tự đưa bằng chứng lên blockchain, nên không thể dựa vào Solana để hứa mọi thay đổi đều được
+phát hiện.
+
+
+
+
+HỎI ĐÁP: PILOT, KINH DOANH VÀ CÂU HỎI KHÓ
+Câu hỏi dự kiến để luyện tập, không phải danh sách chính thức của BTC. Trả lời ngắn trước, mở bằng chứng khi được hỏi
+sâu. Phần này nằm ngoài bài pitch 4 phút hiện tại.
+17. Ai sẽ trả tiền? Giá bao nhiêu?
+Giả thuyết là HTX hoặc đơn vị gom hàng trả phí cho việc quản lý hồ sơ; bên mua xem hồ sơ được chia sẻ.
+Nhóm chưa có khách trả tiền, khảo sát willingness to pay hoặc mức giá được kiểm chứng. Sẽ phỏng vấn và
+pilot trước, rồi so sánh giá trị tiết kiệm với chi phí hỗ trợ, vận hành và lưu trữ để quyết định.
+
+18. Pilot sẽ làm thế nào và đo thành công bằng gì?
+Đề xuất bắt đầu với một HTX tự nguyện và một số lô có tài liệu được phép sử dụng. Đo cùng tác vụ bằng
+cách hiện tại và DurianTrust: thời gian chuẩn bị, số tài liệu thiếu, thời gian bên mua tìm đúng tài liệu và lỗi
+quyền truy cập. Ghi nhận phản hồi, đặt tiêu chí cùng HTX trước khi thử; chưa có kết quả pilot.
+
+19. Có thể mở rộng lên nhiều HTX không? Chi phí vận hành ra sao?
+Stack hiện là React/Vite, FastAPI và Supabase PostgreSQL/Storage. Nhóm chưa có load test hoặc chi phí
+trên mỗi lô được đo, nên chưa cam kết quy mô hay SLA. Cần đo độ trễ, lỗi, dung lượng và lưu lượng theo lô,
+rồi tính cả hosting, backup, hỗ trợ và kiểm tra tài liệu. Chỉ nâng gói khi số đo cho thấy cần.
+
+20. Tại sao nên chọn dự án nếu AI yếu và blockchain còn tùy chọn?
+Giá trị nhóm muốn kiểm chứng trước là một quy trình hồ sơ dễ dùng giữa HTX và bên mua. Nhóm tách rõ
+phần đã có với thử nghiệm, công bố giới hạn AI và không thay model chỉ để có số đẹp. Điều đáng đánh giá là
+khả năng thực thi, nhận diện rủi ro và kế hoạch đo hiệu quả; nhóm chưa thể hứa tác động thương mại đã
+được chứng minh.
+
+
+
+
+HỎI ĐÁP: BÊN MUA VÀ NGÔN NGỮ HỒ SƠ
+Câu hỏi dự kiến để luyện tập, không phải danh sách chính thức của BTC. Trả lời ngắn trước, mở bằng chứng khi được hỏi
+sâu. Phần này nằm ngoài bài pitch 4 phút hiện tại.
+21. Bên mua cụ thể là ai: thương lái, doanh nghiệp Việt Nam hay nhà nhập khẩu Trung Quốc?
+Ở giai đoạn đầu, nhóm đề xuất tập trung bên nhận lô trực tiếp từ HTX, như đơn vị thu mua hoặc doanh
+nghiệp xuất khẩu tại Việt Nam. Nhà nhập khẩu Trung Quốc có thể là người xem tiếp theo, nhưng nhóm chưa
+xác nhận khách hàng nào trong các nhóm này. Pilot cần chọn một nhóm chính và hỏi họ phải đối chiếu tài liệu
+gì trước giao nhận.
+
+22. Bên mua Trung Quốc đọc hồ sơ bằng ngôn ngữ nào? Có tự dịch tài liệu không?
+Nhóm chưa có luồng hồ sơ tiếng Trung đã được kiểm chứng cho bên mua. Đổi ngôn ngữ giao diện không
+đồng nghĩa nội dung người dùng nhập hoặc PDF đã được dịch. Nếu pilot cần tiếng Trung, nhóm sẽ xác định
+các trường cần song ngữ, giữ bản gốc và nhờ người có chuyên môn kiểm tra bản dịch thuật ngữ, tên chất và
+số đo trước khi chia sẻ.
+
+
+
+
+
+
+===============================================================================
+PHẦN E — CHECKLIST SỰ THẬT TRƯỚC KHI TRẢ LỜI
+===============================================================================
+1. Một prototype đã deploy không đồng nghĩa production E2E hoặc field pilot.
+2. HTX, Lâm Đồng, 850 kg, MAU-2026-01 là tình huống minh họa.
+3. Không có lab/HTX thật, doanh thu hoặc business-impact metrics được xác nhận.
+4. Private/public chia sẻ theo whole record; revocation không thu hồi copies.
+5. Cloud không auto-sync chain. Google Auth thực tế vẫn qua Supabase Auth.
+6. Custody hai chữ ký là state số; không legal title/physical delivery.
+7. Upload PDF/OCR/QR/checklist không xác minh lab, hóa chất hoặc customs eligibility.
+8. 85,38% baseline same-source và 39,6% external mapped-three-class không thay thế nhau.
+9. 35,6% là candidate Colab external; 82,34% là candidate local test; 85,33% là Colab validation.
+10. Candidate chưa promote. Model live Render hash chưa xác nhận.
+11. Không có field/OOD independent evaluation đã chứng minh.
+12. Cadmium rule demo 0,05 ppm không pháp lý; synthetic ML không đo hóa chất.
+13. Pitch current tối đa 4 phút; target 3:45 gồm video 40s. Các deck 10 phút cũ không phải bản thi hiện tại.
+14. Q&A là dự kiến; có thể trả lời ngoài danh sách nếu có bằng chứng, không đoán.
+
+HẾT GÓI CONTEXT. Khi người dùng gửi câu hỏi tiếp theo, trả lời trực tiếp theo các dữ kiện này.
