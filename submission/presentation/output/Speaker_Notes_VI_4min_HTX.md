@@ -8,7 +8,9 @@ Hãy hình dung một hợp tác xã chuẩn bị giao 850 ký sầu riêng. Bê
 
 ## 2. Vì sao DurianTrust ra đời? (25s)
 
-Theo họp báo Chính phủ ngày 3 tháng 9, Trung Quốc chiếm khoảng 95% kim ngạch xuất khẩu sầu riêng Việt Nam trong tám tháng đầu năm 2026. Yêu cầu kiểm nghiệm và truy xuất khiến hồ sơ đúng lô rất quan trọng. DurianTrust hỗ trợ chuẩn bị và đối chiếu hồ sơ. Cadimi và Vàng O vẫn cần kiểm nghiệm; website chưa chứng minh giúp giảm lô bị trả.
+Trung Quốc chiếm khoảng 95% kim ngạch xuất khẩu sầu riêng Việt Nam trong tám tháng đầu năm 2026. Năm 2025, báo Công Thương ghi nhận năm container bị trả vì thiếu giấy kiểm định Vàng O; VietnamPlus ghi nhận 17 xe phải quay đầu. DurianTrust giúp chuẩn bị hồ sơ theo lô để bên mua đối chiếu. An toàn thực phẩm vẫn phải được xác nhận bằng kiểm nghiệm.
+
+[THAO TÁC, KHÔNG ĐỌC] Chỉ vào tỷ trọng 95%, rồi hai ảnh bài báo. Các trường hợp năm 2025 là dẫn chứng lịch sử, không khẳng định mọi lô bị trả đều do thiếu giấy tờ. Mốc 25 giây cần kiểm tra khi đọc thành tiếng.
 
 ## 3. Người dùng đầu tiên (15s)
 
@@ -49,5 +51,7 @@ Mốc kiểm soát: bắt đầu video lúc 01:15, hết video lúc 01:55, hết
 Nếu chậm hơn đồng hồ: bỏ câu giải thích Zalo/Drive ở slide 3 và câu cuối về trả phí ở slide 9. Luôn giữ phần kết và giới hạn của Solana/AI. Không mở bài nói AI chi tiết hoặc phần hỏi đáp trong 4 phút.
 
 Nguồn bối cảnh: https://baochinhphu.vn/hop-bao-chinh-phu-thuong-ky-thang-8-dai-dien-bo-cong-an-lam-ro-nhieu-van-de-duoc-quan-tam-102260903170016698.htm
+
+Dẫn chứng slide 2 (năm 2025): Công Thương, 20/01/2025 - https://congthuong.vn/sau-rieng-gap-kho-khi-xuat-khau-sang-trung-quoc-370377.html ; VietnamPlus/TTXVN, 19/02/2025 - https://www.vietnamplus.vn/vi-sao-xuat-khau-sau-rieng-qua-cac-cua-khau-tai-lang-son-giam-manh-post1013155.amp
 
 Đối chiếu kỹ thuật: https://github.com/vinhelysia/DurainCheckerDemo ; https://github.com/vinhelysia/DurainCheckerDemo/blob/main/submission/review/ai-training/MENDELEY_EXTERNAL_EVAL.md
