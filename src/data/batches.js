@@ -1,3 +1,10 @@
+export function missingCloudBatchFields(batch) {
+  return ['farm', 'province', 'variety', 'harvest_date', 'weight_kg'].filter(field =>
+    field === 'weight_kg'
+      ? !Number.isFinite(Number(batch[field])) || Number(batch[field]) <= 0
+      : !String(batch[field] ?? '').trim())
+}
+
 export function filterCloudBatches(rows, query, language) {
   const term = query.trim().toLocaleLowerCase(language)
   return rows.filter(batch => [batch.code, batch.farm, batch.province].join(' ').toLocaleLowerCase(language).includes(term))

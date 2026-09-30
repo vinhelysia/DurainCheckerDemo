@@ -130,6 +130,11 @@ do $$ begin
   assert (select count(*) from storage.objects) = 0, 'Private files leaked';
 end $$;
 set local role authenticated;
+select set_config('request.jwt.claim.sub', '22222222-2222-4222-8222-222222222222', true);
+do $$ begin
+  assert (select count(*) from public.cloud_evidence) = 0, 'Other account private metadata leak';
+  assert (select count(*) from storage.objects) = 0, 'Other account private file leak';
+end $$;
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111111', true);
 update public.cloud_batches set is_public = true;
 select set_config('request.jwt.claim.sub', '22222222-2222-4222-8222-222222222222', true);
@@ -165,5 +170,11 @@ select set_config('request.jwt.claim.sub', '', true);
 do $$ begin
   assert (select count(*) from public.cloud_evidence) = 0, 'Revoked evidence metadata leaked';
   assert (select count(*) from storage.objects) = 0, 'Revoked file still visible';
+end $$;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '22222222-2222-4222-8222-222222222222', true);
+do $$ begin
+  assert (select count(*) from public.cloud_evidence) = 0, 'Revoked metadata visible to another account';
+  assert (select count(*) from storage.objects) = 0, 'Revoked file visible to another account';
 end $$;
 rollback;

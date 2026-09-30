@@ -38,7 +38,7 @@ export default function BatchEvidence({ batchId, records, more, onMore, onSaved,
     finally { setBusy(false) }
   }
 
-  return <section id="cloud-evidence" className="dashboard-card cloud-form cloud-evidence" aria-labelledby="evidence-title">
+  return <section id="cloud-evidence" tabIndex={-1} className="dashboard-card cloud-form cloud-evidence" aria-labelledby="evidence-title">
     <div className="cloud-evidence-heading"><div><p className="section-kicker">02 / {t('Bằng chứng', 'Evidence')}</p><h2 id="evidence-title">{t('Ảnh & tài liệu của lô', 'Batch photos & documents')}</h2></div><span>{records.length}{more ? '+' : ''} {t('tệp', 'files')}</span></div>
     <p className="cloud-muted">{t('Tệp do chủ hồ sơ cung cấp. Nguồn và ngày là thông tin khai báo; chưa được xác minh với đơn vị phát hành.', 'Files supplied by the record owner. Sources and dates are declared and have not been verified with the issuer.')}</p>
     {error && <p role="alert" className="lookup-notice">{error}</p>}

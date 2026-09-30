@@ -7,6 +7,25 @@ vi.mock('@supabase/supabase-js', () => ({
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.resetModules(); vi.clearAllMocks() })
 
+it('reads buyer records anonymously even while the owner is signed in, and does not cache visibility', async () => {
+  vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+  vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'public-test-key')
+  getSession.mockResolvedValue({ data: { session: { access_token: 'owner-token' } } })
+  const fetch = vi.fn().mockImplementation(() => Promise.resolve(new Response('{}', { status: 200 })))
+  vi.stubGlobal('fetch', fetch)
+  const { cloudRequest } = await import('./cloudClient')
+  for (const suffix of ['', '/events', '/evidence']) await cloudRequest(`/batches/test${suffix}`, {}, true)
+  expect(getSession).not.toHaveBeenCalled()
+  for (const [, options] of fetch.mock.calls) {
+    expect(options.headers.has('Authorization')).toBe(false)
+    expect(options.cache).toBe('no-store')
+  }
+  await cloudRequest('/batches/test', { method: 'PATCH', body: JSON.stringify({ is_public: false }) })
+  expect(fetch.mock.calls[3][1].headers.get('Authorization')).toBe('Bearer owner-token')
+  fetch.mockResolvedValueOnce(new Response(JSON.stringify({ error: 'Batch not found or private.' }), { status: 404 }))
+  await expect(cloudRequest('/batches/test', {}, true)).rejects.toThrow('Batch not found or private.')
+})
+
 it('gates Google login and uses the same-origin PKCE callback without additional scopes', async () => {
   vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
   vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'public-test-key')

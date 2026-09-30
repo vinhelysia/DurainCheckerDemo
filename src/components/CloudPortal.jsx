@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, Circle, ClipboardList, FileText, FileUp, Globe, LockKeyhole, Plus, QrCode, Sprout } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 import LanguageSwitch from './LanguageSwitch'
@@ -7,7 +7,7 @@ import { API_BASE_URL } from '../lib/api'
 import BatchQRLabel from './BatchQRLabel'
 import BatchEvidence from './BatchEvidence'
 import { exampleBatch } from '../data/recordExample'
-import { filterCloudBatches, formatDate } from '../data/batches'
+import { filterCloudBatches, formatDate, missingCloudBatchFields } from '../data/batches'
 
 function BatchFields({ batch = {}, t }) {
   return <>
@@ -123,7 +123,26 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [revision, setRevision] = useState(0)
+  const editForm = useRef(null)
   const path = `/batches/${encodeURIComponent(id)}`
+
+  useEffect(() => {
+    if (editing) editForm.current?.querySelector('input')?.focus()
+  }, [editing])
+
+  function openChecklistItem(target, done) {
+    if (target === 'cloud-overview' && !done) {
+      setEditing(true)
+      editForm.current?.querySelector('input')?.focus()
+      return
+    }
+    const section = document.getElementById(target)
+    const entry = section?.querySelector('details.cloud-disclosure')
+    if (!done && entry) entry.open = true
+    const focusTarget = !done && entry ? entry.querySelector('input, select') : section
+    focusTarget?.focus({ preventScroll: true })
+    focusTarget?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'center' })
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -218,10 +237,12 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
   }
 
   const shareUrl = `${window.location.origin}${import.meta.env.BASE_URL}#/cloud?batchId=${encodeURIComponent(id)}`
+  const missingFields = batch ? missingCloudBatchFields(batch) : []
+  const fieldNames = { farm: t('vườn / HTX', 'farm / cooperative'), province: t('tỉnh / vùng', 'region'), variety: t('giống', 'variety'), harvest_date: t('ngày thu hoạch', 'harvest date'), weight_kg: t('khối lượng', 'weight') }
   const checks = batch ? [
-    [Boolean(batch.variety && batch.weight_kg > 0), t('Thông tin lô và khối lượng', 'Batch details and weight')],
-    [evidence.length > 0, t('Bằng chứng đính kèm', 'Attached evidence')],
-    [events.length > 0, t('Mốc hành trình', 'Journey events')],
+    [!missingFields.length, t('Thông tin lô và khối lượng', 'Batch details and weight'), 'cloud-overview', missingFields.map(field => fieldNames[field]).join(', ')],
+    [evidence.length > 0, t('Bằng chứng đính kèm', 'Attached evidence'), 'cloud-evidence', t('Thêm ảnh hoặc tài liệu có nguồn và ngày.', 'Add a photo or document with its source and date.')],
+    [events.length > 0, t('Mốc hành trình', 'Journey events'), 'cloud-journey', t('Ghi nhận thu hoạch, đóng gói hoặc giao nhận.', 'Record harvesting, packing or delivery.')],
   ] : []
   return <div className={`cloud-detail${publicView ? ' cloud-buyer-record' : ''}`}>
     {error && <p className="lookup-notice" role="alert">{error}</p>}
@@ -236,7 +257,7 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
     {!loading && batch && <>
       <div className="cloud-record-layout">
         <div className="cloud-record-main">
-          <article id="cloud-overview" className="dashboard-card cloud-form cloud-overview">
+          <article id="cloud-overview" tabIndex={-1} className="dashboard-card cloud-form cloud-overview">
             <div className="cloud-record-heading">
               <div><p className="section-kicker">{t('Hồ sơ lô hàng', 'Batch record')}</p><h2>{batch.code}</h2><p className="cloud-record-farm">{batch.farm}</p></div>
               <span className={`cloud-status cloud-status--${example ? 'sample' : batch.is_public ? 'public' : 'private'}`}>
@@ -251,14 +272,14 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
             <p className="cloud-muted">{t('Thông tin hiện tại do chủ hồ sơ khai báo và có thể cập nhật. Chưa xác minh thực địa, phiếu lab hoặc quyền sở hữu hàng hóa.', 'Current details are declared by the owner and may be updated. Physical origin, lab documents and ownership of goods have not been verified.')}</p>
 
             {!publicView && <><button className="button button-secondary" disabled={busy} onClick={() => setEditing(!editing)}>{editing ? t('Hủy chỉnh sửa', 'Cancel editing') : t('Sửa thông tin lô', 'Edit batch details')}</button>
-              {editing && <form className="cloud-form" onSubmit={saveDetails}><BatchFields batch={batch} t={t} /><button className="button button-primary" disabled={busy}>{t('Lưu thông tin', 'Save details')}</button></form>}
+              {editing && <form ref={editForm} className="cloud-form" onSubmit={saveDetails}><BatchFields batch={batch} t={t} /><button className="button button-primary" disabled={busy}>{t('Lưu thông tin', 'Save details')}</button></form>}
             </>}
 
           </article>
           <div className="cloud-record-activity">
             <BatchEvidence batchId={id} records={evidence} more={moreEvidence} onMore={loadMoreEvidence} onSaved={() => { setNotice(t('Đã đính kèm bằng chứng.', 'Evidence attached.')); setRevision(v => v + 1) }} publicView={publicView} t={t} />
-            <div className="cloud-journey-block">
-              <section id="cloud-journey" className="dashboard-card cloud-form cloud-journey">
+            <div id="cloud-journey" tabIndex={-1} className="cloud-journey-block">
+              <section className="dashboard-card cloud-form cloud-journey">
                 <p className="section-kicker">03 / {t('Hành trình', 'Journey')}</p>
                 <h2>{t('Lịch sử ghi nhận', 'Recorded history')}</h2>
                 {!events.length && <p>{t('Chưa có mốc nào.', 'No events yet.')}</p>}
@@ -287,7 +308,15 @@ function BatchDetails({ id, publicView, t, language, example = false, onChange }
           </div>
         </div>
         <aside className="cloud-record-rail" aria-label={t('Tình trạng và chia sẻ hồ sơ', 'Record status and sharing')}>
-          <section className="dashboard-card cloud-checklist"><div className="cloud-checklist-heading"><h3>{t('Mức đầy đủ của hồ sơ', 'Record completeness')}</h3><span>{checks.filter(([done]) => done).length}/3 {t('mục đã có', 'items present')}</span></div><ul>{checks.map(([done, label]) => <li key={label} className={done ? 'is-complete' : ''}>{done ? <Check size={18} aria-hidden="true" /> : <Circle size={18} aria-hidden="true" />}<span>{label}</span><small>{done ? t('Đã có', 'Present') : t('Còn thiếu', 'Missing')}</small></li>)}</ul><p>{t('Chỉ kiểm tra có thông tin; không đánh giá độ thật, chất lượng hoặc điều kiện xuất khẩu.', 'Checks presence only, not authenticity, quality or export eligibility.')}</p></section>
+          <section className="dashboard-card cloud-checklist">
+            <div className="cloud-checklist-heading"><h3>{t('Mức đầy đủ của hồ sơ', 'Record completeness')}</h3><span role="status">{checks.filter(([done]) => done).length}/3 {t('mục đã có', 'items present')}</span></div>
+            <ul>{checks.map(([done, label, target, hint]) => <li key={target} className={done ? 'is-complete' : ''}>
+              {done ? <Check size={18} aria-hidden="true" /> : <Circle size={18} aria-hidden="true" />}<span>{label}</span>
+              <small>{done ? t('Đã có', 'Present') : `${t('Còn thiếu', 'Missing')}: ${hint}`}</small>
+              {!publicView && <button type="button" className="cloud-checklist-action" disabled={busy} onClick={() => openChecklistItem(target, done)} aria-label={`${done ? t('Xem', 'View') : t('Bổ sung', 'Add')}: ${label}`}>{done ? t('Xem', 'View') : t('Bổ sung', 'Add')}<ArrowRight size={14} aria-hidden="true" /></button>}
+            </li>)}</ul>
+            <p>{t('Đủ 3 mục chỉ có nghĩa đã có thông tin, tài liệu và lịch sử; không xác nhận tài liệu là thật hoặc lô đạt chuẩn xuất khẩu.', 'All 3 items only mean details, evidence and history are present; this does not authenticate documents or certify export eligibility.')}</p>
+          </section>
           {publicView && <details className="buyer-evidence-guide">
             <summary>{t('Hiểu nguồn dữ liệu & giới hạn', 'Data sources & limitations')}</summary>
             <ul>
